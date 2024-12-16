@@ -1,0 +1,7 @@
+mutation applyCoupon($code: String!) {
+  applyCoupon(input: { code: $code }) {
+    cart {
+      ...CartData
+    }
+  }
+}

@@ -1,0 +1,74 @@
+fragment ProductContentFullWithGroup on Product {
+  ...ProductContentFull
+  ... on GroupProduct {
+    databaseId
+    name
+    date
+    featured
+    onSale
+    price
+    # rawPrice: price(format: RAW)
+    regularPrice
+    salePrice
+    productTechnical
+    productInstructions
+    uri
+    galleryImages(first: 100) {
+      nodes {
+        databaseId
+        sourceUrl(size: LARGE)
+        sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+        altText
+      }
+    }
+    productTags(first: 100) {
+      nodes {
+        slug
+        name
+      }
+    }
+    productCategories {
+      nodes {
+        ...ProductCategoryFields
+      }
+    }
+    brands(first: 100) {
+      nodes {
+        name
+        slug
+        parentId
+        thumbnail
+      }
+    }
+    attributes(first: 100) {
+      nodes {
+        attributeId
+        ... on LocalProductAttribute {
+          label
+          name
+          options
+          variation
+        }
+        ... on GlobalProductAttribute {
+          label
+          name
+          options
+          variation
+          slug
+        }
+        scope
+        fullOptions {
+          name
+          slug
+          hk_swatch_colour
+          hk_swatch_colour_2
+        }
+      }
+    }
+    products {
+      nodes {
+        ...ProductContentFull
+      }
+    }
+  }
+}

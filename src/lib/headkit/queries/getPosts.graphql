@@ -1,0 +1,54 @@
+query getPosts (
+  $where: RootQueryToPostConnectionWhereArgs
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+){
+  posts (
+    first: $first
+    last: $last
+    after: $after
+    before: $before
+    where: $where
+  ){
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      endCursor
+      startCursor
+    }
+    nodes {
+      databaseId
+      id
+      excerpt
+      date
+      link
+      uri
+      slug
+      status
+      title
+      featuredImage {
+        node {
+          id
+          sourceUrl
+      		sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+        }
+      }
+      categories {
+        nodes {
+          name
+          databaseId
+          slug
+          uri
+        }
+      }
+      tags {
+        nodes {
+          slug
+          name
+        }
+      }
+    }
+  }
+}

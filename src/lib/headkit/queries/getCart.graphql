@@ -1,0 +1,5 @@
+query getCart {
+  cart(recalculateTotals: true) {
+    ...CartData
+  }
+}

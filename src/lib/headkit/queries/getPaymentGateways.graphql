@@ -1,0 +1,10 @@
+query getPaymentGateways {
+  paymentGateways {
+    nodes {
+      id
+      title
+      icon
+      description
+    }
+  }
+}

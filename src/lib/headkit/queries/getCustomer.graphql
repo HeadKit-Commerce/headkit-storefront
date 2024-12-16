@@ -1,0 +1,27 @@
+query getCustomer(
+  $withAddress: Boolean! = true
+  $withOrders: Boolean! = false
+  $withWishlists: Boolean! = false
+) {
+  customer {
+    id
+    databaseId
+    sessionToken
+    username
+    firstName
+    lastName
+    email
+    shipping @include(if: $withAddress) {
+      ...CustomerAddress
+    }
+    billing @include(if: $withAddress) {
+      ...CustomerAddress
+    }
+    orders @include(if: $withOrders) {
+      nodes {
+        ...CustomerOrder
+      }
+    }
+    wishlists @include(if: $withWishlists)
+  }
+}

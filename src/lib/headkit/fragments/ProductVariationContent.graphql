@@ -1,0 +1,31 @@
+fragment ProductVariationContent on ProductVariation {
+  databaseId
+  name
+  description
+  price
+  rawPrice: price(format: RAW)
+  regularPrice
+  salePrice
+  date
+  featured
+  onSale
+  stockQuantity
+  stockStatus
+  attributes(first: 1000) {
+    nodes {
+      name
+      label
+      value
+    }
+  }
+  image {
+    databaseId
+    sourceUrl(size: LARGE)
+    sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+    altText
+  }
+  metaData(keysIn: "_wc_additional_variation_images") {
+    key
+    value
+  }
+}

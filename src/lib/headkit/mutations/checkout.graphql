@@ -1,0 +1,19 @@
+mutation checkout($input: CheckoutInput!) {
+  checkout(input: $input) {
+    clientMutationId
+    order {
+      id
+      databaseId
+      orderKey
+      orderNumber
+      status
+      refunds {
+        nodes {
+          amount
+        }
+      }
+    }
+    result
+    redirect
+  }
+}

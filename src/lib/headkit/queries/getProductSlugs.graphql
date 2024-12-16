@@ -1,0 +1,16 @@
+query getProductSlugs($after: String) {
+  products(where: { status: "publish" }, first: 1000, after: $after) {
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+    nodes {
+      ... on SimpleProduct {
+        uri
+      }
+      ... on VariableProduct {
+        uri
+      }
+    }
+  }
+}

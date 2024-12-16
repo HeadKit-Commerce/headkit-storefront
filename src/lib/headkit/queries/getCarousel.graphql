@@ -1,0 +1,16 @@
+query getCarousel($where: RootQueryToCarouselConnectionWhereArgs) {
+  carousels(where: $where) {
+    nodes {
+      id
+      header
+      description
+      url
+      buttonText
+      startDate
+      endDate
+      image
+      mobileImage
+      textColor
+    }
+  }
+}

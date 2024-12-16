@@ -1,0 +1,125 @@
+fragment ProductContentFull on Product {
+  databaseId
+  sku
+  slug
+  name
+  type
+  description
+  shortDescription(format: RAW)
+  dateOnSaleTo
+  dateOnSaleFrom
+  image {
+    databaseId
+    sourceUrl(size: LARGE)
+    sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+    altText
+  }
+  metaData(key: "_gift_card") {
+    key
+    id
+    value
+  }
+  ...SimpleProductContent
+  ...VariableProductContent
+  ...ExternalProductContent
+}
+
+
+fragment ProductVariationContent on ProductVariation {
+  databaseId
+  name
+  description
+  price
+  rawPrice: price(format: RAW)
+  regularPrice
+  salePrice
+  date
+  featured
+  onSale
+  stockQuantity
+  stockStatus
+  attributes(first: 1000) {
+    nodes {
+      name
+      label
+      value
+    }
+  }
+  image {
+    databaseId
+    sourceUrl(size: LARGE)
+    sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+    altText
+  }
+  metaData(keysIn: "_wc_additional_variation_images") {
+    key
+    value
+  }
+}
+
+fragment ExternalProductContent on ExternalProduct {
+  databaseId
+  name
+  date
+  featured
+  onSale
+  price
+  rawPrice: price(format: RAW)
+  regularPrice
+  salePrice
+  productTechnical
+  productInstructions
+  uri
+  galleryImages(first: 100) {
+    nodes {
+      databaseId
+      sourceUrl(size: LARGE)
+      sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+      altText
+    }
+  }
+  productTags(first: 100) {
+    nodes {
+      slug
+      name
+    }
+  }
+  productCategories {
+    nodes {
+      ...ProductCategoryFields
+    }
+  }
+  brands(first: 100) {
+    nodes {
+      name
+      slug
+      parentId
+      thumbnail
+    }
+  }
+  attributes(first: 100) {
+    nodes {
+      attributeId
+      ... on LocalProductAttribute {
+        label
+        name
+        options
+        variation
+      }
+      ... on GlobalProductAttribute {
+        label
+        name
+        options
+        variation
+        slug
+      }
+      scope
+      fullOptions {
+        name
+        slug
+        hk_swatch_colour
+        hk_swatch_colour_2
+      }
+    }
+  }
+}

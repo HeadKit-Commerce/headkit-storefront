@@ -1,0 +1,177 @@
+fragment CartData on Cart {
+  availableShippingMethods {
+    packageDetails
+    supportsShippingCalculator
+    rates {
+      id
+      methodId
+      instanceId
+      label
+      cost
+      tax
+    }
+  }
+  chosenShippingMethods
+  contents {
+    nodes {
+      ...CartItem
+    }
+  }
+  appliedCoupons {
+    code
+    discountAmount
+    discountTax
+  }
+  appliedGiftCards {
+    id
+    code
+    amount
+  }
+  fees {
+    id
+    name
+    amount
+    taxClass
+    taxable
+    total
+  }
+  contentsTotal
+  contentsTax
+  subtotal
+  subtotalTax
+  shippingTax
+  shippingTotal
+  total
+  totalTax
+  feeTax
+  feeTotal
+  discountTax
+  discountTotal
+  needsShippingAddress
+  displayPricesIncludeTax
+}
+
+fragment CartItem on CartItem {
+  key
+  __typename
+  product {
+    node {
+      id
+      databaseId
+      name
+      uri
+      __typename
+      type
+      onSale
+      slug
+      reviewCount
+      brands(first: 100) {
+        nodes {
+          name
+        }
+      }
+      image {
+        id
+        sourceUrl
+        altText
+        title
+      }
+      shippingClasses {
+        nodes {
+          id
+          name
+        }
+      }
+      upsell {
+        nodes {
+          ...ProductShortContent
+        }
+      }
+      ... on SimpleProduct {
+        id
+        stockStatus
+        stockQuantity
+        price
+        regularPrice
+        salePrice
+        productCategories {
+          nodes {
+            name
+          }
+        }
+        galleryImages {
+          nodes {
+            id
+            sourceUrl
+            altText
+            title
+          }
+        }
+      }
+      ... on VariableProduct {
+        id
+        stockStatus
+        stockQuantity
+        productCategories {
+          nodes {
+            name
+          }
+        }
+        galleryImages {
+          nodes {
+            id
+            sourceUrl
+            altText
+            title
+          }
+        }
+      }
+      ... on ExternalProduct {
+        id
+        productCategories {
+          nodes {
+            name
+          }
+        }
+        galleryImages {
+          nodes {
+            id
+            sourceUrl
+            altText
+            title
+          }
+        }
+      }
+    }
+  }
+  variation {
+    node {
+      id
+      variationId: databaseId
+      status
+      stockStatus
+      stockQuantity
+      name
+      type
+      onSale
+      price
+      regularPrice
+      salePrice
+      image {
+        id
+        sourceUrl
+        altText
+        title
+      }
+    }
+    attributes {
+      id
+      name
+      value
+    }
+  }
+  quantity
+  total
+  subtotal
+  subtotalTax
+}

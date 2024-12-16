@@ -1,0 +1,27 @@
+query getFAQs (
+  $where: RootQueryToFaqConnectionWhereArgs
+  $first: Int
+  $last: Int
+  $after: String
+  $before: String
+){
+  faqs (
+    first: $first
+    last: $last
+    after: $after
+    before: $before
+    where: $where
+  ){
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      endCursor
+      startCursor
+    }
+    nodes {
+      id
+      question
+      answer
+    }
+  }
+}

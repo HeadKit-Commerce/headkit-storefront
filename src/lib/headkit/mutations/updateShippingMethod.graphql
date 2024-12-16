@@ -1,0 +1,7 @@
+mutation updateShippingMethod($shippingMethod: String!) {
+  updateShippingMethod(input: { shippingMethods: [$shippingMethod] }) {
+    cart {
+      ...CartData
+    }
+  }
+}

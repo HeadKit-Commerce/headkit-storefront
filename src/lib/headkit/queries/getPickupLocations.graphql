@@ -1,0 +1,17 @@
+query getPickupLocations {
+  pickupLocations {
+    nodes {
+      address
+      city
+      country
+      countryCode
+      details
+      enabled
+      name
+      postcode
+      shippingMethodId
+      state
+      stateCode
+    }
+  }
+}

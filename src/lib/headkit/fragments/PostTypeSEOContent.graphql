@@ -1,0 +1,28 @@
+fragment PostTypeSEOContent on PostTypeSEO {
+    title
+    breadcrumbs {
+        text
+        url
+    }
+    canonical
+    metaDesc
+    metaKeywords
+    metaRobotsNofollow
+    metaRobotsNoindex
+    opengraphDescription
+    opengraphImage {
+        sourceUrl
+        altText
+    }
+    opengraphModifiedTime
+    opengraphPublishedTime
+    opengraphSiteName
+    opengraphTitle
+    opengraphUrl
+    twitterDescription
+    twitterTitle
+    twitterImage {
+        sourceUrl
+        altText
+    }
+}

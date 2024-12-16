@@ -1,0 +1,10 @@
+fragment MenuItem on MenuItem {
+  __typename
+  id
+  title
+  label
+  description
+  uri
+  target
+  parentId
+}

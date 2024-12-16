@@ -1,0 +1,144 @@
+fragment SimpleProductContent on SimpleProduct {
+  date
+  databaseId
+  name
+  featured # Optional, depends on use case
+  onSale
+  price
+  rawPrice: price(format: RAW)
+  regularPrice
+  salePrice
+  stockStatus
+  stockQuantity
+  soldIndividually
+  productTechnical
+  productInstructions
+  uri
+  galleryImages(first: 100) {
+    nodes {
+      databaseId
+      sourceUrl(size: LARGE)
+      sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+      altText
+    }
+  }
+  productTags(first: 100) {
+    nodes {
+      slug
+      name
+    }
+  }
+  productCategories {
+    nodes {
+      ...ProductCategoryFields
+    }
+  }
+  brands(first: 100) {
+    nodes {
+      name
+      slug
+      parentId
+      thumbnail
+    }
+  }
+  attributes(first: 100) {
+    nodes {
+      attributeId
+      ... on LocalProductAttribute {
+        label
+        name
+        options
+        variation
+      }
+      ... on GlobalProductAttribute {
+        label
+        name
+        options
+        variation
+        slug
+      }
+      scope
+      fullOptions {
+        name
+        slug
+        hk_swatch_colour
+        hk_swatch_colour_2
+      }
+    }
+  }
+}
+
+fragment VariableProductContent on VariableProduct {
+  databaseId
+  name
+  date
+  featured # Optional, depends on use case
+  onSale
+  price
+  rawPrice: price(format: RAW)
+  regularPrice
+  salePrice
+  stockStatus
+  stockQuantity
+  soldIndividually
+  productTechnical
+  productInstructions
+  uri
+  galleryImages(first: 100) {
+    nodes {
+      databaseId
+      sourceUrl(size: LARGE)
+      sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+      altText
+    }
+  }
+  productTags(first: 100) {
+    nodes {
+      slug
+      name
+    }
+  }
+  productCategories {
+    nodes {
+      ...ProductCategoryFields
+    }
+  }
+  brands(first: 100) {
+    nodes {
+      name
+      slug
+      parentId
+      thumbnail
+    }
+  }
+  attributes(first: 100) {
+    nodes {
+      attributeId
+      ... on LocalProductAttribute {
+        label
+        name
+        options
+        variation
+      }
+      ... on GlobalProductAttribute {
+        label
+        name
+        options
+        variation
+        slug
+      }
+      scope
+      fullOptions {
+        name
+        slug
+        hk_swatch_colour
+        hk_swatch_colour_2
+      }
+    }
+  }
+  variations(first: 1000) {
+    nodes {
+      ...ProductVariationContent
+    }
+  }
+}

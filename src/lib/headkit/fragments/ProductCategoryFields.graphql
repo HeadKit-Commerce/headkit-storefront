@@ -1,0 +1,10 @@
+fragment ProductCategoryFields on ProductCategory {
+ slug
+  name
+  description
+  uri
+  featured
+  thumbnail
+  databaseId
+  parentDatabaseId
+}

@@ -1,0 +1,132 @@
+fragment CustomerContent on Customer {
+  id
+  sessionToken
+  databaseId
+  sessionToken
+  firstName
+  lastName
+  email
+  shipping {
+    ...CustomerAddress
+  }
+  billing {
+    ...CustomerAddress
+  }
+}
+
+fragment CustomerAddress on CustomerAddress {
+  firstName
+  lastName
+  email
+  phone
+  address1
+  address2
+  company
+  city
+  state
+  country
+  postcode
+}
+
+fragment CustomerOrder on Order {
+  databaseId
+  currency
+  lineItems {
+    nodes {
+      databaseId
+      productId
+      variationId
+      orderId
+      metaData {
+        id
+        key
+        value
+      }
+      quantity
+      subtotalTax
+      subtotal
+      totalTax
+      total
+      product {
+        node {
+          title
+          databaseId
+          name
+          image {
+            id
+            sourceUrl
+            altText
+          }
+        }
+      }
+      variation {
+        node {
+          id
+          databaseId
+          name
+          image {
+            id
+            sourceUrl
+            altText
+          }
+        }
+      }
+    }
+  }
+  billing {
+    ...CustomerAddress
+  }
+  shipping {
+    ...CustomerAddress
+  }
+  hasShippingAddress
+  needsShippingAddress
+  needsPayment
+  needsProcessing
+  couponLines {
+    nodes {
+      ...CouponLine
+    }
+  }
+  subtotal
+  cartTax
+  shippingTotal
+  shippingTax
+  totalTax
+  total
+  discountTotal
+  discountTax
+  date
+  pricesIncludeTax
+  shippingLines {
+    nodes {
+      databaseId
+      methodTitle
+      shippingMethod {
+        id
+        databaseId
+        title
+        description
+      }
+      taxes {
+        amount
+        subtotal
+        total
+      }
+      total
+      totalTax
+    }
+  }
+  metaData {
+    key
+    value
+  }
+}
+
+fragment CouponLine on CouponLine {
+  id
+  databaseId
+  code
+  discount
+  discountTax
+}

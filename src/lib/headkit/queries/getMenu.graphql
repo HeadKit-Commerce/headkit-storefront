@@ -1,0 +1,14 @@
+query getMenu {
+  menus(first: 10000) {
+    nodes {
+      name
+      slug
+      locations
+      menuItems(first: 10000) {
+        nodes {
+          ...MenuItem
+        }
+      }
+    }
+  }
+}

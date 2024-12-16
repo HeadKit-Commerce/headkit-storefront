@@ -1,0 +1,6 @@
+query getStripeConfig {
+  stripeConfig {
+    publishableKey
+    accountId
+  }
+}

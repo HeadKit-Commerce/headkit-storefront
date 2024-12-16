@@ -1,0 +1,13 @@
+query getProductCategories (
+  $first: Int
+  $where: RootQueryToProductCategoryConnectionWhereArgs
+){
+  productCategories (
+    first: $first
+    where: $where
+  ){
+    nodes {
+      ...ProductCategoryFields
+    }
+  }
+}

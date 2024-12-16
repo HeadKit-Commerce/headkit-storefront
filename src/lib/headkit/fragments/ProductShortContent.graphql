@@ -1,0 +1,14 @@
+fragment ProductShortContent on Product {
+  slug
+  databaseId
+  name
+  uri
+  type
+  image {
+    databaseId
+    sourceUrl(size: MEDIUM_LARGE)
+    altText
+  }
+  ...SimpleProductContent
+  ...VariableProductContent
+}

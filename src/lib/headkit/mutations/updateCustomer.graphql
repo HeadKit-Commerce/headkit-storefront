@@ -1,0 +1,10 @@
+mutation updateCustomer($input: UpdateCustomerInput!, $withCustomer: Boolean! = true, $withCart: Boolean! = false) {
+    updateCustomer(input: $input) {
+      customer @include(if: $withCustomer) {
+        ...CustomerContent
+      }
+      cart @include(if: $withCart) {
+        ...CartData
+      }
+    }
+}

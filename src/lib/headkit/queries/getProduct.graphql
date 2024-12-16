@@ -1,0 +1,8 @@
+query getProduct($id: ID!, $type: ProductIdTypeEnum) {
+  product(id: $id, idType: $type) {
+    ...ProductContentFullWithGroup
+    seo {
+      ...PostTypeSEOContent
+    }
+  }
+}

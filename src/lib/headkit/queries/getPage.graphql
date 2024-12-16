@@ -1,0 +1,70 @@
+query getPage($id: ID!, $type: PageIdType) {
+  page(id: $id, idType: $type) {
+    databaseId
+    id
+    content
+    date
+    uri
+    slug
+    status
+    title
+    featuredImage {
+      node {
+        id
+        sourceUrl
+        sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+      }
+    }
+    editorBlocks(flat: true) {
+      __typename
+      clientId
+      parentClientId
+      cssClassNames
+      ... on CoreHeading {
+        attributes {
+          content
+        }
+      }
+      ... on CoreParagraph {
+        attributes {
+          content
+        }
+      }
+      ... on CoreButton {
+        attributes {
+          linkTarget
+          linkClassName
+          url
+          text
+        }
+      }
+      ... on WoocommerceHandpickedProducts {
+        attributes {
+          products
+        }
+        products {
+          nodes {
+            ...ProductShortContent
+          }
+        }
+      }
+      ... on WoocommerceProductOnSale {
+        products {
+          nodes {
+            ...ProductShortContent
+          }
+        }
+      }
+      ... on WoocommerceProductNew {
+        products {
+          nodes {
+            ...ProductShortContent
+          }
+        }
+      }
+    }
+    seo {
+      ...PostTypeSEOContent
+    }
+  }
+}

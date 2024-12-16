@@ -1,0 +1,109 @@
+query getOrder($orderId: ID!) {
+  order(id: $orderId, idType: DATABASE_ID) {
+    orderNumber
+    currency
+    paymentMethod
+    paymentMethodTitle
+    needsPayment
+    subtotal
+    cartTax
+    totalTax
+    total
+    discountTotal
+    discountTax
+    datePaid
+    metaData {
+      id
+      key
+      value
+    }
+    createdVia
+    date
+    status
+    shipping {
+      firstName
+      lastName
+      email
+      address1
+      address2
+      city
+      state
+      postcode
+      country
+    }
+    billing {
+      firstName
+      lastName
+      email
+      address1
+      address2
+      city
+      state
+      postcode
+      country
+    }
+    lineItems {
+      nodes {
+        subtotal
+        subtotalTax
+        total
+        totalTax
+        quantity
+        variation {
+          node {
+            attributes {
+              nodes {
+                id
+                label
+                name
+                value
+              }
+            }
+            name
+            type
+          }
+        }
+        product {
+          node {
+            title
+            id
+            productId: databaseId
+            name
+            type
+            onSale
+            slug
+            image {
+              id
+              sourceUrl
+              altText
+            }
+            type
+          }
+        }
+      }
+    }
+    shippingLines {
+      nodes {
+        databaseId
+        methodTitle
+        shippingMethod {
+          id
+          databaseId
+          title
+          description
+        }
+        taxes {
+          amount
+          subtotal
+          total
+        }
+        total
+        totalTax
+      }
+    }
+    shippingTax
+    shippingTotal
+    needsShippingAddress
+    pricesIncludeTax
+  }
+}

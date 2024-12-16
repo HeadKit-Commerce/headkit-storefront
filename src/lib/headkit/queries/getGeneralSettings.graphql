@@ -1,0 +1,13 @@
+query getGeneralSettings {
+  generalSettings {
+    title
+    description
+    url
+    language
+    startOfWeek
+    timeFormat
+    timezone
+    dateFormat
+    currency
+  }
+}
