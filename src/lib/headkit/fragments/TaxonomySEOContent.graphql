@@ -1,0 +1,33 @@
+fragment TaxonomySEOContent on TaxonomySEO {
+    title
+    breadcrumbs {
+        text
+        url
+    }
+    canonical
+    cornerstone
+    focuskw
+    metaDesc
+    metaKeywords
+    metaRobotsNofollow
+    metaRobotsNoindex
+    opengraphAuthor
+    opengraphDescription
+    opengraphImage {
+        sourceUrl
+        altText
+    }
+    opengraphModifiedTime
+    opengraphPublishedTime
+    opengraphPublisher
+    opengraphSiteName
+    opengraphTitle
+    opengraphType
+    opengraphUrl
+    twitterDescription
+    twitterTitle
+    twitterImage {
+        sourceUrl
+        altText
+    }
+}

@@ -1,0 +1,74 @@
+query getProductList(
+  $where: RootQueryToProductUnionConnectionWhereArgs
+  $first: Int
+) {
+  products(first: $first, where: $where) {
+    found
+    nodes {
+      type
+      databaseId
+      slug
+      name
+      image {
+        sourceUrl
+        altText
+      }
+      ... on SimpleProduct {
+        price
+        regularPrice
+        onSale
+        salePrice
+        uri
+        date
+      }
+      ... on VariableProduct {
+        price
+        regularPrice
+        onSale
+        salePrice
+        uri
+        date
+        variations {
+          nodes {
+            image {
+              sourceUrl
+              altText
+            }
+            attributes(first: 100) {
+              nodes {
+                name
+                label
+                value
+              }
+            }
+          }
+        }
+        attributes(first: 100) {
+          nodes {
+            attributeId
+            ... on LocalProductAttribute {
+              label
+              name
+              options
+              variation
+            }
+            ... on GlobalProductAttribute {
+              label
+              name
+              options
+              variation
+              slug
+            }
+            scope
+            fullOptions {
+              name
+              slug
+              hk_swatch_colour
+              hk_swatch_colour_2
+            }
+          }
+        }
+      }
+    }
+  }
+}

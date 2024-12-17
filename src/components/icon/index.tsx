@@ -4,6 +4,7 @@ import { LoadingSvg } from "./svg/loading-svg";
 import {
   HiArrowSmallDown,
   HiArrowSmallRight,
+  HiOutlineCheck,
   HiOutlineMinus,
   HiOutlinePlus,
   HiOutlineShoppingBag,
@@ -48,6 +49,7 @@ const Icon = {
   minus: (props: IconProps) => <HiOutlineMinus {...props} />,
   plus: (props: IconProps) => <HiOutlinePlus {...props} />,
   close: (props: IconProps) => <HiOutlineXMark {...props} />,
+  check: (props: IconProps) => <HiOutlineCheck {...props} />,
 };
 
 type IconType = keyof typeof Icon;

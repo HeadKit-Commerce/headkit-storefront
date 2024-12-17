@@ -1,0 +1,18 @@
+query getProductCategory($id: ID!, $type: ProductCategoryIdType) {
+  productCategory(id: $id, idType: $type) {
+    ...ProductCategoryFields
+    ancestors {
+      nodes {
+        ...ProductCategoryFields
+      }
+    }
+    children {
+      nodes {
+        ...ProductCategoryFields
+      }
+    }
+    seo {
+      ...TaxonomySEOContent
+    }
+  }
+}

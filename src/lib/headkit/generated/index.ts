@@ -43325,6 +43325,8 @@ export type SimpleProductContentFragment = { __typename?: 'SimpleProduct', date?
 
 export type VariableProductContentFragment = { __typename?: 'VariableProduct', databaseId: number, name?: string | null, date?: string | null, featured?: boolean | null, onSale?: boolean | null, price?: string | null, regularPrice?: string | null, salePrice?: string | null, stockStatus?: StockStatusEnum | null, stockQuantity?: number | null, soldIndividually?: boolean | null, productTechnical?: string | null, productInstructions?: string | null, uri?: string | null, rawPrice?: string | null, galleryImages?: { __typename?: 'ProductToMediaItemConnection', nodes: Array<{ __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null, sourceUrlMobile?: string | null }> } | null, productTags?: { __typename?: 'ProductToProductTagConnection', nodes: Array<{ __typename?: 'ProductTag', slug?: string | null, name?: string | null }> } | null, productCategories?: { __typename?: 'ProductToProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null, brands?: { __typename?: 'ProductToBrandConnection', nodes: Array<{ __typename?: 'Brand', name?: string | null, slug?: string | null, parentId?: string | null, thumbnail?: string | null }> } | null, attributes?: { __typename?: 'ProductToProductAttributeConnection', nodes: Array<{ __typename?: 'GlobalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, slug?: string | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null } | { __typename?: 'LocalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null }> } | null, variations?: { __typename?: 'ProductWithVariationsToProductVariationConnection', nodes: Array<{ __typename?: 'SimpleProductVariation', databaseId: number, name?: string | null, description?: string | null, price?: string | null, regularPrice?: string | null, salePrice?: string | null, date?: string | null, featured?: boolean | null, onSale?: boolean | null, stockQuantity?: number | null, stockStatus?: StockStatusEnum | null, rawPrice?: string | null, attributes?: { __typename?: 'ProductVariationToVariationAttributeConnection', nodes: Array<{ __typename?: 'VariationAttribute', name?: string | null, label?: string | null, value?: string | null }> } | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null, sourceUrlMobile?: string | null } | null, metaData?: Array<{ __typename?: 'MetaData', key: string, value?: string | null } | null> | null }> } | null };
 
+export type TaxonomySeoContentFragment = { __typename?: 'TaxonomySEO', title?: string | null, canonical?: string | null, cornerstone?: boolean | null, focuskw?: string | null, metaDesc?: string | null, metaKeywords?: string | null, metaRobotsNofollow?: string | null, metaRobotsNoindex?: string | null, opengraphAuthor?: string | null, opengraphDescription?: string | null, opengraphModifiedTime?: string | null, opengraphPublishedTime?: string | null, opengraphPublisher?: string | null, opengraphSiteName?: string | null, opengraphTitle?: string | null, opengraphType?: string | null, opengraphUrl?: string | null, twitterDescription?: string | null, twitterTitle?: string | null, breadcrumbs?: Array<{ __typename?: 'SEOPostTypeBreadcrumbs', text?: string | null, url?: string | null } | null> | null, opengraphImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null, twitterImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null };
+
 export type AddToCartMutationVariables = Exact<{
   input: AddToCartInput;
 }>;
@@ -43506,6 +43508,37 @@ export type GetProductCategoriesQueryVariables = Exact<{
 
 
 export type GetProductCategoriesQuery = { __typename?: 'Query', productCategories?: { __typename?: 'RootQueryToProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null };
+
+export type GetProductCategoryQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+  type?: InputMaybe<ProductCategoryIdType>;
+}>;
+
+
+export type GetProductCategoryQuery = { __typename?: 'Query', productCategory?: { __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null, ancestors?: { __typename?: 'ProductCategoryToAncestorsProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null, children?: { __typename?: 'ProductCategoryToProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null, seo?: { __typename?: 'TaxonomySEO', title?: string | null, canonical?: string | null, cornerstone?: boolean | null, focuskw?: string | null, metaDesc?: string | null, metaKeywords?: string | null, metaRobotsNofollow?: string | null, metaRobotsNoindex?: string | null, opengraphAuthor?: string | null, opengraphDescription?: string | null, opengraphModifiedTime?: string | null, opengraphPublishedTime?: string | null, opengraphPublisher?: string | null, opengraphSiteName?: string | null, opengraphTitle?: string | null, opengraphType?: string | null, opengraphUrl?: string | null, twitterDescription?: string | null, twitterTitle?: string | null, breadcrumbs?: Array<{ __typename?: 'SEOPostTypeBreadcrumbs', text?: string | null, url?: string | null } | null> | null, opengraphImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null, twitterImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | null } | null };
+
+export type GetProductFiltersQueryVariables = Exact<{
+  mainCategory?: InputMaybe<Scalars['String']['input']>;
+  subCategories?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  instock?: InputMaybe<Scalars['Boolean']['input']>;
+  lowestPrice?: InputMaybe<Scalars['Float']['input']>;
+  highestPrice?: InputMaybe<Scalars['Float']['input']>;
+  attributes?: InputMaybe<Array<InputMaybe<AttributeFilterInput>> | InputMaybe<AttributeFilterInput>>;
+  brands?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>> | InputMaybe<Scalars['String']['input']>>;
+  onSale?: InputMaybe<Scalars['Boolean']['input']>;
+  dateQuery?: InputMaybe<ProductDateQueryInput>;
+}>;
+
+
+export type GetProductFiltersQuery = { __typename?: 'Query', productFilters?: { __typename?: 'ProductFilter', categories?: Array<{ __typename?: 'ProductFilterChoice', count?: number | null, id?: string | null, name?: string | null, slug?: string | null } | null> | null, brands?: Array<{ __typename?: 'ProductFilterChoice', count?: number | null, id?: string | null, name?: string | null, slug?: string | null } | null> | null, attributes?: Array<{ __typename?: 'ProductFilterAttribute', label?: string | null, name?: string | null, slug?: string | null, choices?: Array<{ __typename?: 'ProductFilterChoice', count?: number | null, id?: string | null, name?: string | null, slug?: string | null, options?: Array<string | null> | null } | null> | null } | null> | null, price?: { __typename?: 'ProductFilterPriceRange', highest?: number | null, lowest?: number | null } | null } | null };
+
+export type GetProductListQueryVariables = Exact<{
+  where?: InputMaybe<RootQueryToProductUnionConnectionWhereArgs>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetProductListQuery = { __typename?: 'Query', products?: { __typename?: 'RootQueryToProductUnionConnection', found?: number | null, nodes: Array<{ __typename?: 'ExternalProduct', type?: ProductTypesEnum | null, databaseId: number, slug?: string | null, name?: string | null, image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'GroupProduct', type?: ProductTypesEnum | null, databaseId: number, slug?: string | null, name?: string | null, image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'SimpleProduct', price?: string | null, regularPrice?: string | null, onSale?: boolean | null, salePrice?: string | null, uri?: string | null, date?: string | null, type?: ProductTypesEnum | null, databaseId: number, slug?: string | null, name?: string | null, image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'SimpleProductVariation', type?: ProductTypesEnum | null, databaseId: number, slug?: string | null, name?: string | null, image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'VariableProduct', price?: string | null, regularPrice?: string | null, onSale?: boolean | null, salePrice?: string | null, uri?: string | null, date?: string | null, type?: ProductTypesEnum | null, databaseId: number, slug?: string | null, name?: string | null, variations?: { __typename?: 'ProductWithVariationsToProductVariationConnection', nodes: Array<{ __typename?: 'SimpleProductVariation', image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null, attributes?: { __typename?: 'ProductVariationToVariationAttributeConnection', nodes: Array<{ __typename?: 'VariationAttribute', name?: string | null, label?: string | null, value?: string | null }> } | null }> } | null, attributes?: { __typename?: 'ProductToProductAttributeConnection', nodes: Array<{ __typename?: 'GlobalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, slug?: string | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null } | { __typename?: 'LocalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null }> } | null, image?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null }> } | null };
 
 export type GetProductSlugsQueryVariables = Exact<{
   after?: InputMaybe<Scalars['String']['input']>;
@@ -44273,6 +44306,41 @@ export const ProductContentFullWithGroupFragmentDoc = gql`
 }
     ${ProductContentFullFragmentDoc}
 ${ProductCategoryFieldsFragmentDoc}`;
+export const TaxonomySeoContentFragmentDoc = gql`
+    fragment TaxonomySEOContent on TaxonomySEO {
+  title
+  breadcrumbs {
+    text
+    url
+  }
+  canonical
+  cornerstone
+  focuskw
+  metaDesc
+  metaKeywords
+  metaRobotsNofollow
+  metaRobotsNoindex
+  opengraphAuthor
+  opengraphDescription
+  opengraphImage {
+    sourceUrl
+    altText
+  }
+  opengraphModifiedTime
+  opengraphPublishedTime
+  opengraphPublisher
+  opengraphSiteName
+  opengraphTitle
+  opengraphType
+  opengraphUrl
+  twitterDescription
+  twitterTitle
+  twitterImage {
+    sourceUrl
+    altText
+  }
+}
+    `;
 export const AddToCartDocument = gql`
     mutation addToCart($input: AddToCartInput!) {
   addToCart(input: $input) {
@@ -44804,6 +44872,144 @@ export const GetProductCategoriesDocument = gql`
   }
 }
     ${ProductCategoryFieldsFragmentDoc}`;
+export const GetProductCategoryDocument = gql`
+    query getProductCategory($id: ID!, $type: ProductCategoryIdType) {
+  productCategory(id: $id, idType: $type) {
+    ...ProductCategoryFields
+    ancestors {
+      nodes {
+        ...ProductCategoryFields
+      }
+    }
+    children {
+      nodes {
+        ...ProductCategoryFields
+      }
+    }
+    seo {
+      ...TaxonomySEOContent
+    }
+  }
+}
+    ${ProductCategoryFieldsFragmentDoc}
+${TaxonomySeoContentFragmentDoc}`;
+export const GetProductFiltersDocument = gql`
+    query getProductFilters($mainCategory: String, $subCategories: [String], $instock: Boolean, $lowestPrice: Float, $highestPrice: Float, $attributes: [AttributeFilterInput], $brands: [String], $onSale: Boolean, $dateQuery: ProductDateQueryInput) {
+  productFilters(
+    mainCategory: $mainCategory
+    subCategories: $subCategories
+    instock: $instock
+    lowestPrice: $lowestPrice
+    highestPrice: $highestPrice
+    attributes: $attributes
+    brands: $brands
+    onSale: $onSale
+    dateQuery: $dateQuery
+  ) {
+    categories {
+      count
+      id
+      name
+      slug
+    }
+    brands {
+      count
+      id
+      name
+      slug
+    }
+    attributes {
+      choices {
+        count
+        id
+        name
+        slug
+        options
+      }
+      label
+      name
+      slug
+    }
+    price {
+      highest
+      lowest
+    }
+  }
+}
+    `;
+export const GetProductListDocument = gql`
+    query getProductList($where: RootQueryToProductUnionConnectionWhereArgs, $first: Int) {
+  products(first: $first, where: $where) {
+    found
+    nodes {
+      type
+      databaseId
+      slug
+      name
+      image {
+        sourceUrl
+        altText
+      }
+      ... on SimpleProduct {
+        price
+        regularPrice
+        onSale
+        salePrice
+        uri
+        date
+      }
+      ... on VariableProduct {
+        price
+        regularPrice
+        onSale
+        salePrice
+        uri
+        date
+        variations {
+          nodes {
+            image {
+              sourceUrl
+              altText
+            }
+            attributes(first: 100) {
+              nodes {
+                name
+                label
+                value
+              }
+            }
+          }
+        }
+        attributes(first: 100) {
+          nodes {
+            attributeId
+            ... on LocalProductAttribute {
+              label
+              name
+              options
+              variation
+            }
+            ... on GlobalProductAttribute {
+              label
+              name
+              options
+              variation
+              slug
+            }
+            scope
+            fullOptions {
+              name
+              slug
+              hk_swatch_colour
+              hk_swatch_colour_2
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `;
 export const GetProductSlugsDocument = gql`
     query getProductSlugs($after: String) {
   products(where: {status: "publish"}, first: 1000, after: $after) {
@@ -44882,6 +45088,9 @@ const GetPickupLocationsDocumentString = print(GetPickupLocationsDocument);
 const GetPostsDocumentString = print(GetPostsDocument);
 const GetProductDocumentString = print(GetProductDocument);
 const GetProductCategoriesDocumentString = print(GetProductCategoriesDocument);
+const GetProductCategoryDocumentString = print(GetProductCategoryDocument);
+const GetProductFiltersDocumentString = print(GetProductFiltersDocument);
+const GetProductListDocumentString = print(GetProductListDocument);
 const GetProductSlugsDocumentString = print(GetProductSlugsDocument);
 const GetProductsDocumentString = print(GetProductsDocument);
 const GetStripeConfigDocumentString = print(GetStripeConfigDocument);
@@ -44961,6 +45170,15 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProductCategories(variables?: GetProductCategoriesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductCategoriesQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductCategoriesQuery>(GetProductCategoriesDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProductCategories', 'query', variables);
+    },
+    getProductCategory(variables: GetProductCategoryQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductCategoryQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductCategoryQuery>(GetProductCategoryDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProductCategory', 'query', variables);
+    },
+    getProductFilters(variables?: GetProductFiltersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductFiltersQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductFiltersQuery>(GetProductFiltersDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProductFilters', 'query', variables);
+    },
+    getProductList(variables?: GetProductListQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductListQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductListQuery>(GetProductListDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProductList', 'query', variables);
     },
     getProductSlugs(variables?: GetProductSlugsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductSlugsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductSlugsQuery>(GetProductSlugsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProductSlugs', 'query', variables);

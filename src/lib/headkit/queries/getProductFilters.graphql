@@ -1,0 +1,52 @@
+query getProductFilters(
+  $mainCategory: String
+  $subCategories: [String]
+  $instock: Boolean
+  $lowestPrice: Float
+  $highestPrice: Float
+  $attributes: [AttributeFilterInput]
+  $brands: [String]
+  $onSale: Boolean
+  $dateQuery: ProductDateQueryInput
+) {
+  productFilters(
+    mainCategory: $mainCategory
+    subCategories: $subCategories
+    instock: $instock
+    lowestPrice: $lowestPrice
+    highestPrice: $highestPrice
+    attributes: $attributes
+    brands: $brands
+    onSale: $onSale
+    dateQuery: $dateQuery
+  ) {
+    categories {
+      count
+      id
+      name
+      slug
+    }
+    brands {
+      count
+      id
+      name
+      slug
+    }
+    attributes {
+      choices {
+        count
+        id
+        name
+        slug
+        options
+      }
+      label
+      name
+      slug
+    }
+    price {
+      highest
+      lowest
+    }
+  }
+}

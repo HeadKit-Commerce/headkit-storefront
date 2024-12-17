@@ -5,6 +5,9 @@ import {
   AddToCartInput,
   CheckoutInput,
   GetCustomerQueryVariables,
+  GetProductFiltersQueryVariables,
+  GetProductListQueryVariables,
+  ProductCategoryIdType,
   RemoveItemsFromCartInput,
   UpdateCustomerInput,
   UpdateItemQuantitiesInput,
@@ -170,6 +173,30 @@ const updateCustomer = async ({
   return response;
 };
 
+const getProductList = async ({
+  input,
+}: {
+  input: GetProductListQueryVariables;
+}) => {
+  const response = await headkit().getProductList(input);
+  return response;
+};
+
+const getProductCategory = async ({ slug }: { slug: string }) => {
+  const response = await headkit().getProductCategory({
+    id: slug,
+    type: ProductCategoryIdType.Slug,
+  });
+  return response;
+};
+
+const getProductFilters = async (
+  productFiltersQuery: GetProductFiltersQueryVariables
+) => {
+  const response = await headkit().getProductFilters(productFiltersQuery);
+  return response;
+};
+
 export {
   getCart,
   addToCart,
@@ -187,4 +214,7 @@ export {
   getOrder,
   createPaymentIntent,
   updateCustomer,
+  getProductList,
+  getProductCategory,
+  getProductFilters,
 };

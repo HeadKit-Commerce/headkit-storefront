@@ -90,7 +90,7 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
   const formattedMenu = formatNodeTree({
     nodes: menuItems.map((item) => ({
       id: item.id,
-      parentId: item.parentId ?? "",
+      parentId: item.parentId!,
       payload: {
         label: item.label,
         uri: item.uri,
