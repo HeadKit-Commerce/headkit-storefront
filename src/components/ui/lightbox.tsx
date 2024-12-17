@@ -31,8 +31,8 @@ const Lightbox = ({ images, initialSelectedIndex }: Props) => {
 
   return (
     <DialogContent>
-      <DialogTitle className="absolute"></DialogTitle>
-      <DialogDescription className="absolute"> </DialogDescription>
+      <DialogTitle hidden />
+      <DialogDescription hidden />
       <Carousel setApi={setApi} opts={{ align: "center", loop: true }}>
         <CarouselContent>
           {images.map((image, i) => (
