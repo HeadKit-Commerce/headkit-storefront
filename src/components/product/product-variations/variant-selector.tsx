@@ -29,18 +29,16 @@ interface Props {
   attributes: Array<GlobalProductAttribute | LocalProductAttribute>;
   onChange: (selectedOptions: { [key: string]: string }) => void;
   variations: ExtendedProductVariation[];
-  defaultSelectedOptions: { [key: string]: string };
 }
 
-const VariantSelector = ({
+export const VariantSelector = ({
   attributes,
   onChange,
   variations,
-  defaultSelectedOptions,
 }: Props) => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
-  }>(defaultSelectedOptions);
+  }>({});
   const [filteredAttributes, setFilteredAttributes] = useState(attributes);
 
   useEffect(() => {
@@ -70,6 +68,48 @@ const VariantSelector = ({
 
     setFilteredAttributes([...sortedGlobalAttributes, ...localAttributes]);
   }, [attributes]);
+
+  useEffect(() => {
+    if (!filteredAttributes.length) return; // Wait for filteredAttributes to be ready
+
+    const params = new URLSearchParams(window.location.search);
+    const urlOptions: { [key: string]: string } = {};
+    params.forEach((value, key) => {
+      urlOptions[key] = value;
+    });
+
+    if (Object.keys(urlOptions).length > 0) {
+      setSelectedOptions(urlOptions);
+    } else {
+      // Instead of finding a single default variant, build options attribute by attribute
+      const defaultOptions: { [key: string]: string } = {};
+      
+      filteredAttributes.forEach((attribute) => {
+        // Find all variations that match our current selected options
+        const compatibleVariations = variations.filter((variant) => {
+          return Object.entries(defaultOptions).every(([key, value]) => 
+            variant.attributeKeyValue[key]?.value === value
+          );
+        });
+
+        // Find first available option for this attribute
+        const availableOption = attribute.fullOptions?.find((option) => {
+          return compatibleVariations.some((variant) => 
+            variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug &&
+            variant.stockStatus === "IN_STOCK"
+          );
+        });
+
+        if (availableOption?.slug) {
+          defaultOptions[attribute.name ?? ""] = availableOption.slug;
+        }
+      });
+
+      if (Object.keys(defaultOptions).length > 0) {
+        setSelectedOptions(defaultOptions);
+      }
+    }
+  }, [variations, filteredAttributes]);
 
   useEffect(() => {
     onChange(selectedOptions);
@@ -124,7 +164,7 @@ const VariantSelector = ({
             <div className="font-semibold text-purple-800">
               {attribute.label}
             </div>
-            <div className="text-gray-700">
+            <div className="text-gray-700 capitalize">
               {selectedOptions[attribute?.name ?? ""]}
             </div>
           </div>
@@ -177,5 +217,3 @@ const VariantSelector = ({
     </div>
   );
 };
-
-export { VariantSelector };

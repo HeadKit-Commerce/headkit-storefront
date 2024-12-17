@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import { ProductPrice } from "@/components/product/product-price";
 import { VariantSelector } from "./variant-selector";
 import { AvailabilityStatus } from "../availability-status";
-import { useSearchParams } from "next/navigation";
 import { getVariationImages } from "@/lib/headkit/utils/get-variation-images";
 
 interface Attribute {
@@ -41,44 +40,7 @@ export const ProductVariations = ({
   }>({});
   const [product, setProduct] = useState<ProductVariationContentFragment>();
   const [variations, setVariations] = useState<ExtendedProductVariation[]>([]);
-  const [attributes, setAttributes] = useState<Array<GlobalProductAttribute>>(
-    []
-  );
-  const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-    const options: { [key: string]: string } = {};
-    params.forEach((value, key) => {
-      options[key] = value;
-    });
-    setSelectedOptions(options);
-  }, [searchParams]);
-
-  // useEffect(() => {
-  //   if (parentProduct) {
-  //     setAttributes(parentProduct.attributes.nodes);
-  //     setVariations(addAttributeKeyValue(parentProduct.variations.nodes));
-  //   }
-  // }, [parentProduct]);
-
-  const selectDefaultVariant = (variationNodes: ExtendedProductVariation[]) => {
-    // Find the first in-stock variation
-    const defaultVariant = variationNodes.find(
-      (variant) => variant.stockStatus !== "OUT_OF_STOCK"
-    );
-
-    if (defaultVariant) {
-      const defaultOptions: { [key: string]: string } = {};
-      // Extract attribute names and values
-      defaultVariant?.attributes?.nodes?.forEach((attr) => {
-        if (attr?.name && attr?.value) {
-          defaultOptions[attr.name] = attr.value;
-        }
-      });
-      setSelectedOptions(defaultOptions); // Set the default options
-    }
-  };
+  const [attributes, setAttributes] = useState<Array<GlobalProductAttribute>>([]);
 
   useEffect(() => {
     if (parentProduct) {
@@ -89,18 +51,7 @@ export const ProductVariations = ({
 
       setAttributes(processedAttributes);
       setVariations(processedVariations);
-
-      const params = Object.fromEntries(searchParams.entries());
-
-      if (Object.keys(params).length > 0) {
-        // Use query parameters to set selected options
-        setSelectedOptions(params);
-      } else {
-        // Select default variant if no query parameters
-        selectDefaultVariant(processedVariations);
-      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parentProduct]);
 
   useEffect(() => {
@@ -158,48 +109,17 @@ export const ProductVariations = ({
     }));
   };
 
-  const getDefaultOptions = (): { [key: string]: string } => {
-    // Get valid attribute names
-    const validAttributeNames = attributes.map((attr) => attr.name);
-
-    // 1. Get sanitized options from query params
-    const params = new URLSearchParams(searchParams.toString());
-    const sanitizedOptions: { [key: string]: string } = {};
-    params.forEach((value, key) => {
-      if (validAttributeNames.includes(key)) {
-        sanitizedOptions[key] = value;
-      }
-    });
-
-    // If query params exist, use them
-    if (Object.keys(sanitizedOptions).length > 0) {
-      return sanitizedOptions;
-    }
-
-    // 2. If no query params, set the first variant as default
-    if (variations.length > 0) {
-      const firstVariation = variations[0];
-      const defaultOptions: { [key: string]: string } = {};
-      Object.entries(firstVariation.attributeKeyValue).forEach(
-        ([key, attr]) => {
-          defaultOptions[key] = attr.value;
-        }
-      );
-
-      return defaultOptions;
-    }
-
-    return {};
-  };
-
   return (
     <div>
       <div className="space-y-5">
         <VariantSelector
           attributes={attributes}
           variations={variations}
-          defaultSelectedOptions={getDefaultOptions()} // Pass selectedOptions as a prop
-          onChange={(updatedOptions) => setSelectedOptions(updatedOptions)} // Update selected options on change
+          onChange={(updatedOptions) => {
+            if (Object.keys(updatedOptions).length > 0) {
+              setSelectedOptions(updatedOptions);
+            }
+          }} // Update selected options on change
         />
       </div>
 

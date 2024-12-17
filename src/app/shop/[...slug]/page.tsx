@@ -64,7 +64,6 @@ export async function generateMetadata(
 // cannot use searchParams because it will be statically generated
 export default async function Product({ params }: Props) {
   const { slug } = await params;
-  console.log("slug", slug);
   const [product, generalSettings] = await Promise.all([
     headkit().getProduct({
       id: slug[slug.length - 1],
