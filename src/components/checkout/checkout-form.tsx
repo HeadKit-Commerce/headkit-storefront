@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ContactFormStep } from "./steps/contact-form-step";
 import { DeliveryMethodStep } from "./steps/delivery-method-step";
 import { BillingAddressStep } from "./steps/billing-address-step";
@@ -23,13 +23,24 @@ import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 
 interface FormData {
-  firstName: string;
-  lastName: string;
   email?: string;
   newsletter?: boolean;
   deliveryMethod?: DeliveryStepEnum;
   location?: string;
-  address?: {
+  billingAddress?: {
+    firstName: string;
+    lastName: string;
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    phone: string;
+  };
+  shippingAddress?: {
+    firstName: string;
+    lastName: string;
     line1: string;
     line2?: string;
     city: string;
@@ -49,6 +60,19 @@ interface Props {
   stripeConfig: StripeConfig | null;
 }
 
+const getStripeEnabled = (config: StripeConfig | null) => !!(
+  config?.publishableKey && config?.accountId
+);
+
+const getStripePromise = (config: StripeConfig | null) => {
+  const enabled = getStripeEnabled(config);
+  return enabled
+    ? loadStripe(config!.publishableKey, {
+      stripeAccount: config!.accountId,
+    })
+    : null;
+};
+
 const CheckoutForm = ({ stripeConfig }: Props) => {
   const router = useRouter();
   const { cartData } = useAppContext();
@@ -60,9 +84,20 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     newsletter: false,
     deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT,
     location: "",
-    firstName: "",
-    lastName: "",
-    address: {
+    billingAddress: {
+      firstName: "",
+      lastName: "",
+      line1: "",
+      line2: "",
+      city: "",
+      postalCode: "",
+      state: "",
+      country: "",
+      phone: "",
+    },
+    shippingAddress: {
+      firstName: "",
+      lastName: "",
       line1: "",
       line2: "",
       city: "",
@@ -77,15 +112,8 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     stripePaymentMethod: "",
   });
 
-  const enableStripe = !!(
-    stripeConfig?.publishableKey && stripeConfig?.accountId
-  );
-
-  const stripePromise = enableStripe
-    ? loadStripe(stripeConfig.publishableKey, {
-        stripeAccount: stripeConfig.accountId,
-      })
-    : null;
+  const enableStripe = useMemo(() => getStripeEnabled(stripeConfig), [stripeConfig]);
+  const stripePromise = useMemo(() => getStripePromise(stripeConfig), [stripeConfig]);
 
   const handleNextStep = (
     step: CheckoutFormStepEnum,
@@ -105,7 +133,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     } else if (step === CheckoutFormStepEnum.DELIVERY_METHOD) {
       return formData.deliveryMethod;
     } else if (step === CheckoutFormStepEnum.ADDRESS) {
-      return formData.address?.line1;
+      return formData.shippingAddress?.line1 || formData.billingAddress?.line1;
     } else if (step === CheckoutFormStepEnum.PAYMENT) {
       return formData.paymentMethodId;
     }
@@ -125,45 +153,45 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
         transactionId: data.transactionId,
         isPaid: true,
         billing: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address1: formData.address?.line1,
-          address2: formData.address?.line2,
-          city: formData.address?.city,
-          state: formData.address?.state,
-          postcode: formData.address?.postalCode,
-          country: formData.address?.country as CountriesEnum,
+          firstName: formData.billingAddress?.firstName,
+          lastName: formData.billingAddress?.lastName,
+          address1: formData.billingAddress?.line1,
+          address2: formData.billingAddress?.line2,
+          city: formData.billingAddress?.city,
+          state: formData.billingAddress?.state,
+          postcode: formData.billingAddress?.postalCode,
+          country: formData.billingAddress?.country as CountriesEnum,
           email: formData.email,
-          phone: formData.address?.phone,
+          phone: formData.billingAddress?.phone,
         },
         shipping: {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          address1: formData.address?.line1,
-          address2: formData.address?.line2,
-          city: formData.address?.city,
-          state: formData.address?.state,
-          postcode: formData.address?.postalCode,
-          country: formData.address?.country as CountriesEnum,
+          firstName: formData.shippingAddress?.firstName,
+          lastName: formData.shippingAddress?.lastName,
+          address1: formData.shippingAddress?.line1,
+          address2: formData.shippingAddress?.line2,
+          city: formData.shippingAddress?.city,
+          state: formData.shippingAddress?.state,
+          postcode: formData.shippingAddress?.postalCode,
+          country: formData.shippingAddress?.country as CountriesEnum,
           email: formData.email,
-          phone: formData.address?.phone,
+          phone: formData.shippingAddress?.phone,
         },
         metaData:
           data.paymentMethod === "stripe"
             ? [
-                {
-                  key: "_stripe_intent_id",
-                  value: data?.paymentIntentId ?? "",
-                },
-                {
-                  key: "_stripe_charge_captured",
-                  value: "yes",
-                },
-                {
-                  key: "_stripe_payment_method",
-                  value: data?.stripePaymentMethod ?? "",
-                },
-              ]
+              {
+                key: "_stripe_intent_id",
+                value: data?.paymentIntentId ?? "",
+              },
+              {
+                key: "_stripe_charge_captured",
+                value: "yes",
+              },
+              {
+                key: "_stripe_payment_method",
+                value: data?.stripePaymentMethod ?? "",
+              },
+            ]
             : [],
       },
     };
@@ -204,20 +232,20 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
               onNext={(data) =>
                 handleNextStep(CheckoutFormStepEnum.CONTACT, data)
               }
-              defaultValues={{ email: formData.email }}
+              defaultValues={{ email: formData.email, newsletter: formData.newsletter }}
               buttonLabel="Next"
             />
           )}
           {step === CheckoutFormStepEnum.DELIVERY_METHOD && (
             <DeliveryMethodStep
               enableStripe={enableStripe}
-              onSelect={(data) =>
+              onNext={(data) =>
                 handleNextStep(CheckoutFormStepEnum.DELIVERY_METHOD, data)
               }
               defaultValues={{
                 deliveryMethod: formData.deliveryMethod,
                 location: formData.location,
-                address: formData.address,
+                shippingAddress: formData.shippingAddress,
               }}
               buttonLabel="Next"
             />
@@ -225,13 +253,25 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
           {step === CheckoutFormStepEnum.ADDRESS && (
             <>
               {formData.deliveryMethod ===
-              DeliveryStepEnum.CLICK_AND_COLLECT ? (
+                DeliveryStepEnum.CLICK_AND_COLLECT ? (
                 <BillingAddressStep
                   enableStripe={enableStripe}
                   onNext={(data) =>
                     handleNextStep(CheckoutFormStepEnum.ADDRESS, data)
                   }
-                  defaultValues={formData.address}
+                  defaultValues={{
+                    billingAddress: formData.billingAddress ?? {
+                      firstName: "",
+                      lastName: "",
+                      line1: "",
+                      line2: "",
+                      city: "",
+                      state: "",
+                      country: "",
+                      postalCode: "",
+                      phone: "",
+                    },
+                  }}
                   buttonLabel="Next"
                 />
               ) : (

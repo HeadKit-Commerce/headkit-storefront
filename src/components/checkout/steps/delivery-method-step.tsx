@@ -25,8 +25,11 @@ const deliverySchema = z.object({
     DeliveryStepEnum.SHIPPING_TO_HOME,
   ]),
   location: z.string().optional(),
-  address: z
-    .object({
+  shippingAddress: z.union([
+    z.undefined(),
+    z.object({
+      firstName: z.string().min(1, "First Name is required"),
+      lastName: z.string().min(1, "Last Name is required"),
       line1: z.string().min(1, "Address Line 1 is required"),
       line2: z.string().optional(),
       city: z.string().min(1, "City is required"),
@@ -34,24 +37,25 @@ const deliverySchema = z.object({
       country: z.string().min(1, "Country is required"),
       postalCode: z.string().min(1, "Postal Code is required"),
       phone: z.string().min(1, "Phone is required"),
-    })
-    .optional(),
+    }),
+  ]),
 });
 
 interface DeliveryMethodStepProps {
-  onSelect: (data: z.infer<typeof deliverySchema>) => void;
+  onNext: (data: z.infer<typeof deliverySchema>) => void;
   defaultValues?: Partial<z.infer<typeof deliverySchema>>;
   buttonLabel?: string;
   enableStripe?: boolean;
 }
 
 const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
-  onSelect,
+  onNext,
   defaultValues = { deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT },
   buttonLabel = "Next",
   enableStripe = false,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const form = useForm<z.infer<typeof deliverySchema>>({
     resolver: zodResolver(deliverySchema),
     defaultValues,
@@ -61,13 +65,13 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
 
   useEffect(() => {
     if (deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
-      form.setValue("address", undefined);
+      form.setValue("shippingAddress", undefined);
     }
+    form.trigger();
   }, [deliveryMethod, form]);
 
   const onSubmit = async (data: z.infer<typeof deliverySchema>) => {
     try {
-      console.log("data", data);
       setIsSubmitting(true);
       const result = await updateShippingMethod({
         shippingMethod:
@@ -75,12 +79,11 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
             ? data.location ?? ""
             : "",
       });
-      console.log("result", result);
       if (result?.errors) {
         console.error(result?.errors);
         return;
       }
-      onSelect(data);
+      onNext(data);
     } finally {
       setIsSubmitting(false);
     }
@@ -104,9 +107,10 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
 
   useEffect(() => {
     const loadPickupLocations = async () => {
-      const locations = await getPickupLocations();
-      setPickupLocations(
-        locations?.data?.pickupLocations?.nodes
+      try {
+        setIsLoading(true);
+        const locations = await getPickupLocations();
+        const filteredLocations = locations?.data?.pickupLocations?.nodes
           ?.filter((location) => location?.enabled)
           .map((location) => {
             return {
@@ -122,11 +126,23 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               state: location?.state ?? "",
               stateCode: location?.stateCode ?? "",
             };
-          }) ?? []
-      );
+          }) ?? [];
+        
+        setPickupLocations(filteredLocations);
+        
+        if (filteredLocations.length === 0) {
+          form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
     loadPickupLocations();
-  }, []);
+  }, [form]);
+
+  if (isLoading) {
+    return <div className="text-center min-h-[200px] flex items-center justify-center">Loading delivery options...</div>;
+  }
 
   return (
     <Form {...form}>
@@ -143,15 +159,17 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                   defaultValue={field.value}
                   className="flex gap-6"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value={DeliveryStepEnum.CLICK_AND_COLLECT}
-                      id="click-collect"
-                    />
-                    <FormLabel htmlFor="click-collect" className="font-normal">
-                      Free Click & Collect
-                    </FormLabel>
-                  </div>
+                  {pickupLocations.length > 0 && (
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value={DeliveryStepEnum.CLICK_AND_COLLECT}
+                        id="click-collect"
+                      />
+                      <FormLabel htmlFor="click-collect" className="font-normal">
+                        Free Click & Collect
+                      </FormLabel>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem
                       value={DeliveryStepEnum.SHIPPING_TO_HOME}
@@ -231,13 +249,14 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
             }}
             onChange={(event) => {
               if (event.complete) {
-                const { address } = event.value;
-                form.setValue("address.line1", address.line1 || "");
-                form.setValue("address.line2", address.line2 || "");
-                form.setValue("address.city", address.city || "");
-                form.setValue("address.postalCode", address.postal_code || "");
-                form.setValue("address.state", address.state || "");
-                form.setValue("address.country", address.country || "");
+                const { address, phone } = event.value;
+                form.setValue("shippingAddress.line1", address.line1 || "");
+                form.setValue("shippingAddress.line2", address.line2 || "");
+                form.setValue("shippingAddress.city", address.city || "");
+                form.setValue("shippingAddress.postalCode", address.postal_code || "");
+                form.setValue("shippingAddress.state", address.state || "");
+                form.setValue("shippingAddress.country", address.country || "");
+                form.setValue("shippingAddress.phone", phone || "");
               }
             }}
           />
@@ -245,7 +264,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
           // Fallback address form fields
           <>
             <FormField
-              name="address.line1"
+              name="shippingAddress.line1"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -263,7 +282,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               )}
             />
             <FormField
-              name="address.line2"
+              name="shippingAddress.line2"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -281,7 +300,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               )}
             />
             <FormField
-              name="address.city"
+              name="shippingAddress.city"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -299,7 +318,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               )}
             />
             <FormField
-              name="address.state"
+              name="shippingAddress.state"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -317,7 +336,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               )}
             />
             <FormField
-              name="address.country"
+              name="shippingAddress.country"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -335,7 +354,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               )}
             />
             <FormField
-              name="address.postalCode"
+              name="shippingAddress.postalCode"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
@@ -347,6 +366,19 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                       className="border rounded-md p-2 w-full"
                       {...field}
                     />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="shippingAddress.phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone</FormLabel>
+                  <FormControl>
+                    <input type="text" placeholder="Phone" className="border rounded-md p-2 w-full" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -367,4 +399,4 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
   );
 };
 
-export { DeliveryMethodStep };
+export { DeliveryMethodStep }; 

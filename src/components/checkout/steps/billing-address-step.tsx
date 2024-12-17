@@ -14,9 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 
 const addressSchema = z.object({
-  firstName: z.string().min(1, "First Name is required"),
-  lastName: z.string().min(1, "Last Name is required"),
-  address: z.object({
+  billingAddress: z.object({
+    firstName: z.string().min(1, "First Name is required"),
+    lastName: z.string().min(1, "Last Name is required"),
     line1: z.string().min(1, "Address Line 1 is required"),
     line2: z.string().optional(),
     city: z.string().min(1, "City is required"),
@@ -29,8 +29,8 @@ const addressSchema = z.object({
 
 interface BillingAddressStepProps {
   enableStripe: boolean;
-  onNext: (data: { address: z.infer<typeof addressSchema>["address"] }) => void;
-  defaultValues?: z.infer<typeof addressSchema>["address"];
+  onNext: (data: z.infer<typeof addressSchema>) => void;
+  defaultValues?: z.infer<typeof addressSchema>;
   buttonLabel?: string;
 }
 
@@ -38,18 +38,23 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
   enableStripe,
   onNext,
   defaultValues = {
-    line1: "",
-    line2: "",
-    city: "",
-    state: "",
-    country: "",
-    postalCode: "",
+    billingAddress: {
+      firstName: "",
+      lastName: "",
+      line1: "",
+      line2: "",
+      city: "",
+      state: "",
+      country: "",
+      postalCode: "",
+      phone: "",
+    },
   },
   buttonLabel = "Next",
 }) => {
   const form = useForm<z.infer<typeof addressSchema>>({
     resolver: zodResolver(addressSchema),
-    defaultValues: { address: defaultValues },
+    defaultValues,
   });
 
   const onSubmit = (data: z.infer<typeof addressSchema>) => {
@@ -79,17 +84,15 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
           onChange={(event) => {
             if (event.complete && event.value) {
               console.log("event", event);
-              form.setValue("firstName", event.value.firstName ?? "");
-              form.setValue("lastName", event.value.lastName ?? "");
-              form.setValue("address", {
-                line1: event.value.address.line1,
-                line2: event.value.address.line2 ?? undefined,
-                city: event.value.address.city,
-                state: event.value.address.state,
-                country: event.value.address.country,
-                postalCode: event.value.address.postal_code,
-                phone: event.value.phone ?? "",
-              });
+              form.setValue("billingAddress.firstName", event.value.firstName ?? "");
+              form.setValue("billingAddress.lastName", event.value.lastName ?? "");
+              form.setValue("billingAddress.line1", event.value.address.line1);
+              form.setValue("billingAddress.line2", event.value.address.line2 ?? undefined);
+              form.setValue("billingAddress.city", event.value.address.city);
+              form.setValue("billingAddress.state", event.value.address.state);
+              form.setValue("billingAddress.country", event.value.address.country);
+              form.setValue("billingAddress.postalCode", event.value.address.postal_code);
+              form.setValue("billingAddress.phone", event.value.phone ?? "");
               form.trigger();
             }
           }}
@@ -110,7 +113,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
-          name="address.line1"
+          name="billingAddress.line1"
           control={form.control}
           render={({ field }) => (
             <FormItem>
@@ -128,7 +131,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
           )}
         />
         <FormField
-          name="address.line2"
+          name="billingAddress.line2"
           control={form.control}
           render={({ field }) => (
             <FormItem>
@@ -147,7 +150,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
         />
         <div className="grid grid-cols-2 gap-4">
           <FormField
-            name="address.city"
+            name="billingAddress.city"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -165,7 +168,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
             )}
           />
           <FormField
-            name="address.state"
+            name="billingAddress.state"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -185,7 +188,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField
-            name="address.country"
+            name="billingAddress.country"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -203,7 +206,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
             )}
           />
           <FormField
-            name="address.postalCode"
+            name="billingAddress.postalCode"
             control={form.control}
             render={({ field }) => (
               <FormItem>
@@ -221,7 +224,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
             )}
           />
           <FormField
-            name="address.phone"
+            name="billingAddress.phone"
             control={form.control}
             render={({ field }) => (
               <FormItem>

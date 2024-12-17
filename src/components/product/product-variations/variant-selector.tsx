@@ -74,18 +74,14 @@ export const VariantSelector = ({
   useEffect(() => {
     if (!filteredAttributes.length) return; // Wait for filteredAttributes to be ready
 
-    console.log("searchParams", searchParams);
-    console.log("searchParams.get", searchParams.get('pa_colour'));
     const urlOptions: { [key: string]: string } = {};
     searchParams.forEach((value, key) => {
       urlOptions[key] = value;
     });
 
     if (Object.keys(urlOptions).length > 0) {
-      console.log("urlOptions", urlOptions);
       setSelectedOptions(urlOptions);
     } else {
-      console.log("no url options");
       // Instead of finding a single default variant, build options attribute by attribute
       const defaultOptions: { [key: string]: string } = {};
       
@@ -114,6 +110,7 @@ export const VariantSelector = ({
         setSelectedOptions(defaultOptions);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variations, filteredAttributes]);
 
   useEffect(() => {
