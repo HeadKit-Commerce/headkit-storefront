@@ -30,7 +30,7 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
               <Dialog key={index}>
                 <DialogTrigger
                   className={cn(
-                    "border-silver-3 relative cursor-pointer overflow-hidden rounded-[8px] bg-gray-300",
+                    "border-gray-500 relative cursor-pointer overflow-hidden rounded-[8px] bg-gray-300",
                     index > 0 ? "col-span-1" : "col-span-2"
                   )}
                 >
@@ -61,12 +61,15 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
         ) : (
           <div
             className={cn(
-              "border-silver-3 relative col-span-2 aspect-square w-full animate-pulse cursor-pointer overflow-hidden rounded-[8px] bg-gray-200"
+              "border-gray-500 relative col-span-2 aspect-square w-full animate-pulse cursor-pointer overflow-hidden rounded-[8px] bg-gray-200"
             )}
           />
         )}
       </div>
-      <div className="relative block md:hidden">
+      <div className="relative block md:hidden border border-gray-500 rounded-lg overflow-hidden">
+        <div className="absolute left-2 top-2">
+          <BadgeList isSale={isSale} isNewIn={isNew} />
+        </div>
         <Carousel
           opts={{
             align: "start",
@@ -78,9 +81,6 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
               <CarouselItem key={i} className="basis-full pl-[30px]">
                 <Dialog>
                   <DialogTrigger className="w-full">
-                    <div className="absolute left-0 top-0">
-                      <BadgeList isSale={isSale} isNewIn={isNew} />
-                    </div>
                     <div className="relative aspect-square bg-white">
                       <Image
                         priority={i === 0}

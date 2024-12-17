@@ -29,7 +29,7 @@ const BlockEditor = ({ blocks, section = "section-1" }: Props) => {
             case "headkit-product-carousel":
               return (
                 <div
-                  className="overflow-hidden bg-gradient-to-t from-silver-3 to-white py-[30px] lg:py-14"
+                  className="overflow-hidden py-[30px] lg:py-14"
                   key={index}
                 >
                   <div className="container mx-auto !overflow-visible">

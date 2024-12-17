@@ -66,14 +66,16 @@ export const ProductVariations = ({
       onSetProduct(matchedProduct);
     }
 
-    // Update the query params in the URL
-    const params = new URLSearchParams();
-    Object.entries(selectedOptions).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      }
-    });
-    window.history.replaceState(null, "", `?${params.toString()}`);
+    // Only update URL if there are selected options
+    if (Object.keys(selectedOptions).length > 0) {
+      const params = new URLSearchParams();
+      Object.entries(selectedOptions).forEach(([key, value]) => {
+        if (value) {
+          params.set(key, value);
+        }
+      });
+      window.history.replaceState(null, "", `?${params.toString()}`);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedOptions, variations]);
 

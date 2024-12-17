@@ -12,6 +12,7 @@ import { VariantButton } from "./variant-button";
 import { VariantSwatch } from "./variant-swatch";
 import { cn } from "@/lib/utils";
 import { customSizeSort } from "@/lib/headkit/utils/custom-size-sort";
+import { useSearchParams } from "next/navigation";
 
 interface Attribute {
   name: string;
@@ -40,6 +41,7 @@ export const VariantSelector = ({
     [key: string]: string;
   }>({});
   const [filteredAttributes, setFilteredAttributes] = useState(attributes);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const globalAttributes = attributes?.filter(
@@ -72,15 +74,18 @@ export const VariantSelector = ({
   useEffect(() => {
     if (!filteredAttributes.length) return; // Wait for filteredAttributes to be ready
 
-    const params = new URLSearchParams(window.location.search);
+    console.log("searchParams", searchParams);
+    console.log("searchParams.get", searchParams.get('pa_colour'));
     const urlOptions: { [key: string]: string } = {};
-    params.forEach((value, key) => {
+    searchParams.forEach((value, key) => {
       urlOptions[key] = value;
     });
 
     if (Object.keys(urlOptions).length > 0) {
+      console.log("urlOptions", urlOptions);
       setSelectedOptions(urlOptions);
     } else {
+      console.log("no url options");
       // Instead of finding a single default variant, build options attribute by attribute
       const defaultOptions: { [key: string]: string } = {};
       

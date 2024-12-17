@@ -236,9 +236,13 @@ export const ProductDetail = ({ product }: Props) => {
 
           <div className="my-6 grid gap-[10px]">
             {product?.description && (
-              <Collapsible>
-                <CollapsibleTrigger>Details</CollapsibleTrigger>
-                <CollapsibleContent>
+              <Collapsible defaultOpen>
+                <CollapsibleTrigger className="text-2xl font-bold flex w-full justify-between items-center group">
+                  Details
+                  <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
+                  <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="prose py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.description,
@@ -249,8 +253,12 @@ export const ProductDetail = ({ product }: Props) => {
             )}
             {product?.productTechnical && (
               <Collapsible>
-                <CollapsibleTrigger>Technical Details</CollapsibleTrigger>
-                <CollapsibleContent>
+                <CollapsibleTrigger className="text-2xl font-bold flex w-full justify-between items-center group">
+                  Technical Details
+                  <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
+                  <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="prose py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.productTechnical,
@@ -261,8 +269,12 @@ export const ProductDetail = ({ product }: Props) => {
             )}
             {product?.productInstructions && (
               <Collapsible>
-                <CollapsibleTrigger>Instructions</CollapsibleTrigger>
-                <CollapsibleContent>
+                <CollapsibleTrigger className="text-2xl font-bold flex w-full justify-between items-center group">
+                  Instructions
+                  <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
+                  <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="prose py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.productInstructions,
