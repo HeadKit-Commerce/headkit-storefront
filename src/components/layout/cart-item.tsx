@@ -30,7 +30,7 @@ const CartItem = ({
   cartItem,
   orderData,
   updateable = false,
-  removeable = false,
+  removeable = true,
   priceIncludeTax = false,
 }: Props) => {
   const { toggleCartDrawer, setCartData, currencyFormatter, isGlobalDisabled } =
@@ -175,6 +175,16 @@ const CartItem = ({
             <p className="font-semibold capitalize text-[#343A40]">
               {cartItem?.product?.node?.name}
             </p>
+            <div className="flex leading-[24px]">
+              {cartItem.variation?.attributes?.map((attr, index) => (
+                <p
+                  key={attr?.name}
+                  className="text-[15px] font-medium capitalize text-[#343A40]"
+                >
+                  {index > 0 ? <span className="px-1">/</span> : ""} {attr?.value}
+                </p>
+              ))}
+            </div>
           </Link>
           {updateable && renderQuantityControls()}
         </div>
@@ -193,7 +203,7 @@ const CartItem = ({
               )}
               disabled={loading}
             >
-              <Icon.close className="h-2 w-2 bg-white" />
+              <Icon.close className="h-3 w-3 bg-transparent stroke-white" />
             </button>
           )}
         </div>
