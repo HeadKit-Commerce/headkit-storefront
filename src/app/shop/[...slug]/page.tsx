@@ -1,6 +1,7 @@
 import {
   ProductIdTypeEnum,
   PostTypeSeoContentFragment,
+  ProductContentFullWithGroupFragment,
 } from "@/lib/headkit/generated";
 
 import { Metadata, ResolvedMetadata, ResolvingMetadata } from "next";
@@ -11,6 +12,8 @@ import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 import { ProductJsonLD } from "@/components/seo/product-json-ld";
 import { BreadcrumbJsonLD } from "@/components/seo/breadcrumb-json-ld";
 import { ProductDetail } from "@/components/product/product-detail";
+import { ProductCarousel } from "@/components/carousel/product-carousel";
+import { SectionHeader } from "@/components/common/section-header";
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -89,9 +92,46 @@ export default async function Product({ params }: Props) {
           <ProductDetail product={product?.data.product} />
         </div>
       </div>
-      {/* <Suspense fallback={<ProductRelateAndUpsellLoadingSkeleton />}>
-        <ProductRelateAndUpsell currentProductSlug={product?.product?.slug} />
-      </Suspense> */}
+
+      {(product?.data.product.upsell?.nodes?.length ?? 0) > 0 && (
+        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
+          <div className="container mx-auto">
+            <SectionHeader
+              title="You May Also Like"
+              description=""
+              allButton="View All"
+              allButtonPath="/shop"
+            />
+            <div className="mt-5 px-5 lg:mt-[30px]">
+              <ProductCarousel
+                products={
+                  (product?.data.product.upsell?.nodes || []) as ProductContentFullWithGroupFragment[]
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(product?.data.product.related?.nodes?.length ?? 0) > 0 && (
+        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
+          <div className="container mx-auto">
+            <SectionHeader
+              title="Related Products"
+              description=""
+              allButton="View All"
+              allButtonPath="/shop"
+            />
+            <div className="mt-5 px-5 lg:mt-[30px]">
+              <ProductCarousel
+                products={
+                  (product?.data.product.related?.nodes || []) as ProductContentFullWithGroupFragment[]
+                }
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,16 @@
 query getProduct($id: ID!, $type: ProductIdTypeEnum) {
   product(id: $id, idType: $type) {
     ...ProductContentFullWithGroup
+    upsell {
+      nodes {
+        ...ProductShortContent
+      }
+    }
+    related {
+      nodes {
+        ...ProductShortContent
+      }
+    }
     seo {
       ...PostTypeSEOContent
     }
