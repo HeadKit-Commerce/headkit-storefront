@@ -131,7 +131,7 @@ export const ProductDetail = ({ product }: Props) => {
               );
             })}
           </div>
-          <h1 className="mb-5 text-3xl font-black uppercase text-primary">
+          <h1 className="mb-5 text-3xl font-black uppercase text-purple-900">
             {product?.name}
           </h1>
           <div

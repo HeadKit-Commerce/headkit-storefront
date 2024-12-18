@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState } from "react";
 import Link from "next/link";
 import {
   NavigationMenu,
@@ -15,6 +15,14 @@ import { formatNodeTree } from "@/lib/headkit/utils/format-node-tree";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
 import { Icon } from "../icon";
 import { CartDrawer } from "./cart-drawer";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 interface Props {
   menus: Record<
@@ -35,6 +43,8 @@ interface Props {
 }
 
 const Header = ({ menus }: Props) => {
+  const [open, setOpen] = useState(false);
+
   const preheaderMenu = menus[MenuLocationEnum.PreHeader];
   const primaryMenu = menus[MenuLocationEnum.Primary];
   const mainRightMenu = menus[MenuLocationEnum.MainRight];
@@ -58,17 +68,42 @@ const Header = ({ menus }: Props) => {
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
-          {primaryMenu && (
-            <MenuSection menuItems={primaryMenu.menuItems.nodes} />
-          )}
+          <div className="hidden md:flex">
+            {primaryMenu && <MenuSection menuItems={primaryMenu.menuItems.nodes} />}
+          </div>
         </NavigationMenuList>
         {/* Main Right Menu */}
         <NavigationMenuList>
-          {mainRightMenu && (
-            <MenuSection menuItems={mainRightMenu.menuItems.nodes} />
-          )}
+          <div className="hidden md:flex">
+            {mainRightMenu && <MenuSection menuItems={mainRightMenu.menuItems.nodes} />}
+          </div>
           <NavigationMenuItem>
             <CartDrawer />
+          </NavigationMenuItem>
+          <NavigationMenuItem className="md:hidden">
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger>
+                <Menu className="h-6 w-6" />
+              </SheetTrigger>
+              <SheetContent>
+                <SheetTitle hidden />
+                <SheetDescription hidden />
+                <nav className="flex flex-col gap-4 mt-8">
+                  {primaryMenu && (
+                    <MobileMenuSection 
+                      menuItems={primaryMenu.menuItems.nodes} 
+                      onSelect={() => setOpen(false)} 
+                    />
+                  )}
+                  {mainRightMenu && (
+                    <MobileMenuSection 
+                      menuItems={mainRightMenu.menuItems.nodes} 
+                      onSelect={() => setOpen(false)} 
+                    />
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -162,7 +197,7 @@ interface PreheaderProps {
 
 const Preheader = ({ title, links }: PreheaderProps) => {
   return (
-    <div className="flex h-[30px] items-center justify-end sm:justify-between bg-purple-800 px-5 text-sm text-white lg:px-10">
+    <div className="flex h-[30px] items-center justify-end sm:justify-between bg-purple-800 px-5 text-sm text-white md:px-10">
       <div className="hidden sm:block">{title}</div>
       <div className="flex gap-4 md:gap-8">
         {links?.map(({ label, uri, target }, i) => {
@@ -173,6 +208,51 @@ const Preheader = ({ title, links }: PreheaderProps) => {
           );
         })}
       </div>
+    </div>
+  );
+};
+
+const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelect?: () => void }) => {
+  const formattedMenu = formatNodeTree({
+    nodes: menuItems.map((item) => ({
+      id: item.id,
+      parentId: item.parentId!,
+      payload: {
+        label: item.label,
+        uri: item.uri,
+        description: item.description,
+      },
+    })),
+    parent: null,
+  });
+
+  return (
+    <div className="flex flex-col gap-4">
+      {formattedMenu.map((menuItem) => (
+        <div key={menuItem.id}>
+          <Link 
+            href={menuItem.payload.uri} 
+            className="text-lg font-medium"
+            onClick={onSelect}
+          >
+            {menuItem.payload.label}
+          </Link>
+          {menuItem.children && (
+            <div className="ml-4 mt-2 flex flex-col gap-2">
+              {menuItem.children.map((child) => (
+                <Link
+                  key={child.id}
+                  href={child.payload.uri}
+                  className="text-sm text-muted-foreground"
+                  onClick={onSelect}
+                >
+                  {child.payload.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 };

@@ -54,7 +54,7 @@ const Filter = ({ productFilter, initialFilterState, onChange }: Props) => {
   }, [filterValue, searchParams, onChange]);
 
   return (
-    <div className={cn("group sticky top-[80px] z-20 h-[60px] w-full")}>
+    <div className={cn("group sticky top-[80px] z-10 h-[60px] w-full")}>
       <div className="relative h-full w-full">
         <div
           className={cn(

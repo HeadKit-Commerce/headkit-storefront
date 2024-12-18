@@ -47,7 +47,9 @@ const FilterList = ({
           : Array.from(selectedOptions)[0],
       });
     }
-  }, [selectedOptions, multipleSelect, slug, onChange]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptions, multipleSelect, slug,]);
 
   useEffect(() => {
     if (active) {
@@ -92,7 +94,7 @@ const FilterList = ({
     <>
       <div
         onMouseEnter={() => setActive(true)}
-        onMouseLeave={() => setActive(false)}
+        // onMouseLeave={() => setActive(false)}
         className={cn("flex h-full items-center justify-center px-4 py-2", className)}
         role="button"
         aria-expanded={active}

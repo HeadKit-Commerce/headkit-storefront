@@ -75,8 +75,8 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
         const err = error as ApiError;
         setErrorMessage(
           err.response?.errors?.[0]?.message ||
-            err.message ||
-            "An error occurred"
+          err.message ||
+          "An error occurred"
         );
       } finally {
         setIsLoading(false);
@@ -131,9 +131,10 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
               <p>
                 -
                 {currencyFormatter({
-                  price: cart.displayPricesIncludeTax
+                  currency: "AUD",
+                  price: cart?.displayPricesIncludeTax
                     ? getFloatVal(coupon?.discountAmount ?? "0") +
-                      getFloatVal(coupon?.discountTax ?? "0")
+                    getFloatVal(coupon?.discountTax ?? "0")
                     : getFloatVal(coupon?.discountAmount ?? "0"),
                 })}
               </p>

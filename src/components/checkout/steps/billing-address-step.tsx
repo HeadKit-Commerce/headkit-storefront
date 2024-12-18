@@ -68,7 +68,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
         <AddressElement
           options={{
             mode: "billing",
-            allowedCountries: ["AU"],
+            allowedCountries: ["AU", "TH"],
             fields: {
               phone: "always",
             },
@@ -112,6 +112,46 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+        <FormField
+          name="billingAddress.firstName"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <input
+                  type="text"
+                  placeholder="First Name"
+                  className="border rounded-md p-2 w-full"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          name="billingAddress.lastName"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  className="border rounded-md p-2 w-full"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+
         <FormField
           name="billingAddress.line1"
           control={form.control}

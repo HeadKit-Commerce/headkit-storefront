@@ -1,0 +1,41 @@
+query getPost($id: ID!, $type: PostIdType) {
+  post(id: $id, idType: $type) {
+    databaseId
+    id
+    excerpt
+    content
+    date
+    uri
+    slug
+    status
+    title
+    featuredImage {
+      node {
+        id
+        sourceUrl
+        sourceUrlMobile: sourceUrl(size: MEDIUM_LARGE)
+      }
+    }
+    categories {
+      nodes {
+        parentId
+        slug
+        name
+        databaseId
+        parentDatabaseId
+        count
+        uri
+      }
+    }
+    tags {
+      nodes {
+        slug
+        name
+        id
+      }
+    }
+    seo {
+      ...PostTypeSEOContent
+    }
+  }
+}

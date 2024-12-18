@@ -85,7 +85,7 @@ export default async function Page({ params }: Props) {
               Thanks
             </div>
             <div className="font-semibold text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 pb-4">
-              {order?.billing?.firstName}!
+              {order?.billing?.firstName || order?.shipping?.firstName}!
             </div>
           </div>
         </div>

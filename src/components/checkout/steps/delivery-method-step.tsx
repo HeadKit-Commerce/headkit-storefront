@@ -17,7 +17,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   getPickupLocations,
   updateShippingMethod,
+  updateCustomer,
 } from "@/lib/headkit/actions";
+import { CountriesEnum } from "@/lib/headkit/generated";
 
 const deliverySchema = z.object({
   deliveryMethod: z.enum([
@@ -39,6 +41,20 @@ const deliverySchema = z.object({
       phone: z.string().min(1, "Phone is required"),
     }),
   ]),
+}).superRefine((data, ctx) => {
+  if (data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT && !data.location) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Pickup location is required for Click & Collect",
+    });
+  }
+  // make sure shippingAddress is required if deliveryMethod is SHIPPING_TO_HOME
+  if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && !data.shippingAddress) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Shipping address is required for Ship to Home",
+    });
+  }
 });
 
 interface DeliveryMethodStepProps {
@@ -61,28 +77,55 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
     defaultValues,
   });
 
-  const deliveryMethod = form.watch("deliveryMethod");
+  // const deliveryMethod = form.watch("deliveryMethod");
 
-  useEffect(() => {
-    if (deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
-      form.setValue("shippingAddress", undefined);
-    }
-    form.trigger();
-  }, [deliveryMethod, form]);
+  // useEffect(() => {
+  //   if (deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
+  //     form.setValue("shippingAddress", undefined);
+  //   }
+  // }, [deliveryMethod, form]);
 
   const onSubmit = async (data: z.infer<typeof deliverySchema>) => {
     try {
       setIsSubmitting(true);
-      const result = await updateShippingMethod({
+
+      // Update shipping method
+      const shippingMethodResult = await updateShippingMethod({
         shippingMethod:
           data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
             ? data.location ?? ""
             : "",
       });
-      if (result?.errors) {
-        console.error(result?.errors);
+      if (shippingMethodResult?.errors) {
+        console.error(shippingMethodResult?.errors);
         return;
       }
+
+      // Update customer shipping address if shipping to home
+      if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && data.shippingAddress) {
+        const customerResult = await updateCustomer({
+          input: {
+            shipping: {
+              firstName: data.shippingAddress.firstName,
+              lastName: data.shippingAddress.lastName,
+              address1: data.shippingAddress.line1,
+              address2: data.shippingAddress.line2 || "",
+              city: data.shippingAddress.city,
+              state: data.shippingAddress.state,
+              postcode: data.shippingAddress.postalCode,
+              country: data.shippingAddress.country as CountriesEnum,
+              phone: data.shippingAddress.phone,
+            }
+          },
+          withCart: true
+        });
+
+        if (customerResult?.errors) {
+          console.error(customerResult?.errors);
+          return;
+        }
+      }
+
       onNext(data);
     } finally {
       setIsSubmitting(false);
@@ -127,9 +170,9 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               stateCode: location?.stateCode ?? "",
             };
           }) ?? [];
-        
+
         setPickupLocations(filteredLocations);
-        
+
         if (filteredLocations.length === 0) {
           form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME);
         }
@@ -229,163 +272,208 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
             )}
           />
         ) : // SHIPPING_TO_HOME
-        enableStripe ? (
-          <AddressElement
-            key={form.watch("deliveryMethod")}
-            options={{
-              mode: "shipping",
-              allowedCountries: ["AU"],
-              fields: {
-                phone: "always",
-              },
-              validation: {
-                phone: {
-                  required: "always",
+          enableStripe ? (
+            <AddressElement
+              key={form.watch("deliveryMethod")}
+              options={{
+                mode: "shipping",
+                allowedCountries: ["AU", "TH"],
+                fields: {
+                  phone: "always",
                 },
-              },
-              display: {
-                name: "split",
-              },
-            }}
-            onChange={(event) => {
-              if (event.complete) {
-                const { address, phone } = event.value;
-                form.setValue("shippingAddress.line1", address.line1 || "");
-                form.setValue("shippingAddress.line2", address.line2 || "");
-                form.setValue("shippingAddress.city", address.city || "");
-                form.setValue("shippingAddress.postalCode", address.postal_code || "");
-                form.setValue("shippingAddress.state", address.state || "");
-                form.setValue("shippingAddress.country", address.country || "");
-                form.setValue("shippingAddress.phone", phone || "");
-              }
-            }}
-          />
-        ) : (
-          // Fallback address form fields
-          <>
-            <FormField
-              name="shippingAddress.line1"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address Line 1</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="Address Line 1"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+                validation: {
+                  phone: {
+                    required: "always",
+                  },
+                },
+                display: {
+                  name: "split",
+                },
+                defaultValues: {
+                  firstName: form.getValues("shippingAddress.firstName") || "",
+                  lastName: form.getValues("shippingAddress.lastName") || "",
+                  address: {
+                    line1: form.getValues("shippingAddress.line1") || "",
+                    line2: form.getValues("shippingAddress.line2") || "",
+                    city: form.getValues("shippingAddress.city") || "",
+                    state: form.getValues("shippingAddress.state") || "",
+                    country: form.getValues("shippingAddress.country") || "",
+                    postal_code: form.getValues("shippingAddress.postalCode") || "",
+                  },
+                  phone: form.getValues("shippingAddress.phone") || "",
+                },
+              }}
+              onChange={(event) => {
+                console.log("event", event);
+                if (event.complete) {
+                  const { address, phone, firstName, lastName } = event.value;
+                  // Set and validate each field individually
+                  form.setValue("shippingAddress.firstName", firstName || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.lastName", lastName || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.line1", address.line1 || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.line2", address.line2 || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.city", address.city || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.postalCode", address.postal_code || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.state", address.state || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.country", address.country || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.phone", phone || "", { shouldValidate: true });
+                }
+              }}
             />
-            <FormField
-              name="shippingAddress.line2"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address Line 2</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="Address Line 2"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="shippingAddress.city"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="City"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="shippingAddress.state"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="State"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="shippingAddress.country"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="Country"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="shippingAddress.postalCode"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Postal Code</FormLabel>
-                  <FormControl>
-                    <input
-                      type="text"
-                      placeholder="Postal Code"
-                      className="border rounded-md p-2 w-full"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="shippingAddress.phone"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone</FormLabel>
-                  <FormControl>
-                    <input type="text" placeholder="Phone" className="border rounded-md p-2 w-full" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </>
-        )}
+          ) : (
+            // Fallback address form fields
+            <>
+              <FormField
+                name="shippingAddress.firstName"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>First Name</FormLabel>
+                    <FormControl>
+                      <input type="text" placeholder="First Name" className="border rounded-md p-2 w-full" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                name="shippingAddress.lastName"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Last Name</FormLabel>
+                    <FormControl>
+                      <input type="text" placeholder="Last Name" className="border rounded-md p-2 w-full" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                name="shippingAddress.line1"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address Line 1</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="Address Line 1"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.line2"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address Line 2</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="Address Line 2"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.city"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="City"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.state"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="State"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.country"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="Country"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.postalCode"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Postal Code</FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        placeholder="Postal Code"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="shippingAddress.phone"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone</FormLabel>
+                    <FormControl>
+                      <input type="text" placeholder="Phone" className="border rounded-md p-2 w-full" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
         <Button
           type="submit"
           className="w-full"

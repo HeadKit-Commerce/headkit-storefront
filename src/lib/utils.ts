@@ -81,3 +81,27 @@ export const formatShippingPrice = (
         lang,
       });
 };
+
+
+export const processText = (
+  inputText: string
+): {
+  text: string;
+  highlightedText: string;
+} => {
+  if (!inputText) return { text: "", highlightedText: "" };
+  const startDelimiter = "{";
+  const endDelimiter = "}";
+
+  const startIndex = inputText.indexOf(startDelimiter);
+  const endIndex = inputText.indexOf(endDelimiter);
+
+  if (startIndex === -1 || endIndex === -1 || startIndex >= endIndex) {
+    return { text: inputText, highlightedText: "" };
+  }
+
+  const text = inputText.substring(0, startIndex).trim();
+  const highlightedText = inputText.substring(startIndex + 1, endIndex).trim();
+
+  return { text, highlightedText };
+};

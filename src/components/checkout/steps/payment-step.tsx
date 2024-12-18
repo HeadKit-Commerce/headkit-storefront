@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import {
   PaymentElement,
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -27,48 +27,30 @@ import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal } from "@/lib/utils";
 
 const paymentSchema = z.object({
-  paymentGatewayId: z.string().optional(),
+  paymentGatewayId: z.string(),
 });
 
 interface PaymentStepProps {
   enableStripe: boolean;
   onSubmit: (data: {
     paymentMethod: string;
-    transactionId: string;
+    transactionId?: string;
     paymentIntentId?: string;
     stripePaymentMethod?: string;
   }) => void;
   buttonLabel?: string;
 }
 
-const PaymentStep: React.FC<PaymentStepProps> = ({
-  enableStripe,
-  onSubmit,
-  buttonLabel = "Pay",
-}) => {
+const StripePaymentStep = React.forwardRef<
+  { handleSubmit: () => Promise<void> },
+  Omit<PaymentStepProps, 'buttonLabel'> & { onStripeReady: (ready: boolean) => void }
+>(({ onSubmit, onStripeReady }, ref) => {
   const { cartData } = useAppContext();
   const stripe = useStripe();
   const elements = useElements();
-  const [paymentGateways, setPaymentGateways] = useState<PaymentGateway[]>([]);
-  const [isStripeReady, setIsStripeReady] = useState(false);
 
-  // Fetch payment gateways on component mount
-  useEffect(() => {
-    const fetchPaymentGateways = async () => {
-      const response = await getPaymentGateways();
-      console.log("response", response);
-      setPaymentGateways(response.data?.paymentGateways?.nodes ?? []);
-    };
-    fetchPaymentGateways();
-  }, []);
-
-  const form = useForm<z.infer<typeof paymentSchema>>({
-    resolver: zodResolver(paymentSchema),
-  });
-
-  const handleSubmit = async (data: z.infer<typeof paymentSchema>) => {
-    // If using Stripe
-    if (enableStripe && stripe && elements && isStripeReady) {
+  const handleSubmit = async () => {
+    if (stripe && elements) {
       await elements?.submit();
 
       const { data: paymentIntent } = await createPaymentIntent({
@@ -78,8 +60,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
             : 9900,
         currency: "aud",
       });
-
-      console.log("paymentIntent", paymentIntent);
 
       const result = await stripe.confirmPayment({
         clientSecret: paymentIntent.createPaymentIntent.clientSecret,
@@ -91,7 +71,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
         redirect: "if_required",
       });
 
-      console.log("result", result);
       if (result?.error) {
         console.error(result?.error.message);
         return;
@@ -101,34 +80,63 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
         paymentMethod: "stripe",
         transactionId: result.paymentIntent.id,
         paymentIntentId: paymentIntent.createPaymentIntent.id,
-        stripePaymentMethod: JSON.stringify(
-          result.paymentIntent.payment_method
-        ),
-      });
-    } else {
-      // For other payment gateways
-      onSubmit({
-        paymentMethod: data.paymentGatewayId ?? "",
-        transactionId: "ch_mock_123456789",
+        stripePaymentMethod: JSON.stringify(result.paymentIntent.payment_method),
       });
     }
   };
 
   const handleStripeChange = (event: StripePaymentElementChangeEvent) => {
-    console.log(event);
-    setIsStripeReady(event.complete);
+    onStripeReady(event.complete);
   };
+
+  React.useImperativeHandle(ref, () => ({
+    handleSubmit
+  }));
 
   return (
     <div className="space-y-6">
-      {enableStripe && (
-        <PaymentElement
-          options={{
-            layout: "accordion",
-          }}
-          onChange={handleStripeChange}
-        />
-      )}
+      <PaymentElement
+        options={{
+          layout: "accordion",
+        }}
+        onChange={handleStripeChange}
+      />
+    </div>
+  );
+});
+
+StripePaymentStep.displayName = "StripePaymentStep";
+
+const StandardPaymentStep: React.FC<{
+  onSubmit: PaymentStepProps['onSubmit'];
+  onStandardReady: (ready: boolean) => void;
+  form: UseFormReturn<z.infer<typeof paymentSchema>>;
+}> = ({
+  onSubmit,
+  onStandardReady,
+  form
+}) => {
+    const [paymentGateways, setPaymentGateways] = useState<PaymentGateway[]>([]);
+
+    useEffect(() => {
+      const fetchPaymentGateways = async () => {
+        const response = await getPaymentGateways();
+        setPaymentGateways(response.data?.paymentGateways?.nodes ?? []);
+      };
+      fetchPaymentGateways();
+    }, []);
+
+    useEffect(() => {
+      onStandardReady(form.formState.isValid);
+    }, [form.formState.isValid, onStandardReady]);
+
+    const handleSubmit = (data: z.infer<typeof paymentSchema>) => {
+      onSubmit({
+        paymentMethod: data.paymentGatewayId ?? "",
+      });
+    };
+
+    return (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -169,19 +177,65 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="w-full mt-4"
-            disabled={
-              enableStripe
-                ? !form.formState.isValid && !isStripeReady
-                : !form.formState.isValid
-            }
-          >
-            {buttonLabel}
-          </Button>
         </form>
       </Form>
+    );
+  };
+
+const PaymentStep: React.FC<PaymentStepProps> = ({ enableStripe, onSubmit, buttonLabel = "Pay" }) => {
+  const [isStripeReady, setIsStripeReady] = useState(false);
+  const [isStandardReady, setIsStandardReady] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const form = useForm<{ paymentGatewayId: string }>({
+    resolver: zodResolver(paymentSchema),
+    defaultValues: {
+      paymentGatewayId: ''
+    }
+  });
+  const stripeRef = useRef<{ handleSubmit: () => Promise<void> }>(null);
+
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      if (enableStripe && isStripeReady) {
+        await stripeRef.current?.handleSubmit();
+      } else {
+        await form.handleSubmit((data) => {
+          onSubmit({
+            paymentMethod: data.paymentGatewayId ?? "",
+          });
+        })();
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      {enableStripe && (
+        <StripePaymentStep
+          ref={stripeRef}
+          onSubmit={onSubmit}
+          enableStripe={enableStripe}
+          onStripeReady={setIsStripeReady}
+        />
+      )}
+      <StandardPaymentStep
+        onSubmit={onSubmit}
+        onStandardReady={setIsStandardReady}
+        form={form}
+      />
+      <Button
+        onClick={handlePayment}
+        className="w-full mt-4"
+        disabled={loading || (enableStripe ? !isStripeReady : !isStandardReady)}
+        loading={loading}
+      >
+        {buttonLabel}
+      </Button>
     </div>
   );
 };

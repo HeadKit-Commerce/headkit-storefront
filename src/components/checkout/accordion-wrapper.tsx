@@ -40,7 +40,7 @@ const AccordionWrapper = ({
       className={cn(
         "relative mb-2 p-4 rounded-md bg-white border transition-all",
         {
-          "border-purple-500 text-primary": isActive,
+          "border-purple-500": isActive,
           "cursor-pointer": isCompleted && !isActive && clickable,
           "opacity-50": disabled,
         }
@@ -52,16 +52,17 @@ const AccordionWrapper = ({
       )}
 
       <div className="flex justify-between items-center">
-        <div className="flex items-start gap-2 text-2xl">
+        <div className={cn("flex items-start gap-2 text-2xl", {
+          "text-purple-500": isActive || isCompleted,
+        })}>
           <span className="font-bold">{order}.</span>
           <span className="font-extrabold uppercase">{title}</span>
         </div>
         {isActive && rightMenu && <div className="flex">{rightMenu}</div>}
+        {!isActive && isCompleted && briefValue && (
+          <div className="text-gray-900 max-w-[50%] text-right">{briefValue}</div>
+        )}
       </div>
-
-      {!isActive && isCompleted && briefValue && (
-        <div className="mt-2 text-gray-600">{briefValue}</div>
-      )}
 
       {isActive && (
         <div className="mt-4">

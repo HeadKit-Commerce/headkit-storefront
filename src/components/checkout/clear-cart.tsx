@@ -8,7 +8,8 @@ export function ClearCart() {
 
   useEffect(() => {
     setCartData(null);
-  }, [setCartData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }
