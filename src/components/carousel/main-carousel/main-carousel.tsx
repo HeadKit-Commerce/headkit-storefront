@@ -36,7 +36,7 @@ export const MainCarousel = ({ carouselData }: Props) => {
         opts={{
           align: "start",
         }}
-        className="w-full container"
+        className="w-full"
       >
         <CarouselContent>
           {carouselData?.nodes?.map((carousel, index) => {

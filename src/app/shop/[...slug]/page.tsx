@@ -2,6 +2,10 @@ import {
   ProductIdTypeEnum,
   PostTypeSeoContentFragment,
   ProductContentFullWithGroupFragment,
+  SimpleProduct,
+  VariableProduct,
+  GroupProduct,
+  ExternalProduct,
 } from "@/lib/headkit/generated";
 
 import { Metadata, ResolvedMetadata, ResolvingMetadata } from "next";
@@ -114,21 +118,19 @@ export default async function Product({ params }: Props) {
       )}
 
       {(product?.data.product.related?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
-          <div className="container mx-auto">
-            <SectionHeader
-              title="Related Products"
-              description=""
-              allButton="View All"
-              allButtonPath="/shop"
+        <div className="overflow-hidden px-5 md:px-10 py-[30px] lg:pt-[60px] lg:pb-[30px]">
+          <SectionHeader
+            title="Related Products"
+            description=""
+            allButton="View All"
+            allButtonPath="/shop"
+          />
+          <div className="mt-5 lg:mt-[30px]">
+            <ProductCarousel
+              products={
+                (product?.data.product.related?.nodes || []) as ProductContentFullWithGroupFragment[]
+              }
             />
-            <div className="mt-5 px-5 lg:mt-[30px]">
-              <ProductCarousel
-                products={
-                  (product?.data.product.related?.nodes || []) as ProductContentFullWithGroupFragment[]
-                }
-              />
-            </div>
           </div>
         </div>
       )}
@@ -136,15 +138,16 @@ export default async function Product({ params }: Props) {
   );
 }
 
-// export async function generateStaticParams() {
-//   const slugs = await headkit().getProductSlugs();
+export async function generateStaticParams() {
+  const slugs = await headkit().getProductSlugs();
 
-//   return slugs?.data.products?.nodes?.map(
-//     (item: SimpleProduct | VariableProduct) => {
-//       return {
-//         slug:
-//           item?.uri?.split("/").filter((e) => e !== "" && e !== "shop") || [],
-//       };
-//     }
-//   );
-// }
+  return slugs?.data.products?.nodes?.map(
+    (item) => {
+      return {
+        slug:
+          (item as SimpleProduct | VariableProduct | GroupProduct | ExternalProduct | null | undefined)
+            ?.uri?.split("/").filter((e) => e !== "" && e !== "shop") || [],
+      };
+    }
+  ) || [];
+}

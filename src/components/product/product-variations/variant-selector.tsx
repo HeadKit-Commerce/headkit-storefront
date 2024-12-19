@@ -93,13 +93,18 @@ export const VariantSelector = ({
           );
         });
 
-        // Find first available option for this attribute
-        const availableOption = attribute.fullOptions?.find((option) => {
+        // First try to find an in-stock option
+        let availableOption = attribute.fullOptions?.find((option) => {
           return compatibleVariations.some((variant) => 
             variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug &&
             variant.stockStatus === "IN_STOCK"
           );
         });
+
+        // If no in-stock options found, fall back to the first option
+        if (!availableOption) {
+          availableOption = attribute.fullOptions?.[0];
+        }
 
         if (availableOption?.slug) {
           defaultOptions[attribute.name ?? ""] = availableOption.slug;

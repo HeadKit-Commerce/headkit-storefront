@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Button } from "../ui/button";
 
 interface Props {
   menus: Record<
@@ -59,7 +59,7 @@ const Header = ({ menus }: Props) => {
           target: "_blank",
         }))}
       />
-      <NavigationMenu className="sticky top-0 flex items-center justify-between h-20 w-full bg-white container max-w-full z-20">
+      <NavigationMenu className="sticky top-0 flex items-center justify-between h-20 w-full bg-white max-w-full z-20 px-5 md:px-10">
         <NavigationMenuList>
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
@@ -82,23 +82,25 @@ const Header = ({ menus }: Props) => {
           </NavigationMenuItem>
           <NavigationMenuItem className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger>
-                <Menu className="h-6 w-6" />
+              <SheetTrigger asChild>
+                <Button variant={"ghost"}>
+                  <Icon.hamburger className="stroke-purple-800 w-6 h-6" />
+                </Button>
               </SheetTrigger>
               <SheetContent>
                 <SheetTitle hidden />
                 <SheetDescription hidden />
                 <nav className="flex flex-col gap-4 mt-8">
                   {primaryMenu && (
-                    <MobileMenuSection 
-                      menuItems={primaryMenu.menuItems.nodes} 
-                      onSelect={() => setOpen(false)} 
+                    <MobileMenuSection
+                      menuItems={primaryMenu.menuItems.nodes}
+                      onSelect={() => setOpen(false)}
                     />
                   )}
                   {mainRightMenu && (
-                    <MobileMenuSection 
-                      menuItems={mainRightMenu.menuItems.nodes} 
-                      onSelect={() => setOpen(false)} 
+                    <MobileMenuSection
+                      menuItems={mainRightMenu.menuItems.nodes}
+                      onSelect={() => setOpen(false)}
                     />
                   )}
                 </nav>
@@ -181,7 +183,7 @@ const MenuItem = ({ menuItem }: MenuItemProps) => (
           <div className="text-sm font-medium">{menuItem.payload.label}</div>
           {menuItem.payload.description && (
             <p className="text-muted-foreground text-sm">
-              {menuItem.payload.description} sdf
+              {menuItem.payload.description}
             </p>
           )}
         </div>
@@ -230,8 +232,8 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
     <div className="flex flex-col gap-4">
       {formattedMenu.map((menuItem) => (
         <div key={menuItem.id}>
-          <Link 
-            href={menuItem.payload.uri} 
+          <Link
+            href={menuItem.payload.uri}
             className="text-lg font-medium"
             onClick={onSelect}
           >

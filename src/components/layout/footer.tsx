@@ -25,9 +25,8 @@ const Footer = ({ menus }: FooterProps) => {
   const footerPolicyMenu = menus[MenuLocationEnum.FooterPolicy];
 
   return (
-    <footer className="mt-8 border-t-2 border-t-[#E2E2DF]">
-      <div className="container">
-        <div className="grid gap-x-24 gap-y-8 py-10 md:grid-cols-3 md:py-14">
+    <footer className="mt-8 border-t-2 border-t-[#E2E2DF] px-5 md:px-10">
+         <div className="grid gap-x-24 gap-y-8 py-10 md:grid-cols-3 md:py-14">
           {/* Logo and Description */}
           <div className="flex flex-col justify-between">
             <div className="flex">
@@ -131,7 +130,6 @@ const Footer = ({ menus }: FooterProps) => {
             </div>
           </div>
         </div>
-      </div>
     </footer>
   );
 };

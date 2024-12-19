@@ -17,7 +17,7 @@ const SectionHeader = ({
   allButtonTarget
 }: Props) => {
   return (
-    <div className="grid w-full grid-cols-1 gap-x-8 gap-y-2 px-[20px] py-5 md:grid-cols-3">
+    <div className="grid w-full grid-cols-1 gap-x-8 gap-y-2 py-5 md:grid-cols-3">
       <div className="flex items-center">
         <h2 className="text-2xl font-semibold">{title}</h2>
       </div>

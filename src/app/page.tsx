@@ -45,7 +45,7 @@ export default async function Home() {
     <>
       {(mainCarousel?.data?.carousels?.nodes?.length ?? 0) > 0 && (
         <div className="overflow-hidden">
-          <div className="container-fluid mx-auto">
+          <div className="px-5 md:px-10">
             <MainCarousel carouselData={mainCarousel.data.carousels} />
           </div>
         </div>
@@ -55,24 +55,22 @@ export default async function Home() {
 
       {/* Featured Products */}
       {(featuredProducts?.data?.products?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
-          <div className="container mx-auto">
-            <SectionHeader
-              title="Featured Products"
-              description="Explore our curated selection of top-rated products."
-              allButton="View All"
-              allButtonPath="/shop/featured"
+        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+          <SectionHeader
+            title="Featured Products"
+            description="Explore our curated selection of top-rated products."
+            allButton="View All"
+            allButtonPath="/shop/featured"
+          />
+          <div className="mt-5 lg:mt-[30px]">
+            <ProductCarousel
+              products={
+                (featuredProducts?.data?.products?.nodes?.filter(
+                  (node): node is NonNullable<typeof node> =>
+                    node !== null && node !== undefined
+                ) ?? []) as ProductContentFullWithGroupFragment[]
+              }
             />
-            <div className="mt-5 px-5 lg:mt-[30px]">
-              <ProductCarousel
-                products={
-                  (featuredProducts?.data?.products?.nodes?.filter(
-                    (node): node is NonNullable<typeof node> =>
-                      node !== null && node !== undefined
-                  ) ?? []) as ProductContentFullWithGroupFragment[]
-                }
-              />
-            </div>
           </div>
         </div>
       )}
@@ -80,84 +78,79 @@ export default async function Home() {
       <BlockEditor blocks={editorBlocks} section="section-2" />
 
       {(productCategories?.data?.productCategories?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden bg-white py-[30px] lg:py-14">
-          <div className="container mx-auto">
-            <SectionHeader
-              title="Top Collections"
-              description=""
-              allButton="Shop all Collections"
-              allButtonPath="/shop/categories"
+        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+          <SectionHeader
+            title="Top Collections"
+            description=""
+            allButton="Shop all Collections"
+            allButtonPath="/shop/categories"
+          />
+          <div className="mt-5 lg:mt-[30px]">
+            <CategoryCarousel
+              categories={
+                productCategories?.data?.productCategories?.nodes.map(
+                  (category) => ({
+                    name: category?.name || "",
+                    thumbnail: category?.thumbnail || "",
+                    slug: category?.slug || "",
+                    uri: category?.uri || "",
+                  })
+                ) ?? []
+              }
             />
-            <div className="mt-5 px-5 lg:mt-[30px]">
-              <CategoryCarousel
-                categories={
-                  productCategories?.data?.productCategories?.nodes.map(
-                    (category) => ({
-                      name: category?.name || "",
-                      thumbnail: category?.thumbnail || "",
-                      slug: category?.slug || "",
-                      uri: category?.uri || "",
-                    })
-                  ) ?? []
-                }
-              />
-            </div>
           </div>
         </div>
       )}
 
       {/* brands */}
       {(brands?.data?.brands?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden bg-white py-[30px] lg:py-14">
-          <div className="container mx-auto !overflow-visible">
-            <SectionHeader
-              title={"Leading Brands"}
-              description={""}
-              allButton={"All Brands"}
-              allButtonPath={"/"}
-            />
+        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+          <SectionHeader
+            title={"Leading Brands"}
+            description={""}
+            allButton={"All Brands"}
+            allButtonPath={"/"}
+          />
 
-            <div className="mt-5 px-5 lg:mt-[30px] !overflow-visible">
-              <BrandCarousel
-                brands={
-                  brands?.data.brands?.nodes.map((brand) => ({
-                    name: brand?.name || "",
-                    thumbnail: brand?.thumbnail || "",
-                    slug: brand?.slug || "",
-                  })) ?? []
-                }
-              />
-            </div>
+          <div className="mt-5 lg:mt-[30px]">
+            <BrandCarousel
+              brands={
+                brands?.data.brands?.nodes.map((brand) => ({
+                  name: brand?.name || "",
+                  thumbnail: brand?.thumbnail || "",
+                  slug: brand?.slug || "",
+                })) ?? []
+              }
+            />
           </div>
         </div>
       )}
 
       {/* post */}
       {(posts?.data?.posts?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden bg-sand-2 py-[30px] lg:pt-[60px] lg:pb-[30px]">
-          <div className="container mx-auto">
-            <SectionHeader
-              title="Latest News"
-              description="Get the latest news and updates from our blog."
-              allButton="View All"
-              allButtonPath="/blog"
+        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+          <SectionHeader
+            title="Latest News"
+            description="Get the latest news and updates from our blog."
+            allButton="View All"
+            allButtonPath="/blog"
+          />
+          <div className="mt-5 lg:mt-[30px]">
+            <PostCarousel
+              posts={
+                posts?.data?.posts?.nodes.map((post) => ({
+                  title: post?.title || "",
+                  slug: post?.slug || "",
+                  featuredImage: {
+                    src: post?.featuredImage?.node.sourceUrl || "",
+                    alt: post?.title || "",
+                  },
+                })) ?? []
+              }
             />
-            <div className="mt-5 px-5 lg:mt-[30px]">
-              <PostCarousel
-                posts={
-                  posts?.data?.posts?.nodes.map((post) => ({
-                    title: post?.title || "",
-                    slug: post?.slug || "",
-                    featuredImage: {
-                      src: post?.featuredImage?.node.sourceUrl || "",
-                      alt: post?.title || "",
-                    },
-                  })) ?? []
-                }
-              />
-            </div>
           </div>
         </div>
+
       )}
     </>
   );

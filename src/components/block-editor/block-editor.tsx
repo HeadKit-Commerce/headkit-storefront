@@ -29,25 +29,24 @@ const BlockEditor = ({ blocks, section = "section-1" }: Props) => {
             case "headkit-product-carousel":
               return (
                 <div
-                  className="overflow-hidden py-[30px] lg:py-14"
+                  className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden"
                   key={index}
                 >
-                  <div className="container mx-auto !overflow-visible">
-                    <SectionHeader
-                      title={data.content.title}
-                      description={data.content.description}
-                      allButton={data.content.button?.text ?? ""}
-                      allButtonPath={data.content.button?.url ?? ""}
-                    />
+                  <SectionHeader
+                    title={data.content.title}
+                    description={data.content.description}
+                    allButton={data.content.button?.text ?? ""}
+                    allButtonPath={data.content.button?.url ?? ""}
+                  />
 
-                    <div className="mt-5 px-5 lg:mt-[30px] !overflow-visible">
-                      <ProductCarousel
-                        products={data.content.products?.nodes ?? []}
-                      />
-                    </div>
+                  <div className="mt-5 lg:mt-[30px]">
+                    <ProductCarousel
+                      products={data.content.products?.nodes ?? []}
+                    />
                   </div>
 
-                  <div className="container mx-auto px-5 mt-7">
+
+                  <div className="mx-auto mt-7">
                     <Link
                       href={data.content.button?.url || "#"}
                       target={data.content.button?.linkTarget ?? ""}
@@ -84,7 +83,7 @@ const AboutUs = ({
   buttonTarget,
 }: AboutUsProps) => {
   return (
-    <div className="container relative grid h-fit w-full grid-cols-1 gap-8 px-[20px] py-14 md:grid-cols-3 md:px-[40px]">
+    <div className="relative grid h-fit w-full grid-cols-1 gap-8 px-5 md:px-10 py-14 md:grid-cols-3">
       <div className="md:col-span-2">
         <h1 className="mb-5 text-3xl font-semibold">{title}</h1>
         <div

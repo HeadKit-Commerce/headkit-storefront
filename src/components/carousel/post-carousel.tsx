@@ -6,6 +6,8 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselPagination,
+  CarouselPrevious,
+  CarouselNext,
   useDotButton,
 } from "@/components/ui/carousel";
 import { useState } from "react";
@@ -47,6 +49,8 @@ const PostCarousel = ({ posts }: Props) => {
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="-left-4 bg-white" />
+      <CarouselNext className="-right-4 bg-white" />
       {scrollSnaps.length > 1 && (
         <CarouselPagination
           itemLength={scrollSnaps.length}

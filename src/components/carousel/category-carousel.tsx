@@ -2,6 +2,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 import Link from "next/link";
 import { FeaturedImage } from "../product/featured-image";
@@ -36,6 +38,8 @@ const CategoryCarousel = ({ categories }: Props) => {
           </CarouselItem>
         ))}
       </CarouselContent>
+      <CarouselPrevious className="-left-4 bg-white" />
+      <CarouselNext className="-right-4 bg-white" />
     </Carousel>
   );
 };

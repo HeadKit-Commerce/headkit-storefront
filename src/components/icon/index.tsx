@@ -2,8 +2,9 @@ import { IconBaseProps } from "react-icons";
 import { LogoSvg } from "./svg/logo-svg";
 import { LoadingSvg } from "./svg/loading-svg";
 import {
-  HiArrowSmallDown,
-  HiArrowSmallRight,
+  HiBars3,
+  HiOutlineArrowSmallDown,
+  HiOutlineArrowSmallRight,
   HiOutlineCheck,
   HiOutlineMinus,
   HiOutlinePlus,
@@ -42,14 +43,15 @@ const Icon = {
 
   // misc
   loading: (props: IconProps) => <LoadingSvg {...props} />,
-  arrowRight: (props: IconProps) => <HiArrowSmallRight {...props} />,
-  arrowDown: (props: IconProps) => <HiArrowSmallDown {...props} />,
+  arrowRight: (props: IconProps) => <HiOutlineArrowSmallRight {...props} />,
+  arrowDown: (props: IconProps) => <HiOutlineArrowSmallDown {...props} />,
   truck: (props: IconProps) => <HiOutlineTruck {...props} />,
   shoppingBag: (props: IconProps) => <HiOutlineShoppingBag {...props} />,
   minus: (props: IconProps) => <HiOutlineMinus {...props} />,
   plus: (props: IconProps) => <HiOutlinePlus {...props} />,
   close: (props: IconProps) => <HiOutlineXMark {...props} />,
   check: (props: IconProps) => <HiOutlineCheck {...props} />,
+  hamburger: (props: IconProps) => <HiBars3 {...props} />,
 };
 
 type IconType = keyof typeof Icon;

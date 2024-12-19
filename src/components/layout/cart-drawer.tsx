@@ -40,7 +40,7 @@ const CartDrawer = () => {
   return (
     <Sheet onOpenChange={toggleCartDrawer} open={cartDrawer}>
       <SheetTrigger asChild>
-        <Button variant={"ghost"}>
+        <Button variant={"ghost"} className="md:pr-0">
           {(cartData?.contents?.nodes?.length ?? 0) > 0 && (
             <div className="absolute right-2 top-0 z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
               {cartData?.contents?.nodes?.length}

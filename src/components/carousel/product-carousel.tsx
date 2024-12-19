@@ -2,6 +2,8 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
 import { ProductCard } from "../product/product-card";
 import { ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
@@ -30,6 +32,8 @@ const ProductCarousel = ({ products }: Props) => {
             </CarouselItem>
           ))}
       </CarouselContent>
+      <CarouselPrevious className="-left-4 bg-white" />
+      <CarouselNext className="-right-4 bg-white" />
     </Carousel>
   );
 };
