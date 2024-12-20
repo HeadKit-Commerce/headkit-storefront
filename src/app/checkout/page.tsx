@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
 import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
-import Cart from "@/components/checkout/cart";
+import { Cart } from "@/components/checkout/cart";
 import { StripeConfig } from "@/lib/headkit/generated";
 import { getStripeConfig } from "@/lib/headkit/actions";
 
@@ -67,25 +67,24 @@ export default function Page() {
       <div className="order-1 md:order-2 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5">
         <div
           className="px-[20px] md:px-[32] py-[17px] md:py-0 border-y-[1px] border-[#d6d6d6] md:border-0"
-          onClick={() => setShowCart(!showCart)}
         >
-          <div className="md:hidden flex justify-between">
-            <span className="font-medium text-body3 text-black-1">
+          <div className="md:hidden flex justify-between" onClick={() => setShowCart(!showCart)}>
+            <span className="font-medium">
               {cartData?.contents?.nodes?.length}{" "}
               {cartData?.contents?.nodes?.length &&
                 cartData?.contents?.nodes?.length > 1
                 ? "items"
                 : "item"}
             </span>
-            <span className="font-medium text-body3 text-black-1">
+            <span className="font-medium flex items-center">
               {currencyFormatter({
                 price:
                   getFloatVal(cartData?.subtotal || "0") +
                   getFloatVal(cartData?.subtotalTax || "0"),
               })}
-              <Icon.arrowDown
+              <Icon.chevronDown
                 className={cn(
-                  "mt-[2px] ml-[10px] h-[24px] w-[12px] bg-black-1 bg-contain",
+                  "mt-[2px] ml-[10px] h-[24px] w-[12px] bg-contain",
                   { "rotate-180": showCart }
                 )}
               />

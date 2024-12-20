@@ -80,12 +80,59 @@ export const VariantSelector = ({
     });
 
     if (Object.keys(urlOptions).length > 0) {
+      // Find missing required attributes
+      const missingAttributes = filteredAttributes.filter(
+        (attr) => !urlOptions[attr.name ?? ""]
+      );
+
+      // For each missing attribute, find a valid option based on current selections
+      missingAttributes.forEach((attribute) => {
+        if (!attribute.name || !attribute.fullOptions?.length) return;
+
+        // Find variations that match our current URL options
+        const compatibleVariations = variations.filter((variant) =>
+          Object.entries(urlOptions).every(
+            ([key, value]) => variant.attributeKeyValue[key]?.value === value
+          )
+        );
+
+        // First try to find an in-stock option
+        let availableOption = attribute.fullOptions.find((option) => {
+          return compatibleVariations.some(
+            (variant) =>
+              variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug &&
+              variant.stockStatus === StockStatusEnum.InStock
+          );
+        });
+
+        // If no in-stock options found, fall back to any available option
+        if (!availableOption) {
+          availableOption = attribute.fullOptions.find((option) => {
+            return compatibleVariations.some(
+              (variant) =>
+                variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug
+            );
+          });
+        }
+
+        // If still no option found, use the first option from fullOptions
+        if (!availableOption) {
+          availableOption = attribute.fullOptions[0];
+        }
+
+        if (availableOption?.slug) {
+          urlOptions[attribute.name] = availableOption.slug;
+        }
+      });
+
       setSelectedOptions(urlOptions);
     } else {
-      // Instead of finding a single default variant, build options attribute by attribute
+      // Build options attribute by attribute
       const defaultOptions: { [key: string]: string } = {};
       
       filteredAttributes.forEach((attribute) => {
+        if (!attribute.name || !attribute.fullOptions?.length) return;
+
         // Find all variations that match our current selected options
         const compatibleVariations = variations.filter((variant) => {
           return Object.entries(defaultOptions).every(([key, value]) => 
@@ -94,29 +141,35 @@ export const VariantSelector = ({
         });
 
         // First try to find an in-stock option
-        let availableOption = attribute.fullOptions?.find((option) => {
+        let availableOption = attribute.fullOptions.find((option) => {
           return compatibleVariations.some((variant) => 
             variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug &&
-            variant.stockStatus === "IN_STOCK"
+            variant.stockStatus === StockStatusEnum.InStock
           );
         });
 
-        // If no in-stock options found, fall back to the first option
+        // If no in-stock options found, fall back to any available option
         if (!availableOption) {
-          availableOption = attribute.fullOptions?.[0];
+          availableOption = attribute.fullOptions.find((option) => {
+            return compatibleVariations.some((variant) =>
+              variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug
+            );
+          });
+        }
+
+        // If still no option found, use the first option from fullOptions
+        if (!availableOption) {
+          availableOption = attribute.fullOptions[0];
         }
 
         if (availableOption?.slug) {
-          defaultOptions[attribute.name ?? ""] = availableOption.slug;
+          defaultOptions[attribute.name] = availableOption.slug;
         }
       });
 
-      if (Object.keys(defaultOptions).length > 0) {
-        setSelectedOptions(defaultOptions);
-      }
+      setSelectedOptions(defaultOptions);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [variations, filteredAttributes]);
+  }, [variations, filteredAttributes, searchParams]);
 
   useEffect(() => {
     onChange(selectedOptions);

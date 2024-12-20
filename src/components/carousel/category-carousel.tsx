@@ -38,8 +38,8 @@ const CategoryCarousel = ({ categories }: Props) => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white" />
-      <CarouselNext className="-right-4 bg-white" />
+      <CarouselPrevious className="-left-4 bg-white hidden md:block" />
+      <CarouselNext className="-right-4 bg-white hidden md:block" />
     </Carousel>
   );
 };

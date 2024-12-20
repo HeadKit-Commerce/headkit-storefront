@@ -10,7 +10,7 @@ interface Props {
   showDisplayShipping?: boolean;
 }
 
-export default function Cart({ showDisplayShipping }: Props) {
+const Cart = ({ showDisplayShipping }: Props) => {
   const { cartData, currencyFormatter } = useAppContext();
 
   const calculateShipping = () => {
@@ -108,4 +108,6 @@ export default function Cart({ showDisplayShipping }: Props) {
       </div>
     </div>
   );
-}
+};
+
+export { Cart };

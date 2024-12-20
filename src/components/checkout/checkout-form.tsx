@@ -21,6 +21,7 @@ import { useAppContext } from "../context/app-context";
 import { checkout, getCustomer } from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FormData {
   email?: string;
@@ -82,7 +83,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     newsletter: false,
-    deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT,
+    deliveryMethod: undefined,
     location: "",
     billingAddress: {
       firstName: "",
@@ -112,6 +113,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     stripePaymentMethod: "",
   });
   const [stripeEnabled, setStripeEnabled] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const enableStripe = useMemo(
     () => stripeEnabled && getStripeEnabled(stripeConfig),
@@ -121,42 +123,59 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
 
   useEffect(() => {
     const fetchCustomer = async () => {
-      const { data: { customer } } = await getCustomer({
-        withAddress: true,
-        withOrders: false
-      });
+      try {
+        const { data: { customer } } = await getCustomer({
+          withAddress: true,
+          withOrders: false
+        });
 
-      console.log("customer", customer);
+        console.log("customer", customer);
+        console.log("cartData", cartData);
 
-      setFormData((prev) => ({
-        ...prev,
-        location: cartData?.chosenShippingMethods?.[0] ?? "",
-        ...(customer ? {
-          email: customer?.email ?? customer?.billing?.email ?? customer?.shipping?.email ?? "",
-          billingAddress: {
-            firstName: customer?.billing?.firstName ?? "",
-            lastName: customer?.billing?.lastName ?? "",
-            line1: customer?.billing?.address1 ?? "",
-            line2: customer?.billing?.address2 ?? "",
-            city: customer?.billing?.city ?? "",
-            state: customer?.billing?.state ?? "",
-            country: customer?.billing?.country ?? "",
-            postalCode: customer?.billing?.postcode ?? "",
-            phone: customer?.billing?.phone ?? "",
-          },
-          shippingAddress: {
-            firstName: customer?.shipping?.firstName ?? "",
-            lastName: customer?.shipping?.lastName ?? "",
-            line1: customer?.shipping?.address1 ?? "",
-            line2: customer?.shipping?.address2 ?? "",
-            city: customer?.shipping?.city ?? "",
-            state: customer?.shipping?.state ?? "",
-            country: customer?.shipping?.country ?? "",
-            postalCode: customer?.shipping?.postcode ?? "",
-            phone: customer?.shipping?.phone ?? "",
-          }
-        } : {})
-      }));
+        // if cartData?.chosenShippingMethods?.[0] starts with "pickup_location" then set deliveryMethod to DeliveryStepEnum.CLICK_AND_COLLECT, and set location to the pickup location
+        const isPickupLocation = cartData?.chosenShippingMethods?.[0]?.startsWith("pickup_location");
+
+        setFormData((prev) => ({
+          ...prev,
+          ...(isPickupLocation
+            ? {
+              location: cartData?.chosenShippingMethods?.[0] ?? "",
+              deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT
+            }
+            : {
+              shippingMethod: cartData?.chosenShippingMethods?.[0] ?? "",
+              deliveryMethod: DeliveryStepEnum.SHIPPING_TO_HOME
+            }
+          ),
+          ...(customer ? {
+            email: customer?.email ?? customer?.billing?.email ?? customer?.shipping?.email ?? "",
+            billingAddress: {
+              firstName: customer?.billing?.firstName ?? "",
+              lastName: customer?.billing?.lastName ?? "",
+              line1: customer?.billing?.address1 ?? "",
+              line2: customer?.billing?.address2 ?? "",
+              city: customer?.billing?.city ?? "",
+              state: customer?.billing?.state ?? "",
+              country: customer?.billing?.country ?? "",
+              postalCode: customer?.billing?.postcode ?? "",
+              phone: customer?.billing?.phone ?? "",
+            },
+            shippingAddress: {
+              firstName: customer?.shipping?.firstName ?? "",
+              lastName: customer?.shipping?.lastName ?? "",
+              line1: customer?.shipping?.address1 ?? "",
+              line2: customer?.shipping?.address2 ?? "",
+              city: customer?.shipping?.city ?? "",
+              state: customer?.shipping?.state ?? "",
+              country: customer?.shipping?.country ?? "",
+              postalCode: customer?.shipping?.postcode ?? "",
+              phone: customer?.shipping?.phone ?? "",
+            }
+          } : {})
+        }));
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchCustomer();
@@ -211,17 +230,19 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
       const address = formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
         ? formData.billingAddress
         : formData.shippingAddress;
-      
+
       if (!address?.line1) return undefined;
 
-      return [
-        `${address.firstName} ${address.lastName}`,
-        address.line1,
-        address.line2,
-        `${address.city}, ${address.state} ${address.postalCode}`,
-        address.country,
-        address.phone
-      ].filter(Boolean).join(', ');
+      return `
+        <div class="flex flex-col text-sm">
+          <span>${address.firstName} ${address.lastName}</span>
+          <span>${address.line1}</span>
+          ${address.line2 ? `<span>${address.line2}</span>` : ''}
+          <span>${address.city}, ${address.state} ${address.postalCode}</span>
+          <span>${address.country}</span>
+          <span>${address.phone}</span>
+        </div>
+      `;
     } else if (step === CheckoutFormStepEnum.PAYMENT) {
       return formData.paymentMethodId;
     }
@@ -300,6 +321,35 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     console.log("formData", formData);
   }, [formData]);
 
+  const LoadingSkeleton = () => (
+    <div>
+      {[1, 2, 3, 4].map((index) => (
+        <div
+          key={index}
+          className="relative mb-2 px-5 py-5 md:px-10 md:py-5 rounded-md bg-white border"
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex items-start gap-2">
+              <Skeleton className="h-8 w-8 rounded-xl" />
+              <Skeleton className="h-8 w-32 rounded-xl" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (isLoading) {
+    return (
+      <>
+        <div className="mb-4">
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <LoadingSkeleton />
+      </>
+    );
+  }
+
   const FormContent = () => (
     <div>
       {Object.values(CheckoutFormStepEnum).map((step, index) => (
@@ -308,8 +358,8 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
           order={index + 1}
           title={step === CheckoutFormStepEnum.ADDRESS
             ? (formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? 'Billing Address'
-              : 'Shipping Method')
+              ? 'Billing'
+              : 'Shipping Options')
             : step}
           isActive={currentStep === step}
           isCompleted={isStepCompleted(step)}
@@ -326,7 +376,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
                 handleNextStep(CheckoutFormStepEnum.CONTACT, data)
               }
               defaultValues={{ email: formData.email, newsletter: formData.newsletter }}
-              buttonLabel="Next"
+              buttonLabel="Continue To Delivery"
             />
           )}
           {step === CheckoutFormStepEnum.DELIVERY_METHOD && (
@@ -340,7 +390,11 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
                 location: formData.location,
                 shippingAddress: formData.shippingAddress,
               }}
-              buttonLabel="Next"
+              onChange={({ deliveryMethod }) => {
+                // set form value but dont go to next step
+                setFormData((prev) => ({ ...prev, deliveryMethod }));
+              }}
+              buttonLabel={`Continue To ${formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT ? 'Billing' : 'Shipping Options'}`}
             />
           )}
           {step === CheckoutFormStepEnum.ADDRESS && (
@@ -365,14 +419,14 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
                       phone: "",
                     },
                   }}
-                  buttonLabel="Next"
+                  buttonLabel="Continue To Payment"
                 />
               ) : (
                 <ShippingOptionsStep
                   onNext={(data) =>
                     handleNextStep(CheckoutFormStepEnum.ADDRESS, data)
                   }
-                  buttonLabel="Next"
+                  buttonLabel="Continue To Payment"
                 />
               )}
             </>
@@ -411,6 +465,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
           stripe={stripePromise}
           options={{
             mode: "payment",
+            payment_method_types: cartData?.needsShippingAddress ? [] : ["card", "link"],
             amount:
               getFloatVal(cartData?.total ?? "0") > 0
                 ? Math.round(getFloatVal(cartData?.total ?? "0") * 100)

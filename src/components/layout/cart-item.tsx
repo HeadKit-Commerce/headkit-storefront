@@ -93,13 +93,13 @@ const CartItem = ({
       >
         {priceIncludeTax
           ? currencyFormatter({
-              price:
-                getFloatVal(cartItem?.subtotal || "0") +
-                getFloatVal(cartItem?.subtotalTax || "0"),
-            })
+            price:
+              getFloatVal(cartItem?.subtotal || "0") +
+              getFloatVal(cartItem?.subtotalTax || "0"),
+          })
           : currencyFormatter({
-              price: getFloatVal(cartItem?.subtotal || "0"),
-            })}
+            price: getFloatVal(cartItem?.subtotal || "0"),
+          })}
       </p>
     </>
   );
@@ -162,8 +162,8 @@ const CartItem = ({
       <div className="flex gap-3">
         {renderProductImage(
           cartItem?.variation?.node?.image?.sourceUrl ||
-            cartItem?.product?.node?.image?.sourceUrl ||
-            "/assets/fallback-image.webp",
+          cartItem?.product?.node?.image?.sourceUrl ||
+          "/assets/fallback-image.webp",
           cartItem?.product?.node?.name || "",
           cartItem?.product?.node?.uri || ""
         )}
@@ -185,8 +185,11 @@ const CartItem = ({
                 </p>
               ))}
             </div>
+
           </Link>
-          {updateable && renderQuantityControls()}
+          {updateable ? renderQuantityControls() : <div className="mt-0.5 flex">
+            <p className="font-medium text-[#343A40]">x{quantity}</p>
+          </div>}
         </div>
         <div className="flex flex-col items-end justify-between pt-[12px]">
           {renderPrice(

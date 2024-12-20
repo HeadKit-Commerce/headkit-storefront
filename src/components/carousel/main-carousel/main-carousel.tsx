@@ -68,16 +68,28 @@ export const MainCarousel = ({ carouselData }: Props) => {
                   </div>
                   <div className="relative h-[40vh] overflow-hidden rounded-2xl md:h-[60vh] lg:h-[80vh]">
                     {carousel?.image ? (
-                      <Image
-                        priority
-                        src={carousel.image!}
-                        alt={carousel.header!}
-                        quality="100"
-                        sizes="100vw"
-                        width={0}
-                        height={0}
-                        className="object-cover w-full h-full"
-                      />
+                      <>
+                        <Image
+                          priority
+                          src={carousel.mobileImage || carousel.image}
+                          alt={carousel.header!}
+                          quality="100"
+                          sizes="100vw"
+                          width={0}
+                          height={0}
+                          className="object-cover w-full h-full md:hidden"
+                        />
+                        <Image
+                          priority
+                          src={carousel.image}
+                          alt={carousel.header!}
+                          quality="100"
+                          sizes="100vw"
+                          width={0}
+                          height={0}
+                          className="hidden md:block object-cover w-full h-full"
+                        />
+                      </>
                     ) : null}
                   </div>
                 </div>

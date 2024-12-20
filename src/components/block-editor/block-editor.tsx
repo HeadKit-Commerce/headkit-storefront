@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "../common/section-header";
 import { ProductCarousel } from "../carousel/product-carousel";
@@ -43,19 +42,6 @@ const BlockEditor = ({ blocks, section = "section-1" }: Props) => {
                     <ProductCarousel
                       products={data.content.products?.nodes ?? []}
                     />
-                  </div>
-
-
-                  <div className="mx-auto mt-7">
-                    <Link
-                      href={data.content.button?.url || "#"}
-                      target={data.content.button?.linkTarget ?? ""}
-                      className="lg:hidden"
-                    >
-                      <Button rightIcon="arrowRight" fullWidth>
-                        {data.content.button?.text}
-                      </Button>
-                    </Link>
                   </div>
                 </div>
               );

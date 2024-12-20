@@ -20,29 +20,35 @@ import {
   updateCustomer,
 } from "@/lib/headkit/actions";
 import { CountriesEnum } from "@/lib/headkit/generated";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 const deliverySchema = z.object({
   deliveryMethod: z.enum([
     DeliveryStepEnum.CLICK_AND_COLLECT,
     DeliveryStepEnum.SHIPPING_TO_HOME,
-  ]),
+  ]).optional(),
   location: z.string().optional(),
-  shippingAddress: z.union([
-    z.undefined(),
-    z.object({
-      firstName: z.string().min(1, "First Name is required"),
-      lastName: z.string().min(1, "Last Name is required"),
-      line1: z.string().min(1, "Address Line 1 is required"),
-      line2: z.string().optional(),
-      city: z.string().min(1, "City is required"),
-      state: z.string().min(1, "State is required"),
-      country: z.string().min(1, "Country is required"),
-      postalCode: z.string().min(1, "Postal Code is required"),
-      phone: z.string().min(1, "Phone is required"),
-    }),
-  ]),
+  shippingAddress: z.object({
+    firstName: z.string().min(1, "First Name is required"),
+    lastName: z.string().min(1, "Last Name is required"),
+    line1: z.string().min(1, "Address Line 1 is required"),
+    line2: z.string().optional(),
+    city: z.string().min(1, "City is required"),
+    state: z.string().min(1, "State is required"),
+    country: z.string().min(1, "Country is required"),
+    postalCode: z.string().min(1, "Postal Code is required"),
+    phone: z.string().min(1, "Phone is required"),
+  }).optional(),
 }).superRefine((data, ctx) => {
+  if (!data.deliveryMethod) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Please select a delivery method",
+    });
+  }
   if (data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT && !data.location) {
+    console.log("Pickup location is required for Click & Collect");
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Pickup location is required for Click & Collect",
@@ -50,6 +56,7 @@ const deliverySchema = z.object({
   }
   // make sure shippingAddress is required if deliveryMethod is SHIPPING_TO_HOME
   if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && !data.shippingAddress) {
+    console.log("Shipping address is required for Ship to Home");
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Shipping address is required for Ship to Home",
@@ -58,6 +65,7 @@ const deliverySchema = z.object({
 });
 
 interface DeliveryMethodStepProps {
+  onChange: (data: z.infer<typeof deliverySchema>) => void;
   onNext: (data: z.infer<typeof deliverySchema>) => void;
   defaultValues?: Partial<z.infer<typeof deliverySchema>>;
   buttonLabel?: string;
@@ -65,8 +73,9 @@ interface DeliveryMethodStepProps {
 }
 
 const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
+  onChange,
   onNext,
-  defaultValues = { deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT },
+  defaultValues,
   buttonLabel = "Next",
   enableStripe = false,
 }) => {
@@ -77,13 +86,26 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
     defaultValues,
   });
 
-  // const deliveryMethod = form.watch("deliveryMethod");
+  const deliveryMethod = form.watch("deliveryMethod");
 
-  // useEffect(() => {
-  //   if (deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
-  //     form.setValue("shippingAddress", undefined);
-  //   }
-  // }, [deliveryMethod, form]);
+  useEffect(() => {
+    if (deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
+      form.setValue("shippingAddress", undefined);
+    } else {
+      form.setValue("location", undefined);
+    }
+  }, [deliveryMethod, form]);
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "deliveryMethod") {
+        onChange({
+          deliveryMethod: value.deliveryMethod,
+        });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form, onChange]);
 
   const onSubmit = async (data: z.infer<typeof deliverySchema>) => {
     try {
@@ -173,8 +195,12 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
 
         setPickupLocations(filteredLocations);
 
+        // If no pickup locations, force shipping to home and set initial location
         if (filteredLocations.length === 0) {
-          form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME);
+          form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: true });
+        } else if (filteredLocations.length === 1) {
+          // If only one location, automatically select it
+          form.setValue("location", filteredLocations[0].shippingMethodId, { shouldValidate: true });
         }
       } finally {
         setIsLoading(false);
@@ -184,58 +210,62 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
   }, [form]);
 
   if (isLoading) {
-    return <div className="text-center min-h-[200px] flex items-center justify-center">Loading delivery options...</div>;
+    return <div className="text-center min-h-[200px] flex items-center justify-center bg-white/50"> <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          name="deliveryMethod"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Delivery Method</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex gap-6"
-                >
-                  {pickupLocations.length > 0 && (
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value={DeliveryStepEnum.CLICK_AND_COLLECT}
-                        id="click-collect"
-                      />
-                      <FormLabel htmlFor="click-collect" className="font-normal">
-                        Free Click & Collect
+        {pickupLocations.length > 0 && (
+          <FormField
+            name="deliveryMethod"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>How would you like to receive your order?</FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="grid md:grid-cols-2 gap-4"
+                  >
+                    {pickupLocations.length > 0 && (
+                      <FormLabel htmlFor="click-collect" className={cn(
+                        "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
+                        field.value === DeliveryStepEnum.CLICK_AND_COLLECT && "border-purple-500"
+                      )}>
+                        <RadioGroupItem
+                          value={DeliveryStepEnum.CLICK_AND_COLLECT}
+                          id="click-collect"
+                        />
+                        <span className="font-normal">Free Click & Collect</span>
                       </FormLabel>
-                    </div>
-                  )}
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem
-                      value={DeliveryStepEnum.SHIPPING_TO_HOME}
-                      id="ship-home"
-                    />
-                    <FormLabel htmlFor="ship-home" className="font-normal">
-                      Ship to Home
+                    )}
+                    <FormLabel htmlFor="ship-home" className={cn(
+                      "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
+                      field.value === DeliveryStepEnum.SHIPPING_TO_HOME && "border-purple-500"
+                    )}>
+                      <RadioGroupItem
+                        value={DeliveryStepEnum.SHIPPING_TO_HOME}
+                        id="ship-home"
+                      />
+                      <span className="font-normal">Ship to Home</span>
                     </FormLabel>
-                  </div>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
-        {form.watch("deliveryMethod") === DeliveryStepEnum.CLICK_AND_COLLECT ? (
+        {form.watch("deliveryMethod") === DeliveryStepEnum.CLICK_AND_COLLECT && (
           <FormField
             name="location"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Pickup Location</FormLabel>
+                <FormLabel>Select your store to collect from</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
@@ -245,7 +275,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                     {pickupLocations.map((location) => (
                       <div
                         key={location.shippingMethodId}
-                        className="flex items-center space-x-2"
+                        className="flex items-center space-x-2 cursor-pointer w-fit"
                       >
                         <RadioGroupItem
                           value={location.shippingMethodId}
@@ -271,7 +301,9 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               </FormItem>
             )}
           />
-        ) : // SHIPPING_TO_HOME
+        )}
+
+        {form.watch("deliveryMethod") === DeliveryStepEnum.SHIPPING_TO_HOME && (
           enableStripe ? (
             <AddressElement
               key={form.watch("deliveryMethod")}
@@ -304,7 +336,6 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                 },
               }}
               onChange={(event) => {
-                console.log("event", event);
                 if (event.complete) {
                   const { address, phone, firstName, lastName } = event.value;
                   // Set and validate each field individually
@@ -473,12 +504,15 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                 )}
               />
             </>
-          )}
+          )
+        )}
+
         <Button
           type="submit"
           className="w-full"
           disabled={!form.formState.isValid || isSubmitting}
           loading={isSubmitting}
+          rightIcon="arrowRight"
         >
           {buttonLabel}
         </Button>

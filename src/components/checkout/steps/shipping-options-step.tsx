@@ -36,7 +36,6 @@ export const ShippingOptionsStep = ({ onNext, buttonLabel }: Props) => {
   );
 
   useEffect(() => {
-    console.log("cartData", cartData);
     const newShippingRates: Array<ShippingRate> = [];
     cartData?.availableShippingMethods?.map((shipping) =>
       shipping?.rates
@@ -140,7 +139,7 @@ export const ShippingOptionsStep = ({ onNext, buttonLabel }: Props) => {
             </div>
           </RadioGroup>
           {isLoading && (
-            <div className="absolute inset-0 bg-gray-500/30 flex items-center justify-center">
+            <div className="absolute inset-0 white/50 flex items-center justify-center">
               <div className="flex gap-3 items-center">
                 <Loader2 className="h-6 w-6 animate-spin" />
               </div>
@@ -151,7 +150,7 @@ export const ShippingOptionsStep = ({ onNext, buttonLabel }: Props) => {
         <p>Sorry, shipping not currently available on this item</p>
       )}
 
-      <Button type="submit" disabled={!activeMethod || isLoading} className="w-full">
+      <Button type="submit" disabled={!activeMethod || isLoading} className="w-full" rightIcon="arrowRight">
         {buttonLabel}
       </Button>
     </form>

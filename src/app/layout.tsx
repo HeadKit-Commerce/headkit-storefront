@@ -9,7 +9,7 @@ import { AppContextProvider } from "@/components/context/app-context";
 import { Footer } from "@/components/layout/footer";
 
 const urbanist = Urbanist({
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-urbanist",
 });

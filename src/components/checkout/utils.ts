@@ -1,6 +1,6 @@
 export enum CheckoutFormStepEnum {
   CONTACT = "Contact",
-  DELIVERY_METHOD = "Delivery Method",
+  DELIVERY_METHOD = "Delivery",
   ADDRESS = "Address",
   PAYMENT = "Payment",
 }

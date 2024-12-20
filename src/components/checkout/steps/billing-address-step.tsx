@@ -80,6 +80,19 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
             display: {
               name: "split",
             },
+            defaultValues: {
+              firstName: defaultValues.billingAddress.firstName,
+              lastName: defaultValues.billingAddress.lastName,
+              address: {
+                line1: defaultValues.billingAddress.line1,
+                line2: defaultValues.billingAddress.line2,
+                city: defaultValues.billingAddress.city,
+                state: defaultValues.billingAddress.state,
+                country: defaultValues.billingAddress.country,
+                postal_code: defaultValues.billingAddress.postalCode,
+              },
+              phone: defaultValues.billingAddress.phone,
+            },
           }}
           onChange={(event) => {
             if (event.complete && event.value) {
@@ -102,6 +115,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
           className="w-full mt-4"
           disabled={!form.formState.isValid}
           onClick={form.handleSubmit(onSubmit)}
+          rightIcon="arrowRight"
         >
           {buttonLabel}
         </Button>
@@ -282,7 +296,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
             )}
           />
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" className="w-full" rightIcon="arrowRight" disabled={!form.formState.isValid || form.formState.isSubmitting} loading={form.formState.isSubmitting}>
           {buttonLabel}
         </Button>
       </form>

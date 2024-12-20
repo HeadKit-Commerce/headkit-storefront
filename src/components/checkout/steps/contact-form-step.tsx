@@ -112,6 +112,7 @@ const ContactFormStep: React.FC<ContactFormStepProps> = ({
           className="w-full"
           disabled={!form.formState.isValid || form.formState.isSubmitting}
           loading={form.formState.isSubmitting}
+          rightIcon="arrowRight"
         >
           {buttonLabel}
         </Button>
