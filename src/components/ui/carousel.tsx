@@ -281,8 +281,8 @@ const CarouselPagination = ({
           className={cn(
             "!w-3 !h-3 opacity-50 rounded-full inline-block cursor-pointer",
             {
-              "bg-white": theme === "light",
-              "bg-black-1/80": theme === "dark",
+              "bg-black": theme === "light",
+              "bg-black/80": theme === "dark",
             },
             selectedIndex === index && "!opacity-100"
           )}

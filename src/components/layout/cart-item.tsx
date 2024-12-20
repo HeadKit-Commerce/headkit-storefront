@@ -167,7 +167,7 @@ const CartItem = ({
           cartItem?.product?.node?.name || "",
           cartItem?.product?.node?.uri || ""
         )}
-        <div className="flex flex-1 flex-col justify-between px-[20px] pt-[12px]">
+        <div className="flex flex-1 flex-col justify-between px-2 md:px-5">
           <Link
             href={cartItem.product?.node?.uri || "#"}
             onClick={() => toggleCartDrawer(false)}
@@ -175,7 +175,7 @@ const CartItem = ({
             <p className="font-semibold capitalize text-[#343A40]">
               {cartItem?.product?.node?.name}
             </p>
-            <div className="flex leading-[24px]">
+            <div className="flex leading-[24px] flex-wrap">
               {cartItem.variation?.attributes?.map((attr, index) => (
                 <p
                   key={attr?.name}
@@ -191,7 +191,7 @@ const CartItem = ({
             <p className="font-medium text-[#343A40]">x{quantity}</p>
           </div>}
         </div>
-        <div className="flex flex-col items-end justify-between pt-[12px]">
+        <div className="flex flex-col items-end justify-between">
           {renderPrice(
             getFloatVal(cartItem?.variation?.node?.regularPrice || "0"),
             quantity,

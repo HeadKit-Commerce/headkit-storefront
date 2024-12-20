@@ -5,6 +5,7 @@ import {
   currencyFormatter,
   formatShippingPrice,
   getFloatVal,
+  getPaymentMethodDisplay,
 } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";
 import { ClearCart } from "@/components/checkout/clear-cart";
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export async function generateMetadata(
-  {},
+  { },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const getParent = await parent;
@@ -48,38 +49,16 @@ export default async function Page({ params }: Props) {
 
   console.log("order", order);
 
-  // const getPaymentMethod = (order: Order) => {
-  //   if (!order?.metaData) return;
-
-  //   const stripePaymentData = order.metaData.find(
-  //     (item) => item?.key === "_stripe_payment_method"
-  //   );
-
-  //   if (stripePaymentData) {
-  //     return getStripePaymentInfo(
-  //       JSON.parse(stripePaymentData.value) as Stripe.PaymentMethod
-  //     );
-  //   }
-
-  //   const paypalOrderId = order.metaData.find(
-  //     (item) => item?.key === "_ppcp_paypal_order_id"
-  //   );
-
-  //   if (paypalOrderId) {
-  //     return { icon: "Paypal" };
-  //   }
-  // };
-
-  // const paymentMethod = getPaymentMethod(order as Order);
+  const paymentMethod = getPaymentMethodDisplay(order?.metaData as { key: string; value: string }[]);
 
   const initLang = "en";
-  const initCurrency = "USD";
+  const initCurrency = "AUD";
 
   return (
     <>
       <ClearCart />
-      <div className="grid grid-cols-12 gap-8 mt-5 px-[10px] sm:px-[20px] pb-5">
-        <div className="col-span-12 relative bg-gradient-to-t from-black to-purple-900 rounded-[20px] overflow-hidden">
+      <div className="grid grid-cols-12 gap-x-1 gap-y-5 md:gap-8 mt-5 px-5 md:px-10">
+        <div className="col-span-12 relative bg-gradient-to-t from-black to-purple-900 rounded-[20px] overflow-hidden w-full">
           <div className="relative z-10 px-8 py-20 md:px-20 md:py-24">
             <div className="font-semibold text-2xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
               Thanks
@@ -103,19 +82,19 @@ export default async function Page({ params }: Props) {
             </div>
 
             <div className="text-xl">
-              <div className="grid grid-cols-3 mb-5 items-baseline gap-4 font-medium text-lg  mt-[8px]">
+              <div className="grid grid-cols-4 md:grid-cols-3 mb-5 items-baseline gap-1 md:gap-4 font-medium text-lg  mt-[8px]">
                 <div className="col-span-1">
                   <div className="font-extrabold">Contact</div>
                 </div>
-                <div className="col-span-2">{order?.billing?.email}</div>
+                <div className="col-span-3 md:col-span-2">{order?.billing?.email}</div>
               </div>
 
               {order?.shipping?.address1 && (
-                <div className="grid grid-cols-3 mb-5 items-baseline gap-4 font-medium text-lg  mt-[8px]">
+                <div className="grid grid-cols-4 md:grid-cols-3 mb-5 items-baseline gap-1 md:gap-4 font-medium text-lg  mt-[8px]">
                   <div className="col-span-1">
                     <div className="font-extrabold">Shipping Address</div>
                   </div>
-                  <div className="col-span-2">
+                  <div className="col-span-3 md:col-span-2">
                     {order?.shipping?.firstName} {order?.shipping?.lastName}
                     <br />
                     {order?.shipping?.address1}
@@ -130,15 +109,13 @@ export default async function Page({ params }: Props) {
                   </div>
                 </div>
               )}
-              {order?.needsShippingAddress && (
-                <div className="grid grid-cols-3 mb-5 items-baseline gap-4 font-medium text-lg  mt-[8px]">
-                  <div className="col-span-1">
-                    <div className="font-extrabold">Shipping Options</div>
-                  </div>
-                  <div className="col-span-2">
-                    {`${
-                      order?.shippingLines?.nodes?.[0]?.methodTitle ||
-                      "Shipping"
+              <div className="grid grid-cols-4 md:grid-cols-3 mb-5 items-baseline gap-1 md:gap-4 font-medium text-lg  mt-[8px]">
+                <div className="col-span-1">
+                  <div className="font-extrabold">Shipping Options</div>
+                </div>
+                <div className="col-span-3 md:col-span-2">
+                  {`${order?.shippingLines?.nodes?.[0]?.methodTitle ||
+                    "Shipping"
                     } / ${formatShippingPrice(
                       order.shippingTotal || "0",
                       order.shippingTax || "0",
@@ -146,15 +123,15 @@ export default async function Page({ params }: Props) {
                       order.currency || initCurrency,
                       initLang
                     )}`}
-                  </div>
                 </div>
-              )}
+              </div>
 
-              <div className="grid grid-cols-3 mb-5 items-baseline gap-4 font-medium text-lg  mt-[8px]">
+
+              <div className="grid grid-cols-4 md:grid-cols-3 mb-5 items-baseline gap-1 md:gap-4 font-medium text-lg  mt-[8px]">
                 <div className="col-span-1">
                   <div className="font-extrabold">Billing Address</div>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3 md:col-span-2">
                   {order?.billing?.firstName} {order?.billing?.lastName}
                   <br />
                   {order?.billing?.address1}
@@ -165,35 +142,26 @@ export default async function Page({ params }: Props) {
                   <br />
                   {order?.billing?.country}
                   <br />
-                  {/* {order?.billing?.phone} */}
+                  {order?.billing?.phone}
                 </div>
               </div>
-              <div className="grid grid-cols-3 mb-5 items-baseline gap-4 font-medium text-lg  mt-[8px]">
+              <div className="grid grid-cols-4 md:grid-cols-3 mb-5 items-baseline gap-1 md:gap-4 font-medium text-lg  mt-[8px]">
                 <div className="col-span-1">
                   <div className="font-extrabold">Payment</div>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-3 md:col-span-2">
                   {currencyFormatter({
                     price: getFloatVal(order?.total || "0"),
                     lang: initLang,
                     currency: order?.currency || initCurrency,
                   })}
                   <br />
-                  {/* TODO refactor */}
-                  {/* {paymentMethod?.icon in MAP_ALL_STRIPE_PAYMENT_TO_ICON ? (
-                  <div className="flex items-center gap-[6px]">
-                    <Icon
-                      mask
-                      icon={
-                        MAP_ALL_STRIPE_PAYMENT_TO_ICON?.[paymentMethod?.icon]
-                      }
-                      className="w-[20px] h-[20px] bg-black-4"
-                    />
-                    {paymentMethod?.last4 && `ending ${paymentMethod?.last4}`}
-                  </div>
-                ) : (
-                  <div>{paymentMethod?.icon}</div>
-                )} */}
+                  {paymentMethod && (
+                    <div className="flex items-start gap-2 truncate">
+                      {paymentMethod.icon}
+                      {paymentMethod.text}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -253,7 +221,7 @@ export default async function Page({ params }: Props) {
                         {currencyFormatter({
                           price: order?.pricesIncludeTax
                             ? getFloatVal(order?.discountTotal || "0") +
-                              getFloatVal(order?.discountTax || "0")
+                            getFloatVal(order?.discountTax || "0")
                             : getFloatVal(order?.discountTotal || "0"),
                           currency: order.currency || "AUD",
                         })}
@@ -265,18 +233,18 @@ export default async function Page({ params }: Props) {
                   <p>
                     {order?.pricesIncludeTax
                       ? getFloatVal(order?.shippingTotal || "0") +
-                          getFloatVal(order?.shippingTax || "0") ===
+                        getFloatVal(order?.shippingTax || "0") ===
                         0
                         ? "Free"
                         : currencyFormatter({
-                            price:
-                              getFloatVal(order?.shippingTotal || "0") +
-                              getFloatVal(order?.shippingTax || "0"),
-                            currency: order.currency || "AUD",
-                          })
+                          price:
+                            getFloatVal(order?.shippingTotal || "0") +
+                            getFloatVal(order?.shippingTax || "0"),
+                          currency: order.currency || "AUD",
+                        })
                       : getFloatVal(order?.shippingTotal || "0") === 0
-                      ? "Free"
-                      : currencyFormatter({
+                        ? "Free"
+                        : currencyFormatter({
                           price: getFloatVal(order?.shippingTotal || "0"),
                           currency: order.currency || "AUD",
                         })}

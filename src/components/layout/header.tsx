@@ -83,7 +83,7 @@ const Header = ({ menus }: Props) => {
           <NavigationMenuItem className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant={"ghost"}>
+                <Button variant={"ghost"} className="pr-0">
                   <Icon.hamburger className="stroke-purple-800 w-6 h-6" />
                 </Button>
               </SheetTrigger>

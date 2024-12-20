@@ -311,6 +311,12 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     console.log("data", response.data);
     console.log("error", response.errors);
 
+    // // update payment intent
+    // await updatePaymentIntent({
+    //   paymentIntentId: paymentIntent.createPaymentIntent.id,
+    //   description: "Order ID: " + checkoutResult?.order?.databaseId,
+    // });
+
     router.replace(
       `/checkout/success/${response.data.checkout?.order?.databaseId}`
     );

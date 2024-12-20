@@ -92,9 +92,7 @@ export default async function Product({ params }: Props) {
           currency={generalSettings?.data.generalSettings?.currency}
         />
         <BreadcrumbJsonLD seo={product?.data?.product?.seo} />
-        <div className="mt-5">
-          <ProductDetail product={product?.data.product} />
-        </div>
+        <ProductDetail product={product?.data.product} />
       </div>
 
       {(product?.data.product.upsell?.nodes?.length ?? 0) > 0 && (

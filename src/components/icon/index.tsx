@@ -21,6 +21,11 @@ import {
   FaYoutube,
   FaCcVisa,
   FaCcMastercard,
+  FaCcStripe,
+  FaGooglePay,
+  FaApplePay,
+  FaPaypal,
+  FaCcAmex,
 } from "react-icons/fa";
 import { HeadkitMonoSvg } from "./svg/headkit-mono-svg";
 
@@ -41,7 +46,12 @@ const Icon = {
   // payment
   visa: (props: IconProps) => <FaCcVisa {...props} />,
   mastercard: (props: IconProps) => <FaCcMastercard {...props} />,
-
+  stripe: (props: IconProps) => <FaCcStripe {...props} />,
+  googlePay: (props: IconProps) => <FaGooglePay {...props} />,
+  applePay: (props: IconProps) => <FaApplePay {...props} />,
+  paypal: (props: IconProps) => <FaPaypal {...props} />,
+  amex: (props: IconProps) => <FaCcAmex {...props} />,
+  
   // misc
   loading: (props: IconProps) => <LoadingSvg {...props} />,
   arrowRight: (props: IconProps) => <HiOutlineArrowSmallRight {...props} />,

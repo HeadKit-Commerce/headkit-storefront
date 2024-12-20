@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { BadgeList } from "./badge-list";
@@ -7,9 +9,13 @@ import { Lightbox } from "@/components/ui/lightbox";
 
 import {
   Carousel,
+  CarouselApi,
   CarouselContent,
   CarouselItem,
+  CarouselPagination,
+  useDotButton,
 } from "@/components/ui/carousel";
+import { useState } from "react";
 
 interface Props {
   images: {
@@ -21,6 +27,9 @@ interface Props {
 }
 
 const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
+  const [api, setApi] = useState<CarouselApi>();
+  const { selectedIndex, scrollSnaps, onDotButtonClick } = useDotButton(api);
+
   return (
     <div>
       <div className="hidden grid-cols-2 flex-col gap-5 md:grid">
@@ -66,11 +75,12 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
           />
         )}
       </div>
-      <div className="relative block md:hidden border border-gray-500 rounded-lg overflow-hidden">
+      <div className="relative block md:hidden border border-gray-200 rounded-lg overflow-hidden min-h-[300px]">
         <div className="absolute left-2 top-2">
           <BadgeList isSale={isSale} isNewIn={isNew} />
         </div>
         <Carousel
+          setApi={setApi}
           opts={{
             align: "start",
           }}
@@ -99,6 +109,16 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
               </CarouselItem>
             ))}
           </CarouselContent>
+          {scrollSnaps?.length > 1 && (
+            <CarouselPagination
+              itemLength={images?.length}
+              selectedIndex={selectedIndex}
+              onChange={(index) => {
+                onDotButtonClick(index);
+              }}
+            />
+          )}
+
         </Carousel>
       </div>
     </div>

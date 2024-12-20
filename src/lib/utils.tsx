@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { Icon } from "@/components/icon";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -69,13 +70,13 @@ export const formatShippingPrice = (
     ? getFloatVal(shippingTotal) + getFloatVal(shippingTax) === 0
       ? "Free"
       : currencyFormatter({
-          price: getFloatVal(shippingTotal) + getFloatVal(shippingTax),
-          currency,
-          lang,
-        })
+        price: getFloatVal(shippingTotal) + getFloatVal(shippingTax),
+        currency,
+        lang,
+      })
     : getFloatVal(shippingTotal) === 0
-    ? "Free"
-    : currencyFormatter({
+      ? "Free"
+      : currencyFormatter({
         price: getFloatVal(shippingTotal),
         currency,
         lang,
@@ -104,4 +105,54 @@ export const processText = (
   const highlightedText = inputText.substring(startIndex + 1, endIndex).trim();
 
   return { text, highlightedText };
+};
+
+interface PaymentMethodDisplay {
+  icon: React.ReactNode;
+  text: string;
+}
+
+export const getPaymentMethodDisplay = (metaData?: Array<{ key: string; value: string }>): PaymentMethodDisplay => {
+  try {
+    const paymentMethodData = metaData?.find(item => item.key === '_stripe_payment_method')?.value;
+
+    if (!paymentMethodData) {
+      return {
+        icon: <></>,
+        text: "Unknown payment method"
+      };
+    }
+
+    const paymentMethod = JSON.parse(paymentMethodData);
+
+    // Handle different payment method types
+    switch (paymentMethod.type) {
+      case 'link':
+        return {
+          icon: <Icon.stripe className="h-auto w-6 shrink-0" />,
+          text: `Stripe Link (${paymentMethod.link.email})`
+        };
+
+      case 'card':
+        return {
+          icon: <Icon.visa name="credit-card" className="h-auto w-6 shrink-0" />,
+          text: `Card ending in ${paymentMethod.card?.last4 ?? '****'}`
+        };
+
+      // Add more cases as needed
+
+      default:
+        return {
+          icon: <></>,
+          text: `Payment method: ${paymentMethod.type}`
+        };
+    }
+  } catch (error) {
+    // Fallback for parsing errors
+    console.error("Error parsing payment method data:", error);
+    return {
+      icon: <></>,
+      text: "Invalid payment method data"
+    };
+  }
 };
