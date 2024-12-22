@@ -44,6 +44,7 @@ interface Props {
 
 const Header = ({ menus }: Props) => {
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const preheaderMenu = menus[MenuLocationEnum.PreHeader];
   const primaryMenu = menus[MenuLocationEnum.Primary];
@@ -59,7 +60,11 @@ const Header = ({ menus }: Props) => {
           target: "_blank",
         }))}
       />
-      <NavigationMenu className="sticky top-0 flex items-center justify-between h-20 w-full bg-white max-w-full z-20 px-5 md:px-10">
+      <NavigationMenu onValueChange={(val) => {
+        setMenuOpen(!!val)
+      }} className="sticky top-0 flex items-center justify-between h-20 w-full bg-white max-w-full z-20 px-5 md:px-10">
+        {menuOpen && <div className="fixed inset-0 z-0 top-[130px] bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />}
+
         <NavigationMenuList>
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
@@ -147,7 +152,7 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
                 {menuItem.payload.label}
               </NavigationMenuTrigger>
               <NavigationMenuContent className="!w-screen !rounded-none">
-                <ul className="grid gap-3 p-6 w-full">
+                <ul className="grid gap-5 w-full">
                   {menuItem.children.map((child) => (
                     <MenuItem key={child.id} menuItem={child} />
                   ))}

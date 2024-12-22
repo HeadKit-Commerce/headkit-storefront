@@ -20,7 +20,7 @@ const BadgeList = ({ isNewIn, isSale }: Props) => {
   );
 
   return (
-    <div className="relative z-10 flex gap-2 justify-start">
+    <div className="relative flex gap-2 justify-start">
       {isSale && (
         <div className={cn(badgeStyle({ variant: "sale" }))}>Sale</div>
       )}

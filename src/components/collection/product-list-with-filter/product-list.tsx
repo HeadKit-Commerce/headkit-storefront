@@ -137,7 +137,7 @@ const ProductList = ({
   };
 
   return (
-    <div className="px-5 py-[60px] md:px-10">
+    <div className="px-5 py-[60px] md:px-10 relative z-0">
       {shouldDisplayLoadPrevious && page > 0 && page * PER_PAGE > 0 && (
         <div className="flex justify-center py-10">
           <Link

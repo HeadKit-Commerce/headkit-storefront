@@ -5,7 +5,7 @@ import {
   GetProductListQuery,
 } from "@/lib/headkit/generated";
 import { Suspense, useState } from "react";
-import { Filter } from "./filter";
+import { FilterV2 } from "./filter/filter-v2";
 import { ProductList } from "./product-list";
 
 interface Props {
@@ -24,22 +24,18 @@ const ProductListWithFilter = ({
   onSale,
   search
 }: Props) => {
-  // listening when filter change here
-  const [filterState, setFilterState] = useState<{
-    [x: string]: string | string[];
-  }>()
+  const [filterState, setFilterState] = useState(initialFilterState);
 
   return (
     <Suspense>
-      <Filter
-        initialFilterState={initialFilterState}
+      <FilterV2
         productFilter={productFilter}
         onChange={setFilterState}
       />
       <ProductList
         initialProducts={initialProducts}
         initialPage={initialPage}
-        filterState={filterState || {}}
+        filterState={filterState}
         onSale={onSale}
         search={search}
       />
