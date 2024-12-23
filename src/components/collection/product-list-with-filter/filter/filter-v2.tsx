@@ -82,8 +82,8 @@ const FilterV2 = ({ productFilter, onChange }: Props) => {
     form.reset(params);
   }, [searchParams, productFilter, form]);
 
-  // Modify onSubmit to use replaceState like product-variations
-  const onSubmit = useCallback((values: FilterValues) => {
+  // Modify onSubmit to handle form submission correctly
+  const handleFilterChange = useCallback((values: FilterValues) => {
     const filterState: { [key: string]: string | string[] } = {};
     const params = new URLSearchParams();
 
@@ -121,18 +121,62 @@ const FilterV2 = ({ productFilter, onChange }: Props) => {
       params.set('sort', values.sort);
     }
 
-    // Update URL using replaceState
-    window.history.replaceState(
-      null,
-      '',
-      `${pathname}${params.toString() ? `?${params.toString()}` : ''}`
-    );
+    // Preserve page parameter if it exists
+    const pageParam = searchParams.get('page');
+    if (pageParam) {
+      params.set('page', pageParam);
+    }
 
-    onChange(filterState);
-  }, [onChange, pathname]);
+    // Compare current URL params with new ones (excluding page)
+    const currentParams = new URLSearchParams(searchParams);
+    const currentFilterState = Array.from(currentParams.entries()).reduce((acc, [key, value]) => {
+      if (key !== 'page') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as Record<string, string>);
 
-  // Update handleClearFilters to use replaceState
+    const newFilterState = Array.from(params.entries()).reduce((acc, [key, value]) => {
+      if (key !== 'page') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as Record<string, string>);
+
+    const hasChanged = JSON.stringify(currentFilterState) !== JSON.stringify(newFilterState);
+
+    if (hasChanged) {
+      // Update URL using replaceState
+      window.history.replaceState(
+        null,
+        '',
+        `${pathname}${params.toString() ? `?${params.toString()}` : ''}`
+      );
+
+      onChange(filterState);
+    }
+  }, [pathname, searchParams, onChange]);
+
+  // Update the watch effect to use handleFilterChange
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      const timeoutId = setTimeout(() => {
+        handleFilterChange(value as FilterValues);
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form, handleFilterChange]);
+
+  // Update handleClearFilters to prevent infinite loop
   const handleClearFilters = useCallback(() => {
+    // Temporarily remove the watch subscription
+    const subscription = form.watch(() => {});
+    subscription.unsubscribe();
+
+    // Reset form and update URL
     form.reset({
       categories: [],
       brands: [],
@@ -141,31 +185,45 @@ const FilterV2 = ({ productFilter, onChange }: Props) => {
       sort: "",
     });
 
-    // Clear URL params using replaceState
-    window.history.replaceState(null, '', pathname);
+    // Preserve only page parameter
+    const pageParam = searchParams.get('page');
+    const params = new URLSearchParams();
+    if (pageParam) {
+      params.set('page', pageParam);
+    }
+
+    // Update URL
+    window.history.replaceState(
+      null,
+      '',
+      `${pathname}${params.toString() ? `?${params.toString()}` : ''}`
+    );
+    
+    // Trigger onChange directly
     onChange({});
-  }, [form, pathname, onChange]);
 
-  // Debounced effect for form changes
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      // Use setTimeout to debounce the changes
-      const timeoutId = setTimeout(() => {
-        onSubmit(value as FilterValues);
-      }, 300);
+    // Re-setup the watch effect in the next tick
+    setTimeout(() => {
+      const newSubscription = form.watch((value) => {
+        const timeoutId = setTimeout(() => {
+          handleFilterChange(value as FilterValues);
+        }, 300);
+        return () => clearTimeout(timeoutId);
+      });
+      return () => newSubscription.unsubscribe();
+    }, 0);
 
-      return () => clearTimeout(timeoutId);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [form, onSubmit]);
+  }, [form, pathname, onChange, searchParams, handleFilterChange]);
 
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleFilterChange(form.getValues());
+        }}
         className="w-full sticky top-20 z-10"
       >
         <div className="w-full bg-white">

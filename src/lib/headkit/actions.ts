@@ -191,7 +191,7 @@ const getProductCategory = async ({ slug }: { slug: string }) => {
 };
 
 const getProductFilters = async (
-  productFiltersQuery: GetProductFiltersQueryVariables
+  productFiltersQuery?: GetProductFiltersQueryVariables
 ) => {
   const response = await headkit().getProductFilters(productFiltersQuery);
   return response;
