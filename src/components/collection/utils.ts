@@ -2,25 +2,180 @@ import {
   GetProductCategoryQuery,
   OrderEnum,
   ProductsOrderByEnum,
-  ProductsOrderbyInput,
   ProductTaxonomyEnum,
   ProductTaxonomyFilterInput,
   RelationEnum,
   RootQueryToProductUnionConnectionWhereArgs,
   StockStatusEnum,
+  TaxonomyOperatorEnum,
 } from "@/lib/headkit/generated";
 
-const PER_PAGE = 24;
+export const SortKey = {
+  FEATURED: "FEATURED",
+  BEST_SELLING: "BEST_SELLING",
+  CREATED_AT: "CREATED_AT",
+  CREATED_AT_DESC: "CREATED_AT_DESC",
+  PRICE: "PRICE",
+  PRICE_DESC: "PRICE_DESC",
+  TITLE: "TITLE",
+  TITLE_DESC: "TITLE_DESC",
+} as const;
 
-enum SortKey {
-  NEWEST = "Newest",
-  PRICE_HIGH_TO_LOW = "Price: High - Low",
-  PRICE_LOW_TO_HIGH = "Price: Low - High",
-  PRODUCT_NAME_A_TO_Z = "Product Name: A - Z",
-  PRODUCT_NAME_Z_TO_A = "Product Name: Z - A",
+export type SortKeyType = keyof typeof SortKey;
+
+export const SortKeyLabels: Record<SortKeyType, string> = {
+  FEATURED: "Featured",
+  BEST_SELLING: "Best selling",
+  CREATED_AT: "Date, new to old",
+  CREATED_AT_DESC: "Date, old to new",
+  PRICE: "Price, low to high",
+  PRICE_DESC: "Price, high to low",
+  TITLE: "Alphabetically, A-Z",
+  TITLE_DESC: "Alphabetically, Z-A",
+};
+
+interface FilterQuery {
+  categories?: string[];
+  brands?: string[];
+  attributes?: Record<string, string[]>;
+  instock?: boolean;
+  sort?: SortKeyType | "";
+  page?: number;
 }
 
-const makeBreadcrumbFromProductCategoryData = (
+interface QueryParams {
+  filterQuery: FilterQuery;
+  categorySlug?: string;
+  page?: number;
+  perPage?: number;
+  onSale?: boolean;
+  search?: string;
+}
+
+const makeTaxonomyFilter = (slug: string, terms: string[]): ProductTaxonomyFilterInput => {
+  let taxonomy: ProductTaxonomyEnum;
+  switch (slug) {
+    case "categories":
+      taxonomy = ProductTaxonomyEnum.ProductCat;
+      break;
+    case "pa_colour":
+      taxonomy = ProductTaxonomyEnum.PaColour;
+      break;
+    case "pa_size":
+      taxonomy = ProductTaxonomyEnum.PaSize;
+      break;
+    case "brands":
+      taxonomy = ProductTaxonomyEnum.ProductBrand;
+      break;
+    default:
+      throw new Error(`Unknown taxonomy: ${slug}`);
+  }
+
+  return {
+    taxonomy,
+    terms,
+    operator: TaxonomyOperatorEnum.In,
+  };
+};
+
+export const makeWhereProductQuery = ({
+  filterQuery,
+  categorySlug,
+  page = 0,
+  perPage = 24,
+  onSale,
+  search,
+}: QueryParams): RootQueryToProductUnionConnectionWhereArgs => {
+  const where: RootQueryToProductUnionConnectionWhereArgs = {
+    offset: page * perPage,
+    perPage,
+    status: "publish",
+  };
+
+  // Handle category filter
+  if (categorySlug) {
+    where.category = categorySlug;
+  }
+  if (filterQuery.categories?.length) {
+    where.categoryIn = filterQuery.categories;
+  }
+
+  // Collect all taxonomy filters
+  const taxonomyFilters: ProductTaxonomyFilterInput[] = [];
+
+  // Handle brand filter
+  if (filterQuery.brands?.length) {
+    taxonomyFilters.push(makeTaxonomyFilter("brands", filterQuery.brands));
+  }
+
+  // Handle attribute filters
+  if (filterQuery.attributes && Object.keys(filterQuery.attributes).length > 0) {
+    Object.entries(filterQuery.attributes)
+      .filter(([, values]) => values.length > 0)
+      .forEach(([key, values]) => {
+        taxonomyFilters.push(makeTaxonomyFilter(key, values));
+      });
+  }
+
+  // Add taxonomy filters if any exist
+  if (taxonomyFilters.length > 0) {
+    where.taxonomyFilter = {
+      relation: RelationEnum.And,
+      filters: taxonomyFilters,
+    };
+  }
+
+  // Handle stock status
+  if (filterQuery.instock) {
+    where.stockStatus = [StockStatusEnum.InStock];
+  }
+
+  // Handle sorting
+  if (filterQuery.sort) {
+    where.orderby = [];
+    switch (filterQuery.sort) {
+      case "FEATURED":
+        where.orderby.push({ field: ProductsOrderByEnum.MenuOrder, order: OrderEnum.Asc });
+        break;
+      case "BEST_SELLING":
+        where.orderby.push({ field: ProductsOrderByEnum.Rating, order: OrderEnum.Desc });
+        break;
+      case "CREATED_AT":
+        where.orderby.push({ field: ProductsOrderByEnum.Date, order: OrderEnum.Desc });
+        break;
+      case "CREATED_AT_DESC":
+        where.orderby.push({ field: ProductsOrderByEnum.Date, order: OrderEnum.Asc });
+        break;
+      case "PRICE":
+        where.orderby.push({ field: ProductsOrderByEnum.Price, order: OrderEnum.Asc });
+        break;
+      case "PRICE_DESC":
+        where.orderby.push({ field: ProductsOrderByEnum.Price, order: OrderEnum.Desc });
+        break;
+      case "TITLE":
+        where.orderby.push({ field: ProductsOrderByEnum.Name, order: OrderEnum.Asc });
+        break;
+      case "TITLE_DESC":
+        where.orderby.push({ field: ProductsOrderByEnum.Name, order: OrderEnum.Desc });
+        break;
+    }
+  }
+
+  // Handle sale status
+  if (onSale) {
+    where.onSale = true;
+  }
+
+  // Handle search
+  if (search) {
+    where.search = search;
+  }
+
+  return where;
+}; 
+
+
+export const makeBreadcrumbFromProductCategoryData = (
   data: GetProductCategoryQuery
 ): {
   name: string;
@@ -75,7 +230,7 @@ const makeBreadcrumbFromProductCategoryData = (
   return breadcrumb;
 };
 
-const makeSubcategorySwiperFromProductCategoryData = (
+export const makeSubcategorySwiperFromProductCategoryData = (
   data: GetProductCategoryQuery
 ): {
   slug: string;
@@ -95,117 +250,4 @@ const makeSubcategorySwiperFromProductCategoryData = (
     uri: subcategory.uri || "",
     thumbnail: subcategory.thumbnail || null,
   }));
-};
-
-const makeSort = (sortKey: SortKey): ProductsOrderbyInput => {
-  switch (sortKey) {
-    case "NEWEST" as SortKey:
-      return { field: ProductsOrderByEnum.Date, order: OrderEnum.Desc };
-    case "PRICE_HIGH_TO_LOW" as SortKey:
-      return { field: ProductsOrderByEnum.Price, order: OrderEnum.Desc };
-    case "PRICE_LOW_TO_HIGH" as SortKey:
-      return { field: ProductsOrderByEnum.Price, order: OrderEnum.Asc };
-    case "PRODUCT_NAME_Z_TO_A" as SortKey:
-      return { field: ProductsOrderByEnum.Name, order: OrderEnum.Desc };
-    case "PRODUCT_NAME_A_TO_Z" as SortKey:
-      return { field: ProductsOrderByEnum.Name, order: OrderEnum.Asc };
-    default:
-      return { field: ProductsOrderByEnum.Date, order: OrderEnum.Desc };
-  }
-};
-
-const makeTaxonomyFilter = (slug: string, terms: string[]) => {
-  let taxonomy: ProductTaxonomyEnum;
-  switch (slug) {
-    case "categories":
-      taxonomy = ProductTaxonomyEnum.ProductCat;
-      break;
-    case "pa_colour":
-      taxonomy = ProductTaxonomyEnum.PaColour;
-      break;
-    case "pa_size":
-      taxonomy = ProductTaxonomyEnum.PaSize;
-      break;
-    case "brands":
-      taxonomy = ProductTaxonomyEnum.ProductBrand;
-      break;
-    default:
-      throw new Error(`unknow taxonomy: ${slug}`);
-  }
-
-  return {
-    taxonomy,
-    terms,
-  };
-};
-
-const makeWhereProductQuery = ({
-  filterQuery,
-  categorySlug,
-  page,
-  perPage,
-  onSale,
-  search,
-}: {
-  filterQuery?: {
-    [x: string]: string | string[];
-  };
-  categorySlug?: string;
-  page?: number;
-  perPage?: number;
-  onSale?: boolean;
-  search?: string;
-}): RootQueryToProductUnionConnectionWhereArgs => {
-  const taxonomyFilter: ProductTaxonomyFilterInput[] = [];
-  const sort = makeSort(filterQuery?.sort as SortKey);
-  const instock: boolean = JSON.parse(
-    (filterQuery?.instock as string) || "false"
-  );
-
-  if (filterQuery) {
-    Object.entries(filterQuery).forEach(([key, value]) => {
-      const terms = value as string[];
-      if (
-        terms.length &&
-        key !== "sort" &&
-        key !== "page" &&
-        key !== "instock"
-      ) {
-        try {
-          taxonomyFilter.push(makeTaxonomyFilter(key, terms));
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    });
-  }
-
-  const notAllowedSlugs = ["shop", "sale"];
-
-  return {
-    status: "publish",
-    perPage: perPage || PER_PAGE,
-    offset: page ? page * (perPage || PER_PAGE) : 0,
-    onSale,
-    orderby: [sort],
-    ...(instock && { stockStatus: [StockStatusEnum.InStock] }),
-    ...(!onSale &&
-      !search &&
-      !notAllowedSlugs.includes(categorySlug || "") && {
-        category: categorySlug || "",
-      }),
-    ...(search && { search }),
-    taxonomyFilter: {
-      relation: RelationEnum.And,
-      filters: taxonomyFilter,
-    },
-  };
-};
-
-export {
-  PER_PAGE,
-  SortKey,
-  makeBreadcrumbFromProductCategoryData,
-  makeSubcategorySwiperFromProductCategoryData,
-  makeWhereProductQuery,
 };

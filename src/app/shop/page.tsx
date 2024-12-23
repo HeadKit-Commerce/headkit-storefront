@@ -1,7 +1,7 @@
-import { ProductListWithFilter } from "@/components/collection/product-list-with-filter";
+import { ProductListWithFilter } from "@/components/collection-legacy/product-list-with-filter";
 import { getProductFilters, getProductList } from "@/lib/headkit/actions";
-import { makeWhereProductQuery, PER_PAGE } from "@/components/collection/utils";
-import { CollectionHeader } from "@/components/collection/collection-header";
+import { makeWhereProductQuery, PER_PAGE } from "@/components/collection-legacy/utils";
+import { CollectionHeader } from "@/components/collection-legacy/collection-header";
 
 interface Props {
   searchParams: Promise<{ [key: string]: string }>;

@@ -1,65 +1,107 @@
-import { makeWhereProductQuery, PER_PAGE } from "@/components/collection/utils";
-
-import { makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
-
-import { CollectionHeader } from "@/components/collection/collection-header";
-import { makeBreadcrumbFromProductCategoryData } from "@/components/collection/utils";
-import { getProductCategory, getProductFilters, getProductList } from "@/lib/headkit/actions";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProductListWithFilter } from "@/components/collection/product-list-with-filter";
+import { getProductCategory, getProductFilters, getProductList } from "@/lib/headkit/actions";
+import { CollectionPage } from "@/components/collection/collection-page";
+import { makeWhereProductQuery, SortKeyType, makeBreadcrumbFromProductCategoryData, makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
+import { CollectionHeader } from "@/components/collection/collection-header";
 
-interface Props {
-  params: Promise<{ slug: string[] }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+interface CollectionPageProps {
+  params: Promise<{
+    slug: string[];
+  }>;
+  searchParams: Promise<{
+    page?: string;
+    sort?: string;
+    categories?: string;
+    brands?: string;
+    instock?: string;
+    [key: string]: string | undefined;
+  }>;
 }
 
-export default async function Page({ params, searchParams }: Props) {
+export async function generateMetadata({
+  params,
+}: CollectionPageProps): Promise<Metadata> {
   const { slug } = await params;
   const categorySlug = slug.pop();
-  const parsedSearchParams = await searchParams;
-  const pageNumber = Number(parsedSearchParams?.page) || 0;
-  delete parsedSearchParams?.page;
-  const filterQuery = Object.keys(parsedSearchParams).length === 0
-    ? undefined
-    : Object.fromEntries(
-      Object.entries(parsedSearchParams).filter(([, value]) => value !== undefined)
-    ) as { [key: string]: string | string[] };
 
   if (!categorySlug) return notFound();
 
-  const [productCategory, productFilter, initialProducts] = await Promise.all([
-    getProductCategory({ slug: categorySlug }),
-    getProductFilters({ mainCategory: categorySlug }),
-    getProductList({
-      input: {
-        where: makeWhereProductQuery({
-          filterQuery,
-          categorySlug,
-          page: pageNumber,
-          perPage: PER_PAGE,
-        }),
-      },
-    }),
-  ]);
+  const { data } = await getProductCategory({ slug: categorySlug });
+  if (!data?.productCategory) return notFound();
 
-  if (!productCategory?.data?.productCategory) return notFound();
-
-  return (
-    <>
-      <CollectionHeader
-        name={productCategory.data.productCategory?.name || ""}
-        description={productCategory.data.productCategory?.description || ""}
-        breadcrumbData={makeBreadcrumbFromProductCategoryData(productCategory.data)}
-        categories={makeSubcategorySwiperFromProductCategoryData(
-          productCategory.data
-        )}
-      />
-      <ProductListWithFilter
-        initialProducts={initialProducts.data}
-        initialFilterState={filterQuery || {}}
-        initialPage={pageNumber}
-        productFilter={productFilter.data}
-      />
-    </>
-  );
+  return {
+    title: data.productCategory.name || "Collection",
+    description: data.productCategory.description || `Browse our ${categorySlug} collection`,
+  };
 }
+
+export default async function Page({ params, searchParams }: CollectionPageProps) {
+  const { slug } = await params;
+  const categorySlug = slug.pop();
+  const parsedSearchParams = await searchParams;
+  const page = parsedSearchParams.page ? parseInt(parsedSearchParams.page) : 0;
+  const itemsPerPage = 3;
+
+  if (!categorySlug) return notFound();
+
+  try {
+    // Parse attributes from search params
+    const attributes: Record<string, string[]> = {};
+    Object.entries(parsedSearchParams).forEach(([key, value]) => {
+      if (key !== 'page' && key !== 'sort' && key !== 'categories' && key !== 'brands' && key !== 'instock') {
+        attributes[key] = value?.split(',') || [];
+      }
+    });
+
+    // Create filter query object
+    const filterQuery = {
+      categories: parsedSearchParams.categories?.split(",") || [],
+      brands: parsedSearchParams.brands?.split(",") || [],
+      attributes,
+      instock: parsedSearchParams.instock === "true",
+      sort: parsedSearchParams.sort as SortKeyType | undefined,
+      page,
+    };
+
+    const [productCategory, productFilter, productsData] = await Promise.all([
+      getProductCategory({ slug: categorySlug }),
+      getProductFilters({ mainCategory: categorySlug }),
+      getProductList({
+        input: {
+          where: makeWhereProductQuery({
+            filterQuery,
+            categorySlug,
+            page,
+            perPage: itemsPerPage,
+          }),
+          first: itemsPerPage,
+        },
+      }),
+    ]);
+
+    if (!productCategory?.data?.productCategory) return notFound();
+
+    return (
+      <>
+        <CollectionHeader
+          name={productCategory.data.productCategory?.name || ""}
+          description={productCategory.data.productCategory?.description || ""}
+          breadcrumbData={makeBreadcrumbFromProductCategoryData(productCategory.data)}
+          categories={makeSubcategorySwiperFromProductCategoryData(
+            productCategory.data
+          )}
+        />
+        <CollectionPage
+          initialProducts={productsData.data}
+          productFilter={productFilter.data}
+          initialPage={page}
+          itemsPerPage={itemsPerPage}
+        />
+      </>
+    );
+  } catch (error) {
+    console.error("Error fetching collection data:", error);
+    return notFound();
+  }
+} 

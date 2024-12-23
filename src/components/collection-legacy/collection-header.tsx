@@ -1,5 +1,5 @@
 import sanitize from "sanitize-html";
-import { Breadcrumb } from "@/components/product/breadcrumb";
+import { Breadcrumb } from "../product/breadcrumb";
 
 interface Props {
   name: string;

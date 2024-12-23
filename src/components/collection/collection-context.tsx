@@ -1,0 +1,247 @@
+"use client";
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { getProductList } from "@/lib/headkit/actions";
+import { GetProductFiltersQuery, GetProductListQuery, ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
+import { makeWhereProductQuery, SortKeyType } from "./utils";
+
+interface FilterValues {
+  categories: string[];
+  brands: string[];
+  attributes: Record<string, string[]>;
+  instock: boolean;
+  sort: SortKeyType | "";
+  page: number;
+}
+
+interface CollectionContextType {
+  products: ProductContentFullWithGroupFragment[];
+  totalProducts: number;
+  currentPage: number;
+  itemsPerPage: number;
+  isLoading: boolean;
+  isLoadingBefore: boolean;
+  isLoadingAfter: boolean;
+  hasMore: boolean;
+  filterValues: FilterValues;
+  setFilterValues: (values: FilterValues) => void;
+  clearFilters: () => void;
+  loadMore: () => void;
+  loadPrevious: () => void;
+  productFilter: GetProductFiltersQuery;
+}
+
+interface CollectionProviderProps {
+  children: React.ReactNode;
+  initialProducts: GetProductListQuery;
+  productFilter: GetProductFiltersQuery;
+  initialPage?: number;
+  itemsPerPage?: number;
+  onSale?: boolean;
+  search?: string;
+}
+
+const CollectionContext = createContext<CollectionContextType | null>(null);
+
+export function CollectionProvider({
+  children,
+  initialProducts,
+  productFilter,
+  initialPage = 0,
+  itemsPerPage = 24,
+  onSale,
+  search,
+}: CollectionProviderProps) {
+  const [products, setProducts] = useState<ProductContentFullWithGroupFragment[]>(
+    (initialProducts.products?.nodes || []) as ProductContentFullWithGroupFragment[]
+  );
+  const [totalProducts, setTotalProducts] = useState(initialProducts.products?.found || 0);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingBefore, setIsLoadingBefore] = useState(false);
+  const [isLoadingAfter, setIsLoadingAfter] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Parse initial filter values from URL
+  const [filterValues, setFilterValues] = useState<FilterValues>(() => {
+    const initialValues: FilterValues = {
+      categories: [],
+      brands: [],
+      attributes: {},
+      instock: false,
+      sort: "",
+      page: initialPage,
+    };
+
+    // Parse categories and brands
+    const categories = searchParams.get("categories")?.split(",").filter(Boolean) || [];
+    const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+    if (categories.length) initialValues.categories = categories;
+    if (brands.length) initialValues.brands = brands;
+
+    // Parse attributes from productFilter
+    productFilter?.productFilters?.attributes?.forEach((attr) => {
+      if (attr?.slug) {
+        const values = searchParams.get(attr.slug)?.split(",").filter((value): value is string => 
+          typeof value === 'string' && value !== null && value !== undefined && value !== ''
+        ) || [];
+        if (values.length) {
+          initialValues.attributes[attr.slug] = values;
+        }
+      }
+    });
+
+    // Parse other values
+    initialValues.instock = searchParams.get("instock") === "true";
+    initialValues.sort = (searchParams.get("sort") || "") as SortKeyType | "";
+
+    return initialValues;
+  });
+
+  const hasMore = products.length < totalProducts;
+
+  const createUrl = (pageIndex: number) => {
+    const params = new URLSearchParams(searchParams);
+    if (pageIndex <= 0) {
+      params.delete("page");
+    } else {
+      params.set("page", pageIndex.toString());
+    }
+    return `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+  };
+
+  const fetchProducts = async (pageIndex: number, position: "before" | "after" | "middle") => {
+    const setLoadingState = (isLoading: boolean) => {
+      if (position === "before") setIsLoadingBefore(isLoading);
+      else if (position === "after") setIsLoadingAfter(isLoading);
+      else setIsLoading(isLoading);
+    };
+
+    if (isLoading || isLoadingBefore || isLoadingAfter) return;
+
+    try {
+      setLoadingState(true);
+      const categorySlug = pathname.split("/").pop();
+
+      const { data: fetchedProducts } = await getProductList({
+        input: {
+          where: makeWhereProductQuery({
+            filterQuery: filterValues,
+            categorySlug,
+            page: pageIndex,
+            perPage: itemsPerPage,
+            onSale,
+            search,
+          }),
+          first: itemsPerPage,
+        },
+      });
+
+      const newProducts = (fetchedProducts?.products?.nodes || []) as ProductContentFullWithGroupFragment[];
+      const totalFound = fetchedProducts?.products?.found || 0;
+
+      // Don't update anything if we're trying to load more but got no products
+      if (position === "after" && newProducts.length === 0) {
+        setLoadingState(false);
+        return;
+      }
+
+      // Update state based on position
+      setCurrentPage(pageIndex);
+      setTotalProducts(totalFound);
+
+      if (position === "middle") {
+        setProducts(newProducts);
+      } else if (position === "before") {
+        setProducts([...newProducts, ...products]);
+      } else { // after
+        setProducts([...products, ...newProducts]);
+      }
+
+      // Only update URL if we have products or it's not "after" position
+      if (position !== "after" || newProducts.length > 0) {
+        window.history.pushState(null, "", createUrl(pageIndex));
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoadingState(false);
+    }
+  };
+
+  // Reset products when filters change
+  useEffect(() => {
+    if (!isInitialLoad) {
+      fetchProducts(0, "middle");
+    }
+    setIsInitialLoad(false);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterValues, onSale, search]);
+
+  // Handle URL changes
+  useEffect(() => {
+    const pageParam = searchParams.get("page");
+    const newPageIndex = pageParam ? parseInt(pageParam) : 0;
+    
+    if (!isInitialLoad && newPageIndex !== currentPage && products.length < totalProducts) {
+      fetchProducts(newPageIndex, newPageIndex > currentPage ? "after" : "before");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  const clearFilters = () => {
+    setFilterValues({
+      categories: [],
+      brands: [],
+      attributes: {},
+      instock: false,
+      sort: "",
+      page: 0,
+    });
+  };
+
+  const loadMore = () => {
+    fetchProducts(currentPage + 1, "after");
+  };
+
+  const loadPrevious = () => {
+    if (currentPage > 0) {
+      fetchProducts(currentPage - 1, "before");
+    }
+  };
+
+  return (
+    <CollectionContext.Provider
+      value={{
+        products,
+        totalProducts,
+        currentPage,
+        itemsPerPage,
+        isLoading,
+        isLoadingBefore,
+        isLoadingAfter,
+        hasMore,
+        filterValues,
+        setFilterValues,
+        clearFilters,
+        loadMore,
+        loadPrevious,
+        productFilter,
+      }}
+    >
+      {children}
+    </CollectionContext.Provider>
+  );
+}
+
+export function useCollection() {
+  const context = useContext(CollectionContext);
+  if (!context) {
+    throw new Error("useCollection must be used within a CollectionProvider");
+  }
+  return context;
+} 
