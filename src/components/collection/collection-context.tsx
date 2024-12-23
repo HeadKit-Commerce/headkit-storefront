@@ -24,6 +24,7 @@ interface CollectionContextType {
   isLoadingBefore: boolean;
   isLoadingAfter: boolean;
   hasMore: boolean;
+  hasFirstPage: boolean;
   filterValues: FilterValues;
   setFilterValues: (values: FilterValues) => void;
   clearFilters: () => void;
@@ -40,9 +41,12 @@ interface CollectionProviderProps {
   itemsPerPage?: number;
   onSale?: boolean;
   search?: string;
+  newIn?: boolean;
 }
 
 const CollectionContext = createContext<CollectionContextType | null>(null);
+
+const SPECIAL_PAGES = ["/shop", "/sale", "/new"];
 
 export function CollectionProvider({
   children,
@@ -52,6 +56,7 @@ export function CollectionProvider({
   itemsPerPage = 24,
   onSale,
   search,
+  newIn,
 }: CollectionProviderProps) {
   const [products, setProducts] = useState<ProductContentFullWithGroupFragment[]>(
     (initialProducts.products?.nodes || []) as ProductContentFullWithGroupFragment[]
@@ -62,6 +67,7 @@ export function CollectionProvider({
   const [isLoadingBefore, setIsLoadingBefore] = useState(false);
   const [isLoadingAfter, setIsLoadingAfter] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasFirstPage, setHasFirstPage] = useState(initialPage === 0);
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -124,7 +130,8 @@ export function CollectionProvider({
 
     try {
       setLoadingState(true);
-      const categorySlug = pathname.split("/").pop();
+      // Only get categorySlug for non-special pages
+      const categorySlug = SPECIAL_PAGES.includes(pathname) ? undefined : pathname.split("/").pop();
 
       const { data: fetchedProducts } = await getProductList({
         input: {
@@ -135,6 +142,7 @@ export function CollectionProvider({
             perPage: itemsPerPage,
             onSale,
             search,
+            newIn,
           }),
           first: itemsPerPage,
         },
@@ -155,8 +163,10 @@ export function CollectionProvider({
 
       if (position === "middle") {
         setProducts(newProducts);
+        setHasFirstPage(pageIndex === 0);
       } else if (position === "before") {
         setProducts([...newProducts, ...products]);
+        if (pageIndex === 0) setHasFirstPage(true);
       } else { // after
         setProducts([...products, ...newProducts]);
       }
@@ -225,6 +235,7 @@ export function CollectionProvider({
         isLoadingBefore,
         isLoadingAfter,
         hasMore,
+        hasFirstPage,
         filterValues,
         setFilterValues,
         clearFilters,

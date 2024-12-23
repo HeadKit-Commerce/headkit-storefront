@@ -4,7 +4,7 @@ import { GetProductFiltersQuery, GetProductListQuery } from "@/lib/headkit/gener
 import { CollectionProvider } from "./collection-context";
 import { Filter } from "./filter";
 import { ProductGrid } from "./product-grid";
-import { Pagination } from "./pagination";
+import { LoadPrevious, LoadMore, ProductCount } from "./pagination";
 
 interface CollectionPageProps {
   initialProducts: GetProductListQuery;
@@ -34,8 +34,12 @@ export function CollectionPage({
     >
       <div className="flex flex-col gap-8">
         <Filter />
+        <LoadPrevious />
         <ProductGrid />
-        <Pagination />
+        <div className="flex flex-col items-center gap-5">
+          <LoadMore />
+          <ProductCount />
+        </div>
       </div>
     </CollectionProvider>
   );

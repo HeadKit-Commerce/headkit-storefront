@@ -31,6 +31,7 @@ export default async function Page({ searchParams }: Props) {
           filterQuery: filterState,
           page: pageNumber,
           perPage: itemsPerPage,
+          newIn: true,
         }),
         first: itemsPerPage,
       }
@@ -51,8 +52,8 @@ export default async function Page({ searchParams }: Props) {
   return (
     <>
       <CollectionHeader
-        name="Shop"
-        description=""
+        name="New Arrivals"
+        description="Discover our latest products from the last 30 days"
         breadcrumbData={[
           {
             name: "Home",
@@ -60,8 +61,8 @@ export default async function Page({ searchParams }: Props) {
             current: false,
           },
           {
-            name: "Shop",
-            uri: "/shop",
+            name: "New Arrivals",
+            uri: "/new",
             current: true,
           },
         ]}
@@ -74,4 +75,4 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
-} 
+}

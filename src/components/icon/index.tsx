@@ -7,6 +7,7 @@ import {
   HiOutlineArrowSmallRight,
   HiOutlineCheck,
   HiOutlineChevronDown,
+  HiOutlineMagnifyingGlass,
   HiOutlineMinus,
   HiOutlinePlus,
   HiOutlineShoppingBag,
@@ -64,6 +65,7 @@ const Icon = {
   check: (props: IconProps) => <HiOutlineCheck {...props} />,
   hamburger: (props: IconProps) => <HiBars3 {...props} />,
   chevronDown: (props: IconProps) => <HiOutlineChevronDown {...props} />,
+  search: (props: IconProps) => <HiOutlineMagnifyingGlass {...props} />,
 };
 
 type IconType = keyof typeof Icon;

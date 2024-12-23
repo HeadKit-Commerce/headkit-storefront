@@ -23,6 +23,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
+import { SearchDrawer } from "./search-drawer";
 
 interface Props {
   menus: Record<
@@ -82,6 +83,9 @@ const Header = ({ menus }: Props) => {
           <div className="hidden md:flex">
             {mainRightMenu && <MenuSection menuItems={mainRightMenu.menuItems.nodes} />}
           </div>
+          <NavigationMenuItem>
+            <SearchDrawer />
+          </NavigationMenuItem>
           <NavigationMenuItem>
             <CartDrawer />
           </NavigationMenuItem>

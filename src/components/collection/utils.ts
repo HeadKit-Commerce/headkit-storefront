@@ -50,6 +50,7 @@ interface QueryParams {
   perPage?: number;
   onSale?: boolean;
   search?: string;
+  newIn?: boolean;
 }
 
 const makeTaxonomyFilter = (slug: string, terms: string[]): ProductTaxonomyFilterInput => {

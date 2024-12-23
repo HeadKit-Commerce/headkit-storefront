@@ -41,7 +41,7 @@ export default async function Page({ params, searchParams }: CollectionPageProps
   const categorySlug = slug.pop();
   const parsedSearchParams = await searchParams;
   const page = parsedSearchParams.page ? parseInt(parsedSearchParams.page) : 0;
-  const itemsPerPage = 3;
+  const itemsPerPage = 24;
 
   if (!categorySlug) return notFound();
 
