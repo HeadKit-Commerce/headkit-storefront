@@ -7,6 +7,7 @@ import {
   SimpleProduct,
   StockStatusEnum,
   VariableProduct,
+  StripeConfig,
 } from "@/lib/headkit/generated";
 import Image from "next/image";
 import { ProductImageGallery } from "./product-image-gallery";
@@ -26,6 +27,10 @@ import { Icon } from "@/components/icon";
 import { AvailabilityStatus } from "./availability-status";
 import { AddToCart } from "./add-to-cart";
 import { CONFIG } from "@/config/app-config";
+import { ExpressCheckout } from "@/components/stripe/express-checkout";
+import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
+import { getFloatVal } from "@/lib/utils";
+import { getStripeConfig } from "@/lib/headkit/actions";
 
 interface Props {
   product: ProductContentFullWithGroupFragment;
@@ -41,14 +46,15 @@ export const ProductDetail = ({ product }: Props) => {
   const [imageVariableSelected, setImageVariableSelected] = useState<
     { src: string; alt: string }[]
   >([]);
+  const [stripeConfig, setStripeConfig] = useState<StripeConfig | null>(null);
 
   const handleVariableImage = (images: { src: string; alt: string }[]) => {
     const galleryImages =
       product?.attributes?.nodes.length === 1 && images.length === 1
         ? product?.galleryImages?.nodes.map((image) => ({
-            src: image?.sourceUrl || CONFIG.fallbackProductImage,
-            alt: image?.altText || "product",
-          })) || []
+          src: image?.sourceUrl || CONFIG.fallbackProductImage,
+          alt: image?.altText || "product",
+        })) || []
         : [];
     setImageVariableSelected([...images, ...galleryImages]);
   };
@@ -56,6 +62,20 @@ export const ProductDetail = ({ product }: Props) => {
   const isGiftCard = product?.metaData?.some(
     (meta) => meta?.key === "_gift_card" && meta?.value === "yes"
   );
+
+  useEffect(() => {
+    const fetchStripeConfig = async () => {
+      try {
+        const response = await getStripeConfig();
+        if (response?.data?.stripeConfig) {
+          setStripeConfig(response.data.stripeConfig);
+        }
+      } catch (error) {
+        console.error('Error fetching stripe config:', error);
+      }
+    };
+    fetchStripeConfig();
+  }, []);
 
   useEffect(() => {
     if (product?.type === ProductTypesEnum.Simple) {
@@ -72,6 +92,8 @@ export const ProductDetail = ({ product }: Props) => {
       ]);
     }
   }, [product]);
+
+
 
   return (
     <>
@@ -196,23 +218,24 @@ export const ProductDetail = ({ product }: Props) => {
             />
           </div>
 
-          {/* {selectedProduct !== null && !isGiftCard ? (
+          {selectedProduct !== null && !isGiftCard ? (
             <div className="mt-3">
-              <ExpressCheckoutSingleProductButton
-                productName={selectedProduct?.name}
+              <ExpressCheckout
+                productName={selectedProduct?.name ?? ""}
                 productId={selectedProduct?.databaseId}
                 price={getFloatVal(
-                  selectedProduct?.salePrice ?? selectedProduct?.regularPrice
+                  selectedProduct?.salePrice ?? selectedProduct?.regularPrice ?? ""
                 )}
                 disabled={
                   selectedProduct?.databaseId === null ||
                   (selectedProduct as SimpleProduct)?.stockStatus ===
-                    StockStatusEnum.OutOfStock
+                  StockStatusEnum.OutOfStock
                 }
                 singleCheckout={true}
+                stripeConfig={stripeConfig}
               />
             </div>
-          ) : null} */}
+          ) : null}
 
           <div className="mt-5 flex w-full flex-wrap justify-between gap-2">
             <div>
@@ -222,16 +245,17 @@ export const ProductDetail = ({ product }: Props) => {
                 iconPosition="left"
               />
             </div>
-            {/* <PaymentMethodMessaging
+            <PaymentMethodMessaging
               price={getFloatVal(
-                selectedProduct?.price || selectedProduct?.regularPrice
+                selectedProduct?.price || selectedProduct?.regularPrice || ""
               )}
               disabled={
                 !selectedProduct ||
                 (selectedProduct as SimpleProduct)?.stockStatus ===
-                  StockStatusEnum.OutOfStock
+                StockStatusEnum.OutOfStock
               }
-            /> */}
+              stripeConfig={stripeConfig}
+            />
           </div>
 
           <div className="my-6 grid gap-[10px]">

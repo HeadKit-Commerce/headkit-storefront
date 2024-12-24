@@ -1,0 +1,27 @@
+mutation login($input: LoginInput!) {
+  login(input: $input) {
+    authToken
+    clientMutationId
+    user {
+      id
+      name
+      firstName
+      lastName
+      email
+      nicename
+      avatar {
+        default
+        extraAttr
+        forceDefault
+        foundAvatar
+        height
+        isRestricted
+        rating
+        scheme
+        size
+        url
+        width
+      }
+    }
+  }
+}

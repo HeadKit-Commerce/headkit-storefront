@@ -1,0 +1,11 @@
+mutation registerUser($input: RegisterUserInput!) {
+  registerUser(
+    input: $input) {
+    user {
+      jwtAuthToken
+      username
+      firstName
+      lastName
+    }
+  }
+}

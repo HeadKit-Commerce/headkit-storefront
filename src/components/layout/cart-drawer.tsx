@@ -11,16 +11,19 @@ import {
 import { useAppContext } from "../context/app-context";
 import { Icon } from "../icon";
 import { useEffect } from "react";
-import { getCart as getCartAction } from "@/lib/headkit/actions";
+import { getCart as getCartAction, getStripeConfig } from "@/lib/headkit/actions";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { CartItem } from "./cart-item";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
-import { Cart, CartItemFragment } from "@/lib/headkit/generated";
+import { Cart, CartItemFragment, StripeConfig } from "@/lib/headkit/generated";
+import { ExpressCheckout } from "@/components/stripe/express-checkout";
+import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
+import { useState } from "react";
 
 const CartDrawer = () => {
-  const { cartDrawer, toggleCartDrawer, setCartData, cartData } =
-    useAppContext();
+  const { cartDrawer, toggleCartDrawer, setCartData, cartData } = useAppContext();
+  const [stripeConfig, setStripeConfig] = useState<StripeConfig | null>(null);
 
   useEffect(() => {
     const getCart = async () => {
@@ -35,6 +38,20 @@ const CartDrawer = () => {
     };
     getCart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchStripeConfig = async () => {
+      try {
+        const response = await getStripeConfig();
+        if (response?.data?.stripeConfig) {
+          setStripeConfig(response.data.stripeConfig);
+        }
+      } catch (error) {
+        console.error('Error fetching stripe config:', error);
+      }
+    };
+    fetchStripeConfig();
   }, []);
 
   return (
@@ -90,10 +107,11 @@ const CartDrawer = () => {
           {(cartData?.contents?.nodes?.length ?? 0) > 0 && (
             <div className="pt-[20px] w-full pb-[30px] md:py-[40px] bg-white md:bg-inherit">
               <>
-                {/* <PaymentMethodMessaging
-                  price={getFloatVal(cart?.contentsTotal)}
+                <PaymentMethodMessaging
+                  price={getFloatVal(cartData?.contentsTotal || "0")}
                   disabled={false}
-                /> */}
+                  stripeConfig={stripeConfig}
+                />
                 <div className="mt-5 flex text-lg font-medium">
                   <p className="leading-[32px] flex-1 flex items-end text-[15px]">
                     Shipping and tax calculated at checkout
@@ -105,13 +123,14 @@ const CartDrawer = () => {
                     })}
                   </p>
                 </div>
-                {/* <div className="mt-5">
-                  <ExpressCheckoutSingleProductButton
+                <div className="mt-5">
+                  <ExpressCheckout
                     singleCheckout={false}
                     disabled={false}
-                    price={getFloatVal(cart?.total) || 0}
+                    price={getFloatVal(cartData?.total || "0")}
+                    stripeConfig={stripeConfig}
                   />
-                </div> */}
+                </div>
                 <Link href="/checkout">
                   <Button
                     fullWidth
