@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ProductCard } from "../product/product-card";
@@ -79,6 +79,7 @@ export function SearchDrawer() {
       </SheetTrigger>
       <SheetContent side="top" className="w-full">
         <SheetTitle className="sr-only">Search products</SheetTitle>
+        <SheetDescription className="sr-only">Search products</SheetDescription>
         <div className="flex flex-col gap-8 py-4">
           <div className="flex justify-center">
             <div className="flex items-center gap-2 max-w-xl w-full">

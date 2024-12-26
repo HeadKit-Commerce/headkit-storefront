@@ -2,6 +2,7 @@ import { PageIdType } from "@/lib/headkit/generated";
 import { Metadata } from "next";
 import { GravityForm } from "@/components/gravity-form";
 import { headkit } from "@/lib/headkit/client";
+import sanitize from "sanitize-html";
 
 const CONTACT_SLUG = "contact";
 
@@ -53,7 +54,7 @@ export default async function ContactPage() {
           <h1 className="mb-6 text-3xl font-bold text-purple-800">{page.title}</h1>
           <div
             className="prose text-purple-800 max-w-none"
-            dangerouslySetInnerHTML={{ __html: page.content || "" }}
+            dangerouslySetInnerHTML={{ __html: sanitize(page.content || "") }}
           />
         </div>
 

@@ -2,6 +2,7 @@ import { headkit } from "@/lib/headkit/client";
 import { PageIdType, PostObjectsConnectionOrderbyEnum, OrderEnum } from "@/lib/headkit/generated";
 import { Metadata } from "next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import sanitize from "sanitize-html";
 
 const FAQ_SLUG = "faq";
 
@@ -76,7 +77,7 @@ export default async function FAQPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      
+
       <div className="px-5 md:px-10 py-10 md:py-16">
         <div>
           {/* Header */}
@@ -85,7 +86,7 @@ export default async function FAQPage() {
             {page.content && (
               <div
                 className="prose text-purple-800 max-w-none"
-                dangerouslySetInnerHTML={{ __html: page.content }}
+                dangerouslySetInnerHTML={{ __html: sanitize(page.content || "") }}
               />
             )}
           </div>
@@ -105,7 +106,7 @@ export default async function FAQPage() {
                   <AccordionContent>
                     <div
                       className="prose text-purple-800 max-w-none pt-2"
-                      dangerouslySetInnerHTML={{ __html: faq.answer || "" }}
+                      dangerouslySetInnerHTML={{ __html: sanitize(faq.answer || "") }}
                     />
                   </AccordionContent>
                 </AccordionItem>

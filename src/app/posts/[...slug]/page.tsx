@@ -10,6 +10,7 @@ import {
   PostObjectsConnectionOrderbyEnum,
 } from "@/lib/headkit/generated";
 import { processText } from "@/lib/utils";
+import sanitize from "sanitize-html";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
@@ -50,7 +51,7 @@ export default async function Page({ params }: Props) {
           <div className="col-span-9">
             <div className="post-content">
               <div
-                dangerouslySetInnerHTML={{ __html: post?.data?.post?.content || "" }}
+                dangerouslySetInnerHTML={{ __html: sanitize(post?.data?.post?.content || "") }}
               ></div>
             </div>
           </div>
