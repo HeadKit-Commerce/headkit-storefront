@@ -2,31 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { AlertBox } from "@/components/alert-box/alert-box";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
 import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
 import { Cart } from "@/components/checkout/cart";
-import { StripeConfig } from "@/lib/headkit/generated";
-import { getStripeConfig } from "@/lib/headkit/actions";
 
 export default function Page() {
   const { cartData, currencyFormatter, toggleCartDrawer } = useAppContext();
   const [showCart, setShowCart] = useState(false);
-  const [stripeConfig, setStripeConfig] = useState<StripeConfig | null>(null);
 
   useEffect(() => {
     toggleCartDrawer(false);
     window.scrollTo(0, 0);
-
-    const fetchStripeConfig = async () => {
-      const config = await getStripeConfig();
-      setStripeConfig(config.data.stripeConfig);
-    };
-
-    fetchStripeConfig();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -43,7 +32,7 @@ export default function Page() {
           <Button
             fullWidth
             suppressHydrationWarning
-            onClick={() => toggleCartDrawer()}
+            onClick={() => toggleCartDrawer(false)}
           >
             Start shopping
           </Button>
@@ -54,14 +43,14 @@ export default function Page() {
 
   const renderCheckoutPage = () => (
     <div className="px-[20px] md:px-[40px] mx-auto grid grid-cols-12 gap-[20px]">
-      <div className="col-span-12">
+      {/* <div className="col-span-12">
         <AlertBox variant="notice" title="Demo Only">
           This is a demo store only. Use Stripe test cards to test payments.
         </AlertBox>
-      </div>
+      </div> */}
       <div className="order-2 md:order-1 col-span-12 md:col-span-6">
         {cartData?.contents?.nodes?.length && (
-          <CheckoutForm stripeConfig={stripeConfig} />
+          <CheckoutForm />
         )}
       </div>
       <div className="order-1 md:order-2 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5">

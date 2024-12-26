@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useReducer } from "react";
-import { Cart } from "@/lib/headkit/generated";
+import { createContext, ReactNode, useContext, useReducer, useEffect } from "react";
+import { Cart, StripeConfig } from "@/lib/headkit/generated";
+import { getStripeConfig } from "@/lib/headkit/actions";
 
 interface AppContextState {
   cartDrawer: boolean;
@@ -11,6 +12,7 @@ interface AppContextState {
   wishlists: number[];
   initLang: string;
   initCurrency: string;
+  stripeConfig: StripeConfig | null;
 }
 
 interface AppContextActions {
@@ -24,6 +26,7 @@ interface AppContextActions {
     lang?: string;
     currency?: string | null | undefined;
   }) => string;
+  setStripeConfig: (config: StripeConfig | null) => void;
 }
 
 type AppContextValue = AppContextState & AppContextActions;
@@ -46,6 +49,7 @@ const initialState: AppContextState = {
   wishlists: [],
   initLang: "en-AU",
   initCurrency: "AUD",
+  stripeConfig: null,
 };
 
 type AppContextAction =
@@ -53,7 +57,8 @@ type AppContextAction =
   | { type: "SET_CART_DATA"; payload: Cart | null }
   | { type: "SET_IS_LOGIN"; payload: boolean }
   | { type: "SET_IS_GLOBAL_DISABLED"; payload: boolean }
-  | { type: "SET_WISHLISTS"; payload: number[] };
+  | { type: "SET_WISHLISTS"; payload: number[] }
+  | { type: "SET_STRIPE_CONFIG"; payload: StripeConfig | null };
 
 const reducer = (
   state: AppContextState,
@@ -74,6 +79,8 @@ const reducer = (
       return { ...state, isGlobalDisabled: action.payload };
     case "SET_WISHLISTS":
       return { ...state, wishlists: action.payload };
+    case "SET_STRIPE_CONFIG":
+      return { ...state, stripeConfig: action.payload };
     default:
       return state;
   }
@@ -93,6 +100,20 @@ export const AppContextProvider = ({
     initLang: initialLang,
     initCurrency: initialCurrency,
   });
+
+  useEffect(() => {
+    const fetchStripeConfig = async () => {
+      try {
+        const response = await getStripeConfig();
+        if (response?.data?.stripeConfig) {
+          dispatch({ type: "SET_STRIPE_CONFIG", payload: response.data.stripeConfig });
+        }
+      } catch (error) {
+        console.error('Error fetching stripe config:', error);
+      }
+    };
+    fetchStripeConfig();
+  }, []);
 
   const actions: AppContextActions = {
     toggleCartDrawer: (enable?: boolean) => {
@@ -115,6 +136,9 @@ export const AppContextProvider = ({
         style: "currency",
         currency: currency || state.initCurrency,
       }).format(price);
+    },
+    setStripeConfig: (config: StripeConfig | null) => {
+      dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
     },
   };
 

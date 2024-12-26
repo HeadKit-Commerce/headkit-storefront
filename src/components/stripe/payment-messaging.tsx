@@ -3,18 +3,16 @@
 import { Elements, PaymentMethodMessagingElement } from "@stripe/react-stripe-js";
 import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
 import { useAppContext } from "@/components/context/app-context";
-import { StripeConfig } from "@/lib/headkit/generated";
 import { useEffect, useState } from "react";
 import { Stripe } from "@stripe/stripe-js";
 
 interface PaymentMethodMessagingProps {
   disabled: boolean;
   price: number;
-  stripeConfig: StripeConfig | null;
 }
 
-export function PaymentMethodMessaging({ disabled, price, stripeConfig }: PaymentMethodMessagingProps) {
-  const { initLang, initCurrency } = useAppContext();
+export function PaymentMethodMessaging({ disabled, price }: PaymentMethodMessagingProps) {
+  const { initLang, initCurrency, stripeConfig } = useAppContext();
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const lang = initLang.split("-");
   const validCurrencies = ["USD", "GBP", "EUR", "DKK", "NOK", "SEK", "AUD", "CAD", "NZD"] as const;

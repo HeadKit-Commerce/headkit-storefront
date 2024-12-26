@@ -6,7 +6,6 @@ import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
 import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal } from "@/lib/utils";
 import { ExpressCheckoutButton } from "@/components/stripe/express-checkout-button";
-import { StripeConfig } from "@/lib/headkit/generated";
 import { useEffect, useState } from "react";
 import { Stripe } from "@stripe/stripe-js";
 
@@ -17,7 +16,6 @@ interface ExpressCheckoutProps {
   variationId?: number;
   productName?: string;
   singleCheckout?: boolean;
-  stripeConfig: StripeConfig | null;
 }
 
 export function ExpressCheckout({
@@ -27,9 +25,8 @@ export function ExpressCheckout({
   variationId,
   productName,
   singleCheckout = false,
-  stripeConfig,
 }: ExpressCheckoutProps) {
-  const { initCurrency, cartData } = useAppContext();
+  const { initCurrency, cartData, stripeConfig} = useAppContext();
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
 
   useEffect(() => {

@@ -5,6 +5,7 @@ import { CouponBox } from "@/components/checkout/coupon-box";
 import { getFloatVal } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";
 import { CartItemFragment } from "@/lib/headkit/generated";
+import { PaymentMethodMessaging } from "../stripe/payment-messaging";
 
 interface Props {
   showDisplayShipping?: boolean;
@@ -105,6 +106,13 @@ const Cart = ({ showDisplayShipping }: Props) => {
         <div className="text-right font-medium text-body2 text-black-1">
           <p>{calculateTotal()}</p>
         </div>
+      </div>
+
+      <div className="mt-5">
+        <PaymentMethodMessaging
+          price={getFloatVal(cartData?.contentsTotal || "0")}
+          disabled={false}
+        />
       </div>
     </div>
   );

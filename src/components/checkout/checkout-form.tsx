@@ -12,16 +12,16 @@ import {
   CheckoutInput,
   CountriesEnum,
   ShippingRate,
-  StripeConfig,
 } from "@/lib/headkit/generated";
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 import { getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../context/app-context";
 import { checkout, getCustomer } from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ExpressCheckout } from "../stripe/express-checkout";
+import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
 
 interface FormData {
   email?: string;
@@ -57,26 +57,11 @@ interface FormData {
   stripePaymentMethod?: string;
 }
 
-interface Props {
-  stripeConfig: StripeConfig | null;
-}
 
-const getStripeEnabled = (config: StripeConfig | null) => !!(
-  config?.publishableKey && config?.accountId
-);
 
-const getStripePromise = (config: StripeConfig | null) => {
-  const enabled = getStripeEnabled(config);
-  return enabled
-    ? loadStripe(config!.publishableKey, {
-      stripeAccount: config!.accountId,
-    })
-    : null;
-};
-
-const CheckoutForm = ({ stripeConfig }: Props) => {
+const CheckoutForm = () => {
   const router = useRouter();
-  const { cartData } = useAppContext();
+  const { cartData, stripeConfig } = useAppContext();
   const [currentStep, setCurrentStep] = useState<CheckoutFormStepEnum>(
     CheckoutFormStepEnum.CONTACT
   );
@@ -112,14 +97,16 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     customerNote: "",
     stripePaymentMethod: "",
   });
-  const [stripeEnabled, setStripeEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
+
   const enableStripe = useMemo(
-    () => stripeEnabled && getStripeEnabled(stripeConfig),
-    [stripeEnabled, stripeConfig]
+    () => !!(stripeConfig?.publishableKey && stripeConfig?.accountId),
+    [stripeConfig]
   );
-  const stripePromise = useMemo(() => getStripePromise(stripeConfig), [stripeConfig]);
+
+  const stripePromise = useMemo(() => enableStripe ? getStripePromise(stripeConfig?.publishableKey ?? "", stripeConfig?.accountId ?? "") : null, [enableStripe, stripeConfig]);
+
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -322,10 +309,6 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
     );
   };
 
-  // log when formData changes
-  useEffect(() => {
-    console.log("formData", formData);
-  }, [formData]);
 
   const LoadingSkeleton = () => (
     <div>
@@ -451,7 +434,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
 
   return (
     <>
-      <div className="mb-4 flex items-center gap-2">
+      {/* <div className="mb-4 flex items-center gap-2">
         <label className="relative inline-flex items-center cursor-pointer">
           <input
             type="checkbox"
@@ -464,7 +447,7 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
         <span className="text-sm font-medium text-gray-900">
           {stripeEnabled ? 'Stripe Enabled' : 'Stripe Disabled'}
         </span>
-      </div>
+      </div> */}
 
       {enableStripe ? (
         <Elements
@@ -512,6 +495,13 @@ const CheckoutForm = ({ stripeConfig }: Props) => {
             },
           }}
         >
+          <div className="mb-4">
+            <ExpressCheckout
+              singleCheckout={false}
+              disabled={false}
+              price={getFloatVal(cartData?.total || "0")}
+            />
+          </div>
           <FormContent />
         </Elements>
       ) : (

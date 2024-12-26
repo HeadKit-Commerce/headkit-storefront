@@ -7,7 +7,6 @@ import {
   SimpleProduct,
   StockStatusEnum,
   VariableProduct,
-  StripeConfig,
 } from "@/lib/headkit/generated";
 import Image from "next/image";
 import { ProductImageGallery } from "./product-image-gallery";
@@ -30,7 +29,6 @@ import { CONFIG } from "@/config/app-config";
 import { ExpressCheckout } from "@/components/stripe/express-checkout";
 import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
 import { getFloatVal } from "@/lib/utils";
-import { getStripeConfig } from "@/lib/headkit/actions";
 
 interface Props {
   product: ProductContentFullWithGroupFragment;
@@ -46,7 +44,6 @@ export const ProductDetail = ({ product }: Props) => {
   const [imageVariableSelected, setImageVariableSelected] = useState<
     { src: string; alt: string }[]
   >([]);
-  const [stripeConfig, setStripeConfig] = useState<StripeConfig | null>(null);
 
   const handleVariableImage = (images: { src: string; alt: string }[]) => {
     const galleryImages =
@@ -62,20 +59,6 @@ export const ProductDetail = ({ product }: Props) => {
   const isGiftCard = product?.metaData?.some(
     (meta) => meta?.key === "_gift_card" && meta?.value === "yes"
   );
-
-  useEffect(() => {
-    const fetchStripeConfig = async () => {
-      try {
-        const response = await getStripeConfig();
-        if (response?.data?.stripeConfig) {
-          setStripeConfig(response.data.stripeConfig);
-        }
-      } catch (error) {
-        console.error('Error fetching stripe config:', error);
-      }
-    };
-    fetchStripeConfig();
-  }, []);
 
   useEffect(() => {
     if (product?.type === ProductTypesEnum.Simple) {
@@ -232,7 +215,6 @@ export const ProductDetail = ({ product }: Props) => {
                   StockStatusEnum.OutOfStock
                 }
                 singleCheckout={true}
-                stripeConfig={stripeConfig}
               />
             </div>
           ) : null}
@@ -254,7 +236,6 @@ export const ProductDetail = ({ product }: Props) => {
                 (selectedProduct as SimpleProduct)?.stockStatus ===
                 StockStatusEnum.OutOfStock
               }
-              stripeConfig={stripeConfig}
             />
           </div>
 
