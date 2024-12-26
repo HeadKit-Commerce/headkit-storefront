@@ -1,0 +1,13 @@
+mutation submitGravityForm($input: SubmitGfFormInput!) {
+  submitGfForm(input: $input) {
+    errors {
+      id
+      message
+    }
+    confirmation {
+      type
+      message
+      url
+    }
+  }
+}

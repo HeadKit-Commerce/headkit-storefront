@@ -176,4 +176,19 @@ export function debounce<T extends (...args: any[]) => void>(
 
     timeout = setTimeout(later, wait);
   };
+}
+
+/**
+ * Converts a string to snake_case
+ * @example
+ * snakeCase('Hello World') // => 'hello_world'
+ * snakeCase('helloWorld') // => 'hello_world'
+ * snakeCase('hello-world') // => 'hello_world'
+ */
+export function snakeCase(str: string): string {
+  return str
+    .trim()
+    .replace(/([a-z])([A-Z])/g, '$1_$2') // Convert camelCase to snake_case
+    .replace(/[\s-]+/g, '_') // Replace spaces and hyphens with underscores
+    .toLowerCase();
 } 

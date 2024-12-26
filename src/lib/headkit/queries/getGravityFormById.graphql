@@ -1,0 +1,112 @@
+query getGravityFormById($id: ID!) {
+  gfForm(id: $id, idType: DATABASE_ID) {
+    id
+    databaseId
+    title
+    description
+    submitButton {
+      imageUrl
+      layoutGridColumnSpan
+      location
+      text
+      type
+      width
+    }
+    formFields {
+      nodes {
+        databaseId
+        type
+        inputType
+        ... on NameField {
+          databaseId
+          label
+          adminLabel
+          isRequired
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+        }
+        ... on EmailField {
+          databaseId
+          label
+          adminLabel
+          placeholder
+          isRequired
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+        }
+        ... on TextField {
+          databaseId
+          label
+          adminLabel
+          placeholder
+          defaultValue
+          isRequired
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+        }
+        ... on TextAreaField {
+          databaseId
+          label
+          adminLabel
+          placeholder
+          isRequired
+          defaultValue
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+        }
+        ... on SelectField {
+          databaseId
+          label
+          adminLabel
+          placeholder
+          isRequired
+          inputName
+          defaultValue
+          errorMessage
+          visibility
+          labelPlacement
+          choices {
+            text
+            value
+          }
+        }
+        ... on RadioField {
+          databaseId
+          label
+          adminLabel
+          isRequired
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+          choices {
+            text
+            value
+          }
+        }
+        ... on CheckboxField {
+          databaseId
+          label
+          adminLabel
+          isRequired
+          inputName
+          errorMessage
+          visibility
+          labelPlacement
+          choices {
+            text
+            value
+          }
+        }
+      }
+    }
+  }
+}

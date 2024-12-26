@@ -9,6 +9,7 @@ import {
   GetProductListQueryVariables,
   ProductCategoryIdType,
   RemoveItemsFromCartInput,
+  SubmitGfFormInput,
   UpdateCustomerInput,
   UpdateItemQuantitiesInput,
 } from "./generated";
@@ -197,6 +198,16 @@ const getProductFilters = async (
   return response;
 };
 
+const getGravityFormById = async ({ id }: { id: string }) => {
+  const response = await headkit().getGravityFormById({ id });
+  return response;
+};
+
+const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
+  const response = await headkit().submitGravityForm({ input });
+  return response;
+};
+
 export {
   getCart,
   addToCart,
@@ -217,4 +228,6 @@ export {
   getProductList,
   getProductCategory,
   getProductFilters,
+  submitGravityForm,
+  getGravityFormById,
 };
