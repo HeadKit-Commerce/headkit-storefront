@@ -59,6 +59,5 @@ export const removeSession = async () => {
 };
 
 export const removeSingleCheckoutSession = async () => {
-  console.log("removing single checkout session");
   (await cookies()).delete(COOKIE_NAMES.SINGLE_CHECKOUT);
 };

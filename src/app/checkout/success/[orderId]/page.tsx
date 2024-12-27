@@ -35,11 +35,15 @@ export default async function Page({ params }: Props) {
   }
 
   const response = await getOrder({ id: orderId });
-  const order = response?.data?.order
+  const order = response?.data?.order;
 
   if (!order) {
     return notFound();
   }
+
+  const isSingleCheckout = !!order?.metaData?.find(meta =>
+    meta?.key === "_single_checkout"
+  );
 
   const paymentMethod = getPaymentMethodDisplay(order?.metaData as { key: string; value: string }[]);
 
@@ -48,9 +52,7 @@ export default async function Page({ params }: Props) {
 
   return (
     <>
-      <ClearCart singleCheckout={!!order?.metaData?.find(meta =>
-        meta?.key === "_single_checkout"
-      )} />
+      {order && <ClearCart singleCheckout={isSingleCheckout} />}
       <div className="grid grid-cols-12 gap-x-1 gap-y-5 md:gap-8 mt-5 px-5 md:px-10">
         <div className="col-span-12 relative bg-gradient-to-t from-black to-purple-900 rounded-[20px] overflow-hidden w-full">
           <div className="relative z-10 px-8 py-20 md:px-20 md:py-24">

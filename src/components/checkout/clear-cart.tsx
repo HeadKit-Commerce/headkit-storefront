@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import { useAppContext } from "@/components/context/app-context";
 import { emptyCart } from "@/lib/headkit/actions";
-import { removeSingleCheckoutSession } from "@/lib/headkit/actions/auth";
 
 interface ClearCartProps {
   singleCheckout?: boolean;
@@ -20,8 +19,6 @@ export function ClearCart({ singleCheckout }: ClearCartProps) {
           // Clear cart data from context
           setCartData(null);
           await emptyCart();
-        } else {
-          await removeSingleCheckoutSession();
         }
       } catch (error) {
         console.error("Error clearing cart:", error);
