@@ -35,6 +35,7 @@ export default async function Page({ params }: Props) {
   }
 
   const response = await getOrder({ id: orderId });
+  console.log(response);
   const order = response?.data?.order
 
   if (!order) {
@@ -170,10 +171,10 @@ export default async function Page({ params }: Props) {
                     orderData={{
                       quantity: lineItem.quantity || 0,
                       image: {
-                        src: lineItem?.product?.node?.image?.sourceUrl || "",
-                        alt: lineItem?.product?.node?.image?.altText || "",
+                        src: lineItem?.variation ? lineItem?.variation?.node?.image?.sourceUrl || "" : lineItem?.product?.node?.image?.sourceUrl || "",
+                        alt: lineItem?.variation ? lineItem?.variation?.node?.image?.altText || "" : lineItem?.product?.node?.image?.altText || "",
                       },
-                      name: lineItem?.product?.node?.name || "",
+                      name: lineItem?.variation ? lineItem?.variation?.node?.name || "" : lineItem?.product?.node?.name || "",
                     }}
                     priceIncludeTax={!!order?.pricesIncludeTax}
                   />

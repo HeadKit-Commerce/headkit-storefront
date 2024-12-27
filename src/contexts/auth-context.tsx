@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const checkAuth = async () => {
       try {
         const token = await getWoocommerceAuthToken();
-        console.log("Initial auth check, token:", token);
         
         if (token) {
           const response = await getCustomer({});

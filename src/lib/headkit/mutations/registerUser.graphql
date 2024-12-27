@@ -1,6 +1,5 @@
 mutation registerUser($input: RegisterUserInput!) {
-  registerUser(
-    input: $input) {
+  registerUser(input: $input) {
     user {
       jwtAuthToken
       username

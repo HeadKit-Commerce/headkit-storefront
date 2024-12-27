@@ -73,7 +73,7 @@ export default function Page() {
       if (response.data?.login?.authToken) {
         const token = response.data.login.authToken;
         setAuthToken(token);
-        
+
         // Add a small delay to ensure cookie is set before redirect
         setTimeout(() => {
           router.push('/account/profile');
@@ -97,9 +97,14 @@ export default function Page() {
         password: data.password,
       });
 
+      console.log(response);
+
       if (response.data?.registerUser?.user?.jwtAuthToken) {
         setAuthToken(response.data.registerUser.user.jwtAuthToken);
-        router.push("/account/profile");
+
+        setTimeout(() => {
+          router.push("/account/profile");
+        }, 100);
       } else {
         setError("Failed to create account. Please try again.");
       }

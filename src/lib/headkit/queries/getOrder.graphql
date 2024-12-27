@@ -64,6 +64,10 @@ query getOrder($orderId: ID!) {
             }
             name
             type
+            image {
+              sourceUrl
+              altText
+            }
           }
         }
         product {
@@ -76,7 +80,6 @@ query getOrder($orderId: ID!) {
             onSale
             slug
             image {
-              id
               sourceUrl
               altText
             }

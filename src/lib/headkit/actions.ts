@@ -231,6 +231,7 @@ const registerUser = async ({
       password,
       firstName,
       lastName,
+      nicename: `${firstName} ${lastName}`,
     },
   });
   return response;
