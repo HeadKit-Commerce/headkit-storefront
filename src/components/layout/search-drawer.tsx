@@ -55,13 +55,18 @@ export function SearchDrawer() {
     }
   }, 300);
 
-  const searchProducts = useCallback((query: string) => {
-    debouncedSearch(query);
-  }, []);
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+      debouncedSearch(value);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
 
   useEffect(() => {
-    searchProducts(searchQuery);
-  }, [searchQuery, searchProducts]);
+    handleSearch(searchQuery);
+  }, [searchQuery, handleSearch]);
 
   const handleViewMore = () => {
     if (!searchQuery) return;
@@ -72,7 +77,7 @@ export function SearchDrawer() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9">
+        <Button variant="ghost" size="icon" className="h-9 w-9 pr-0 justify-end">
           <Icon.search className="h-6 w-6 stroke-purple-800 hover:stroke-pink-500 stroke-2" />
           <span className="sr-only">Search products</span>
         </Button>
@@ -87,7 +92,7 @@ export function SearchDrawer() {
               <Input
                 placeholder="Search products..."
                 value={searchQuery}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
                 className="h-9"
                 autoFocus
               />

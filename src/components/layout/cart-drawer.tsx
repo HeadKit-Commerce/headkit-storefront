@@ -28,6 +28,7 @@ const CartDrawer = () => {
     const getCart = async () => {
       try {
         const cart = await getCartAction();
+        console.log("Cart:", cart);
         if (cart) {
           setCartData(cart.data.cart as Cart);
         }
@@ -46,7 +47,7 @@ const CartDrawer = () => {
       <SheetTrigger asChild>
         <Button variant={"ghost"} className="pr-0 relative">
           {(cartData?.contents?.nodes?.length ?? 0) > 0 && (
-            <div className="absolute -right-2 top-0 z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
+            <div className="absolute -right-2 top-0 z-10 h-4 w-4 rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
               {cartData?.contents?.nodes?.length}
             </div>
           )}

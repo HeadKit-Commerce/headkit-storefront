@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 import { SearchDrawer } from "./search-drawer";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Props {
   menus: Record<
@@ -43,7 +44,8 @@ interface Props {
   >;
 }
 
-const Header = ({ menus }: Props) => {
+function Header({ menus }: Props) {
+  const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -78,6 +80,7 @@ const Header = ({ menus }: Props) => {
             {primaryMenu && <MenuSection menuItems={primaryMenu.menuItems.nodes} />}
           </div>
         </NavigationMenuList>
+
         {/* Main Right Menu */}
         <NavigationMenuList>
           <div className="hidden md:flex">
@@ -87,12 +90,31 @@ const Header = ({ menus }: Props) => {
             <SearchDrawer />
           </NavigationMenuItem>
           <NavigationMenuItem>
+            <div className="relative">
+              <Link href="/account">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden md:inline-flex !pr-0 relative justify-end"
+                  aria-label="Account"
+                >
+                  <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
+                  {isAuthenticated && (
+                    <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
+                      <Icon.check className="h-2 w-2 text-white" />
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            </div>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
             <CartDrawer />
           </NavigationMenuItem>
           <NavigationMenuItem className="md:hidden">
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant={"ghost"} className="pr-0">
+                <Button variant="ghost" className="pr-0">
                   <Icon.hamburger className="stroke-purple-800 w-6 h-6" />
                 </Button>
               </SheetTrigger>
@@ -120,7 +142,7 @@ const Header = ({ menus }: Props) => {
       </NavigationMenu>
     </>
   );
-};
+}
 
 interface MenuSectionProps {
   menuItems: {

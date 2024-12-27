@@ -52443,7 +52443,17 @@ export type GetOrderQueryVariables = Exact<{
 }>;
 
 
-export type GetOrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', orderNumber?: string | null, currency?: string | null, paymentMethod?: string | null, paymentMethodTitle?: string | null, needsPayment?: boolean | null, subtotal?: string | null, cartTax?: string | null, totalTax?: string | null, total?: string | null, discountTotal?: string | null, discountTax?: string | null, datePaid?: string | null, createdVia?: string | null, date?: string | null, status?: OrderStatusEnum | null, shippingTax?: string | null, shippingTotal?: string | null, needsShippingAddress?: boolean | null, pricesIncludeTax?: boolean | null, metaData?: Array<{ __typename?: 'MetaData', id?: string | null, key: string, value?: string | null } | null> | null, shipping?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, email?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, postcode?: string | null, country?: CountriesEnum | null } | null, billing?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, email?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, postcode?: string | null, country?: CountriesEnum | null } | null, lineItems?: { __typename?: 'OrderToLineItemConnection', nodes: Array<{ __typename?: 'LineItem', subtotal?: string | null, subtotalTax?: string | null, total?: string | null, totalTax?: string | null, quantity?: number | null, variation?: { __typename?: 'LineItemToProductVariationConnectionEdge', node: { __typename?: 'SimpleProductVariation', name?: string | null, type?: ProductTypesEnum | null, attributes?: { __typename?: 'ProductVariationToVariationAttributeConnection', nodes: Array<{ __typename?: 'VariationAttribute', id: string, label?: string | null, name?: string | null, value?: string | null }> } | null } } | null, product?: { __typename?: 'LineItemToProductConnectionEdge', node: { __typename?: 'ExternalProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'GroupProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'SimpleProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'VariableProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } } | null }> } | null, shippingLines?: { __typename?: 'OrderToShippingLineConnection', nodes: Array<{ __typename?: 'ShippingLine', databaseId?: number | null, methodTitle?: string | null, total?: string | null, totalTax?: string | null, shippingMethod?: { __typename?: 'ShippingMethod', id: string, databaseId: string, title?: string | null, description?: string | null } | null, taxes?: Array<{ __typename?: 'OrderItemTax', amount?: number | null, subtotal?: number | null, total?: number | null } | null> | null }> } | null } | null };
+export type GetOrderQuery = { __typename?: 'Query', order?: { __typename?: 'Order', databaseId?: number | null, orderNumber?: string | null, currency?: string | null, paymentMethod?: string | null, paymentMethodTitle?: string | null, needsPayment?: boolean | null, subtotal?: string | null, cartTax?: string | null, totalTax?: string | null, total?: string | null, discountTotal?: string | null, discountTax?: string | null, datePaid?: string | null, createdVia?: string | null, date?: string | null, status?: OrderStatusEnum | null, shippingTax?: string | null, shippingTotal?: string | null, needsShippingAddress?: boolean | null, pricesIncludeTax?: boolean | null, metaData?: Array<{ __typename?: 'MetaData', id?: string | null, key: string, value?: string | null } | null> | null, shipping?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, email?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, postcode?: string | null, country?: CountriesEnum | null, phone?: string | null } | null, billing?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, email?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, postcode?: string | null, country?: CountriesEnum | null, phone?: string | null } | null, lineItems?: { __typename?: 'OrderToLineItemConnection', nodes: Array<{ __typename?: 'LineItem', subtotal?: string | null, subtotalTax?: string | null, total?: string | null, totalTax?: string | null, quantity?: number | null, variation?: { __typename?: 'LineItemToProductVariationConnectionEdge', node: { __typename?: 'SimpleProductVariation', name?: string | null, type?: ProductTypesEnum | null, attributes?: { __typename?: 'ProductVariationToVariationAttributeConnection', nodes: Array<{ __typename?: 'VariationAttribute', id: string, label?: string | null, name?: string | null, value?: string | null }> } | null } } | null, product?: { __typename?: 'LineItemToProductConnectionEdge', node: { __typename?: 'ExternalProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'GroupProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'SimpleProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'VariableProduct', title?: string | null, id: string, name?: string | null, type?: ProductTypesEnum | null, onSale?: boolean | null, slug?: string | null, productId: number, image?: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, altText?: string | null } | null } } | null }> } | null, shippingLines?: { __typename?: 'OrderToShippingLineConnection', nodes: Array<{ __typename?: 'ShippingLine', databaseId?: number | null, methodTitle?: string | null, total?: string | null, totalTax?: string | null, shippingMethod?: { __typename?: 'ShippingMethod', id: string, databaseId: string, title?: string | null, description?: string | null } | null, taxes?: Array<{ __typename?: 'OrderItemTax', amount?: number | null, subtotal?: number | null, total?: number | null } | null> | null }> } | null } | null };
+
+export type GetOrdersQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetOrdersQuery = { __typename?: 'Query', orders?: { __typename?: 'RootQueryToOrderConnection', pageInfo: { __typename?: 'RootQueryToOrderConnectionPageInfo', startCursor?: string | null, hasPreviousPage: boolean, hasNextPage: boolean, endCursor?: string | null }, nodes: Array<{ __typename?: 'Order', id: string, databaseId?: number | null, currency?: string | null, total?: string | null, status?: OrderStatusEnum | null, transactionId?: string | null, orderNumber?: string | null, shipping?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, phone?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, country?: CountriesEnum | null, postcode?: string | null, email?: string | null } | null, billing?: { __typename?: 'CustomerAddress', firstName?: string | null, lastName?: string | null, phone?: string | null, address1?: string | null, address2?: string | null, city?: string | null, state?: string | null, country?: CountriesEnum | null, postcode?: string | null, email?: string | null } | null }> } | null };
 
 export type GetPageQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -53765,6 +53775,7 @@ export const GetMenuDocument = gql`
 export const GetOrderDocument = gql`
     query getOrder($orderId: ID!) {
   order(id: $orderId, idType: DATABASE_ID) {
+    databaseId
     orderNumber
     currency
     paymentMethod
@@ -53795,6 +53806,7 @@ export const GetOrderDocument = gql`
       state
       postcode
       country
+      phone
     }
     billing {
       firstName
@@ -53806,6 +53818,7 @@ export const GetOrderDocument = gql`
       state
       postcode
       country
+      phone
     }
     lineItems {
       nodes {
@@ -53870,6 +53883,51 @@ export const GetOrderDocument = gql`
     shippingTotal
     needsShippingAddress
     pricesIncludeTax
+  }
+}
+    `;
+export const GetOrdersDocument = gql`
+    query getOrders($first: Int, $last: Int, $after: String, $before: String) {
+  orders(first: $first, last: $last, after: $after, before: $before) {
+    pageInfo {
+      startCursor
+      hasPreviousPage
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      databaseId
+      currency
+      total
+      status
+      shipping {
+        firstName
+        lastName
+        phone
+        address1
+        address2
+        city
+        state
+        country
+        postcode
+        email
+      }
+      billing {
+        firstName
+        lastName
+        phone
+        address1
+        address2
+        city
+        state
+        country
+        postcode
+        email
+      }
+      transactionId
+      orderNumber
+    }
   }
 }
     `;
@@ -54311,6 +54369,7 @@ const GetGeneralSettingsDocumentString = print(GetGeneralSettingsDocument);
 const GetGravityFormByIdDocumentString = print(GetGravityFormByIdDocument);
 const GetMenuDocumentString = print(GetMenuDocument);
 const GetOrderDocumentString = print(GetOrderDocument);
+const GetOrdersDocumentString = print(GetOrdersDocument);
 const GetPageDocumentString = print(GetPageDocument);
 const GetPaymentGatewaysDocumentString = print(GetPaymentGatewaysDocument);
 const GetPickupLocationsDocumentString = print(GetPickupLocationsDocument);
@@ -54400,6 +54459,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getOrder(variables: GetOrderQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetOrderQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetOrderQuery>(GetOrderDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrder', 'query', variables);
+    },
+    getOrders(variables?: GetOrdersQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetOrdersQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetOrdersQuery>(GetOrdersDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getOrders', 'query', variables);
     },
     getPage(variables: GetPageQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetPageQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetPageQuery>(GetPageDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPage', 'query', variables);

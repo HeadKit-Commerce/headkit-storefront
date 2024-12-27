@@ -48,7 +48,6 @@ const deliverySchema = z.object({
     });
   }
   if (data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT && !data.location) {
-    console.log("Pickup location is required for Click & Collect");
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Pickup location is required for Click & Collect",
@@ -56,7 +55,6 @@ const deliverySchema = z.object({
   }
   // make sure shippingAddress is required if deliveryMethod is SHIPPING_TO_HOME
   if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && !data.shippingAddress) {
-    console.log("Shipping address is required for Ship to Home");
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Shipping address is required for Ship to Home",

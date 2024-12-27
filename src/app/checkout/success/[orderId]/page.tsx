@@ -1,6 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
-import { getCustomer } from "@/lib/headkit/actions";
 import {
   currencyFormatter,
   formatShippingPrice,
@@ -9,6 +8,7 @@ import {
 } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";
 import { ClearCart } from "@/components/checkout/clear-cart";
+import { getOrder } from "@/lib/headkit/actions";
 
 interface Props {
   params: Promise<{
@@ -34,20 +34,12 @@ export default async function Page({ params }: Props) {
     return notFound();
   }
 
-  const customer = await getCustomer({
-    withAddress: true,
-    withOrders: true,
-  });
-
-  const order = customer?.data?.customer?.orders?.nodes?.find(
-    (order) => order.databaseId === Number(orderId)
-  );
+  const response = await getOrder({ id: orderId });
+  const order = response?.data?.order
 
   if (!order) {
     return notFound();
   }
-
-  console.log("order", order);
 
   const paymentMethod = getPaymentMethodDisplay(order?.metaData as { key: string; value: string }[]);
 
@@ -78,7 +70,7 @@ export default async function Page({ params }: Props) {
                 You will receive a confirmation email shortly.
               </p>
               <br />
-              <p className="font-bold text-2xl">Order #{order.databaseId}</p>
+              <p className="font-bold text-2xl">Order #{order?.databaseId}</p>
             </div>
 
             <div className="text-xl">

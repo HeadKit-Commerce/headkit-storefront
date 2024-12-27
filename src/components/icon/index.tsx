@@ -12,6 +12,7 @@ import {
   HiOutlinePlus,
   HiOutlineShoppingBag,
   HiOutlineTruck,
+  HiOutlineUser,
   HiOutlineXMark,
 } from "react-icons/hi2";
 import {
@@ -66,6 +67,7 @@ const Icon = {
   hamburger: (props: IconProps) => <HiBars3 {...props} />,
   chevronDown: (props: IconProps) => <HiOutlineChevronDown {...props} />,
   search: (props: IconProps) => <HiOutlineMagnifyingGlass {...props} />,
+  user: (props: IconProps) => <HiOutlineUser {...props} />,
 };
 
 type IconType = keyof typeof Icon;

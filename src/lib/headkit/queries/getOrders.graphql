@@ -1,0 +1,43 @@
+query getOrders($first: Int, $last: Int, $after: String, $before: String) {
+  orders(first: $first, last: $last, after: $after, before: $before) {
+    pageInfo {
+      startCursor
+      hasPreviousPage
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      id
+      databaseId
+      currency
+      total
+      status
+      shipping {
+        firstName
+        lastName
+        phone
+        address1
+        address2
+        city
+        state
+        country
+        postcode
+        email
+      }
+      billing {
+        firstName
+        lastName
+        phone
+        address1
+        address2
+        city
+        state
+        country
+        postcode
+        email
+      }
+      transactionId
+      orderNumber
+    }
+  }
+}

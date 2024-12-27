@@ -1,5 +1,6 @@
 query getOrder($orderId: ID!) {
   order(id: $orderId, idType: DATABASE_ID) {
+    databaseId
     orderNumber
     currency
     paymentMethod
@@ -30,6 +31,7 @@ query getOrder($orderId: ID!) {
       state
       postcode
       country
+      phone
     }
     billing {
       firstName
@@ -41,6 +43,7 @@ query getOrder($orderId: ID!) {
       state
       postcode
       country
+      phone
     }
     lineItems {
       nodes {
