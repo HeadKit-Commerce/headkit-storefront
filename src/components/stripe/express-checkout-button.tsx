@@ -137,8 +137,12 @@ export function ExpressCheckoutButton({
             },
             {
               key: "_stripe_payment_method",
-              value: result.paymentIntent.payment_method as string,
+              value: JSON.stringify(result.paymentIntent.payment_method),
             },
+            ...(singleCheckout ? [{
+              key: "_single_checkout", 
+              value: "true"
+            }] : []),
           ],
         },
       };
@@ -149,10 +153,6 @@ export function ExpressCheckoutButton({
       console.log("checkoutResult", checkoutResult);
 
 
-
-      if (singleCheckout) {
-        await removeSingleCheckoutSession();
-      }
 
       // Handle successful payment
       router.push(`/checkout/success/${checkoutResult.data.checkout?.order?.databaseId}`);
@@ -191,17 +191,7 @@ export function ExpressCheckoutButton({
         onShippingAddressChange={async (e) => {
           console.log("onShippingAddressChange", singleCheckout, e);
           try {
-            //add single item to new cart
-            if (singleCheckout) {
-              await addToCart({
-                input: {
-                  quantity: 1,
-                  productId: productId!,
-                  variationId: variationId!,
-                },
-                singleCheckout,
-              });
-            }
+
             const { data: customerData } = await updateCustomer({
               input: {
                 shipping: {
@@ -215,6 +205,8 @@ export function ExpressCheckoutButton({
               withCart: true,
               singleCheckout,
             });
+
+            console.log("customerData", customerData);
             const newCartData = customerData?.updateCustomer?.cart;
 
             const shippingRates =
@@ -312,8 +304,21 @@ export function ExpressCheckoutButton({
                   displayName: "Shipping options update once you add your address",
                 }];
               }
-
               e.resolve(resolveDetails);
+
+              //add single item to new cart
+              if (singleCheckout) {
+                await addToCart({
+                  input: {
+                    quantity: 1,
+                    productId: productId!,
+                    variationId: variationId!,
+                  },
+                  singleCheckout,
+                });
+              }
+
+
               setIsOpen(true);
             }
           } catch (error) {

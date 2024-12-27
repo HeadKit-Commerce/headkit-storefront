@@ -192,7 +192,7 @@ const updateCustomer = async ({
   withCart?: boolean;
   singleCheckout?: boolean;
 }) => {
-  const response = await headkit(await getClientConfig()).updateCustomer({
+  const response = await headkit(await getClientConfig(singleCheckout)).updateCustomer({
     input,
     withCustomer,
     withCart,
@@ -297,7 +297,8 @@ const getAvailablePaymentMethods = async () => {
 };
 
 const getOrder = async ({ id }: { id: string }) => {
-  const config = await getClientConfig();
+  const singleCheckoutToken = (await cookies()).get(COOKIE_NAMES.SINGLE_CHECKOUT)?.value;
+  const config = await getClientConfig(!!singleCheckoutToken);
 
   if (config.authToken) {
     // Logged in user - use getOrder
@@ -309,11 +310,15 @@ const getOrder = async ({ id }: { id: string }) => {
     };
   }
 
-  // Guest user - use getCustomer with filter
-  const order = await getGuestOrder({ orderId: id });
+  // Guest user - try both session tokens
+  const guestOrder = await getGuestOrder({ 
+    orderId: id,
+    sessionToken: singleCheckoutToken || config.woocommerceSession 
+  });
+
   return {
     data: {
-      order: order.data?.customer?.orders?.nodes?.[0],
+      order: guestOrder.data?.customer?.orders?.nodes?.[0],
     },
   };
 };
@@ -370,8 +375,16 @@ const getOrders = async () => {
 };
 
 // For guest users in checkout success
-const getGuestOrder = async ({ orderId }: { orderId: string }) => {
-  const response = await headkit(await getClientConfig()).getCustomer({
+const getGuestOrder = async ({ 
+  orderId, 
+  sessionToken 
+}: { 
+  orderId: string;
+  sessionToken?: string;
+}) => {
+  const config = sessionToken ? { woocommerceSession: sessionToken } : await getClientConfig();
+  
+  const response = await headkit(config).getCustomer({
     withAddress: true,
     withOrders: true,
   });

@@ -30,6 +30,7 @@ export function ExpressCheckout({
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
 
   useEffect(() => {
+    console.log("stripeConfig", stripeConfig);
     if (stripeConfig?.publishableKey && stripeConfig?.accountId) {
       setStripePromise(getStripePromise(stripeConfig.publishableKey, stripeConfig.accountId));
     }
@@ -53,8 +54,7 @@ export function ExpressCheckout({
         },
       },
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cartData?.contentsTotal, price, singleCheckout]);
+  }, [singleCheckout, price, cartData?.total, initCurrency]);
 
   if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripePromise) {
     return null;
