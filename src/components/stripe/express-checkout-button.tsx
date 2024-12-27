@@ -7,7 +7,8 @@ import { useAppContext } from "@/components/context/app-context";
 import { useState } from "react";
 import { AlertBox } from "@/components/alert-box/alert-box";
 import { getFloatVal } from "@/lib/utils";
-import { createPaymentIntent } from "@/lib/headkit/actions";
+import { addToCart, createPaymentIntent, updateCustomer, updateShippingMethod } from "@/lib/headkit/actions";
+import { CountriesEnum } from "@/lib/headkit/generated";
 
 interface ExpressCheckoutButtonProps {
   productId?: number;
@@ -33,6 +34,7 @@ interface CartType {
   needsShippingAddress?: boolean;
   total?: string;
 }
+
 
 export function ExpressCheckoutButton({
   productId,
@@ -65,7 +67,7 @@ export function ExpressCheckoutButton({
       }
 
       const { data: paymentIntent } = await createPaymentIntent({
-        amount: singleCheckout 
+        amount: singleCheckout
           ? Math.round((price ?? 0) * 100)
           : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
         currency: initCurrency.toLowerCase(),
@@ -105,7 +107,7 @@ export function ExpressCheckoutButton({
       {isGlobalDisabled && (
         <div className="absolute inset-0 z-10 cursor-not-allowed" />
       )}
-      
+
       <ExpressCheckoutElement
         key={singleCheckout ? `${productId}-${variationId}` : "cart-checkout"}
         onConfirm={onConfirm}
@@ -119,13 +121,98 @@ export function ExpressCheckoutButton({
           },
           buttonHeight: 40,
         }}
+        onShippingRateChange={async (e) => {
+          try {
+            const { data: updateCartResult } = await updateShippingMethod({
+              shippingMethod: e.shippingRate.id,
+            });
+
+            elements?.update({
+              amount: Math.round(
+                getFloatVal(
+                  updateCartResult?.updateShippingMethod?.cart?.total ?? "0"
+                ) * 100
+              ),
+            });
+            const shippingRates =
+              updateCartResult?.updateShippingMethod?.cart
+                ?.availableShippingMethods?.length ?? 0 > 0
+                ? updateCartResult?.updateShippingMethod?.cart
+                  ?.availableShippingMethods?.[0]?.rates
+                : [];
+
+            e.resolve({
+              lineItems: singleCheckout
+                ? [{ amount: Math.round(price! * 100), name: productName! }]
+                : cartData?.contents?.nodes?.map((node) => ({
+                  amount: Math.round(getFloatVal(node?.total) * 100),
+                  name: node?.product?.node?.name,
+                })),
+              shippingRates: updateCartResult?.updateShippingMethod?.cart?.needsShippingAddress ? shippingRates?.map((rate) => ({
+                id: rate?.id ?? "",
+                displayName: rate?.label ?? "",
+                amount: Math.round(
+                  (getFloatVal(rate?.cost || "0") + getFloatVal(rate?.tax || "0")) * 100
+                ),
+              })) : undefined,
+            });
+          } catch (error) {
+            console.log("errror", error);
+            e.reject();
+          }
+        }}
         onShippingAddressChange={async (e) => {
           try {
-            e.resolve({
-              lineItems: [],
-              shippingRates: [],
+            //add single item to new cart
+            if (singleCheckout) {
+              await addToCart({
+                input: {
+                  quantity: 1,
+                  productId: productId!,
+                  variationId: variationId!,
+                },
+              });
+            }
+            const { data: customerData } = await updateCustomer({
+              input: {
+                shipping: {
+                  state: e.address.state,
+                  city: e.address.city,
+                  country: e.address.country as CountriesEnum,
+                  postcode: e.address.postal_code,
+                },
+              },
+              withCustomer: false,
+              withCart: true,
             });
-          } catch {
+            const newCartData = customerData?.updateCustomer?.cart;
+
+            const shippingRates =
+              newCartData?.availableShippingMethods?.length ?? 0 > 0
+                ? newCartData?.availableShippingMethods?.[0]?.rates
+                : [];
+
+            elements?.update({
+              amount: Math.round(getFloatVal(newCartData?.total ?? "0") * 100),
+            });
+
+            e.resolve({
+              lineItems: singleCheckout
+                ? [{ amount: Math.round(price! * 100), name: productName! }]
+                : cartData?.contents?.nodes?.map((node) => ({
+                  amount: Math.round(getFloatVal(node?.total) * 100),
+                  name: node?.product?.node?.name,
+                })),
+              shippingRates: newCartData?.needsShippingAddress ? shippingRates?.map((rate) => ({
+                id: rate?.id ?? "",
+                displayName: rate?.label ?? "",
+                amount: Math.round(
+                  (getFloatVal(rate?.cost || "0") + getFloatVal(rate?.tax || "0")) * 100
+                ),
+              })) : undefined,
+            });
+          } catch (error) {
+            console.log("errror", error);
             e.reject();
           }
         }}
@@ -141,9 +228,9 @@ export function ExpressCheckoutButton({
                 lineItems: singleCheckout
                   ? [{ amount: Math.round(price! * 100), name: productName! }]
                   : cartData?.contents?.nodes?.map((node) => ({
-                      amount: Math.round(getFloatVal(node?.total) * 100),
-                      name: node?.product?.node?.name,
-                    })),
+                    amount: Math.round(getFloatVal(node?.total) * 100),
+                    name: node?.product?.node?.name,
+                  })),
               };
 
               if (cartData?.needsShippingAddress || singleCheckout) {
