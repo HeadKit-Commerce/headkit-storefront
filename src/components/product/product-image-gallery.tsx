@@ -57,7 +57,7 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
                       alt={item?.alt || "image"}
                       fill
                       className="object-contain"
-                      sizes="100vw"
+                      sizes="(max-width: 768px) 100vw, 50vw"
                       quality={100}
                       priority={index === 0}
                     />

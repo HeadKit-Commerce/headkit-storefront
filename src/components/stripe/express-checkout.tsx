@@ -6,7 +6,7 @@ import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
 import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal } from "@/lib/utils";
 import { ExpressCheckoutButton } from "@/components/stripe/express-checkout-button";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Stripe } from "@stripe/stripe-js";
 
 interface ExpressCheckoutProps {
@@ -26,7 +26,7 @@ export function ExpressCheckout({
   productName,
   singleCheckout = false,
 }: ExpressCheckoutProps) {
-  const { initCurrency, cartData, stripeConfig} = useAppContext();
+  const { initCurrency, cartData, stripeConfig } = useAppContext();
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
 
   useEffect(() => {
@@ -35,23 +35,26 @@ export function ExpressCheckout({
     }
   }, [stripeConfig]);
 
-  const options: StripeElementsOptions = {
-    mode: "payment",
-    amount: singleCheckout 
-      ? Math.round((price ?? 0) * 100)
-      : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
-    currency: initCurrency.toLowerCase(),
-    appearance: {
-      theme: "stripe",
-      variables: {
-        colorText: "#23102E",
-        colorTextSecondary: "#23102E",
-        fontSizeBase: "16px",
-        spacingUnit: "10px",
-        fontFamily: '"Urbanist", system-ui, sans-serif',
+  const options: StripeElementsOptions = useMemo(() => {
+    return {
+      mode: "payment",
+      amount: singleCheckout
+        ? Math.round((price ?? 0) * 100)
+        : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
+      currency: initCurrency.toLowerCase(),
+      appearance: {
+        theme: "stripe",
+        variables: {
+          colorText: "#23102E",
+          colorTextSecondary: "#23102E",
+          fontSizeBase: "16px",
+          spacingUnit: "10px",
+          fontFamily: '"Urbanist", system-ui, sans-serif',
+        },
       },
-    },
-  };
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartData?.contentsTotal, price, singleCheckout]);
 
   if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripePromise) {
     return null;

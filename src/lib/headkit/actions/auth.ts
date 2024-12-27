@@ -53,3 +53,12 @@ export const handleAuthToken = async (token: string) => {
 export const removeAuthToken = async () => {
   (await cookies()).delete(COOKIE_NAMES.AUTH_TOKEN);
 };
+
+export const removeSession = async () => {
+  (await cookies()).delete(COOKIE_NAMES.SESSION);
+};
+
+export const removeSingleCheckoutSession = async () => {
+  console.log("removing single checkout session");
+  (await cookies()).delete(COOKIE_NAMES.SINGLE_CHECKOUT);
+};

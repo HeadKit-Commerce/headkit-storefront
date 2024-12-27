@@ -285,7 +285,7 @@ const CheckoutForm = () => {
               },
               {
                 key: "_stripe_payment_method",
-                value: data?.stripePaymentMethod ?? "",
+                value: JSON.stringify(data?.stripePaymentMethod ?? {}),
               },
             ]
             : [],

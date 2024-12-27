@@ -22,7 +22,7 @@ import {
 } from "./actions/auth";
 import { COOKIE_NAMES } from "./constants";
 
-const getClientConfig = async () => {
+const getClientConfig = async (singleCheckout?: boolean) => {
   const config: { authToken?: string; woocommerceSession?: string } = {};
 
   const authToken = await getWoocommerceAuthToken();
@@ -30,21 +30,36 @@ const getClientConfig = async () => {
     config.authToken = authToken;
   }
 
-  const sessionToken = await getWoocommerceSession();
-  if (sessionToken) {
-    config.woocommerceSession = sessionToken;
+  if (singleCheckout) {
+    const singleCheckoutToken = (await cookies()).get(
+      COOKIE_NAMES.SINGLE_CHECKOUT
+    )?.value;
+    if (singleCheckoutToken) {
+      config.woocommerceSession = singleCheckoutToken;
+    }
+  } else {
+    const sessionToken = await getWoocommerceSession();
+    if (sessionToken) {
+      config.woocommerceSession = sessionToken;
+    }
   }
 
   return config;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const handleSessionResponse = async (response: any) => {
+const handleSessionResponse = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  response: any,
+  singleCheckout?: boolean
+) => {
   const currentSession = await getWoocommerceSession();
   const newSession = response.headers.get(COOKIE_NAMES.SESSION);
 
   if (newSession) {
-    if (!currentSession) {
+    if (singleCheckout) {
+      // Save to single checkout cookie when singleCheckout is true
+      (await cookies()).set(COOKIE_NAMES.SINGLE_CHECKOUT, newSession);
+    } else if (!currentSession) {
       (await cookies()).set(COOKIE_NAMES.SESSION, newSession);
     } else if (await shouldUpdateToken(currentSession)) {
       (await cookies()).set(COOKIE_NAMES.SESSION, newSession);
@@ -58,9 +73,18 @@ const getCart = async () => {
   return response;
 };
 
-const addToCart = async ({ input }: { input: AddToCartInput }) => {
-  const response = await headkit(await getClientConfig()).addToCart({ input });
-  await handleSessionResponse(response);
+const addToCart = async ({
+  input,
+  singleCheckout,
+}: {
+  input: AddToCartInput;
+  singleCheckout?: boolean;
+}) => {
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).addToCart({ input });
+
+  await handleSessionResponse(response, singleCheckout);
   return response;
 };
 
@@ -90,8 +114,16 @@ const removeCoupons = async ({ code }: { code: string }) => {
   return response;
 };
 
-const checkout = async ({ input }: { input: CheckoutInput }) => {
-  const response = await headkit(await getClientConfig()).checkout({ input });
+const checkout = async ({
+  input,
+  singleCheckout,
+}: {
+  input: CheckoutInput;
+  singleCheckout?: boolean;
+}) => {
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).checkout({ input });
 
   return response;
 };
@@ -114,12 +146,17 @@ const emptyCart = async () => {
 
 const updateShippingMethod = async ({
   shippingMethod,
+  singleCheckout,
 }: {
   shippingMethod: string;
+  singleCheckout?: boolean;
 }) => {
-  const response = await headkit(await getClientConfig()).updateShippingMethod({
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).updateShippingMethod({
     shippingMethod,
   });
+  await handleSessionResponse(response, singleCheckout);
   return response;
 };
 
@@ -148,16 +185,19 @@ const updateCustomer = async ({
   input,
   withCustomer = true,
   withCart = false,
+  singleCheckout = false,
 }: {
   input: UpdateCustomerInput;
   withCustomer?: boolean;
   withCart?: boolean;
+  singleCheckout?: boolean;
 }) => {
   const response = await headkit(await getClientConfig()).updateCustomer({
     input,
     withCustomer,
     withCart,
   });
+  await handleSessionResponse(response, singleCheckout);
   return response;
 };
 
