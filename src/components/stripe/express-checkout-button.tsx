@@ -140,7 +140,7 @@ export function ExpressCheckoutButton({
               value: JSON.stringify(result.paymentIntent.payment_method),
             },
             ...(singleCheckout ? [{
-              key: "_single_checkout", 
+              key: "_single_checkout",
               value: "true"
             }] : []),
           ],
@@ -153,12 +153,11 @@ export function ExpressCheckoutButton({
       console.log("checkoutResult", checkoutResult);
 
 
-
       // Handle successful payment
+      setIsLoading(false);
+      setIsGlobalDisabled(false);
+      setIsOpen(false);
       router.push(`/checkout/success/${checkoutResult.data.checkout?.order?.databaseId}`);
-
-
-
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "An error occurred");
       setIsLoading(false);

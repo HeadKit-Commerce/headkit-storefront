@@ -103,7 +103,6 @@ export const AppContextProvider = ({
 
   useEffect(() => {
     const fetchStripeConfig = async () => {
-      console.log("fetching stripe config");
       try {
         const response = await getStripeConfig();
         if (response?.data?.stripeConfig) {
