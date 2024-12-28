@@ -12,6 +12,11 @@ mutation checkout($input: CheckoutInput!) {
           amount
         }
       }
+      metaData {
+        id
+        key
+        value
+      }
     }
     result
     redirect

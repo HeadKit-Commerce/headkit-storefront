@@ -52285,7 +52285,7 @@ export type CheckoutMutationVariables = Exact<{
 }>;
 
 
-export type CheckoutMutation = { __typename?: 'Mutation', checkout?: { __typename?: 'CheckoutPayload', clientMutationId?: string | null, result?: string | null, redirect?: string | null, order?: { __typename?: 'Order', id: string, databaseId?: number | null, orderKey?: string | null, orderNumber?: string | null, status?: OrderStatusEnum | null, refunds?: { __typename?: 'OrderToRefundConnection', nodes: Array<{ __typename?: 'Refund', amount?: number | null }> } | null } | null } | null };
+export type CheckoutMutation = { __typename?: 'Mutation', checkout?: { __typename?: 'CheckoutPayload', clientMutationId?: string | null, result?: string | null, redirect?: string | null, order?: { __typename?: 'Order', id: string, databaseId?: number | null, orderKey?: string | null, orderNumber?: string | null, status?: OrderStatusEnum | null, refunds?: { __typename?: 'OrderToRefundConnection', nodes: Array<{ __typename?: 'Refund', amount?: number | null }> } | null, metaData?: Array<{ __typename?: 'MetaData', id?: string | null, key: string, value?: string | null } | null> | null } | null } | null };
 
 export type CreatePaymentIntentMutationVariables = Exact<{
   input: CreatePaymentIntentInput;
@@ -53372,6 +53372,11 @@ export const CheckoutDocument = gql`
         nodes {
           amount
         }
+      }
+      metaData {
+        id
+        key
+        value
       }
     }
     result
