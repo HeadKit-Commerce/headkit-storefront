@@ -133,13 +133,37 @@ export const getPaymentMethodDisplay = (metaData?: Array<{ key: string; value: s
           text: `Stripe Link (${paymentMethod.link.email})`
         };
 
-      case 'card':
-        return {
-          icon: <Icon.visa name="credit-card" className="h-auto w-6 shrink-0" />,
-          text: `Card ending in ${paymentMethod.card?.last4 ?? '****'}`
+      case 'card': {
+        // Handle different card brands
+        const brand = paymentMethod.card?.brand || 'unknown';
+        const last4 = paymentMethod.card?.last4 ?? '****';
+        
+        // Handle different card brands
+        const cardIcons = {
+          visa: <Icon.visa className="h-auto w-6 shrink-0" />,
+          mastercard: <Icon.mastercard className="h-auto w-6 shrink-0" />,
+          amex: <Icon.amex className="h-auto w-6 shrink-0" />,
+          default: <Icon.stripe className="h-auto w-6 shrink-0" />
         };
 
-      // Add more cases as needed
+        // Check if it's Apple Pay
+        if (paymentMethod.card?.wallet?.type === 'apple_pay') {
+          return {
+            icon: (
+              <div className="flex gap-2">
+                <Icon.applePay className="h-auto w-6 shrink-0" />
+                {cardIcons[brand as keyof typeof cardIcons] || cardIcons.default}
+              </div>
+            ),
+            text: `Apple Pay (${brand} ending in ${last4})`
+          };
+        }
+
+        return {
+          icon: cardIcons[brand as keyof typeof cardIcons] || cardIcons.default,
+          text: `${brand.charAt(0).toUpperCase() + brand.slice(1)} ending in ${last4}`
+        };
+      }
 
       default:
         return {

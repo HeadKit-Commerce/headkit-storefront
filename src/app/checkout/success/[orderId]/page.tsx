@@ -153,7 +153,7 @@ export default async function Page({ params }: Props) {
                   })}
                   <br />
                   {paymentMethod && (
-                    <div className="flex items-start gap-2 truncate">
+                    <div className="flex items-start flex-col gap-1 truncate">
                       {paymentMethod.icon}
                       {paymentMethod.text}
                     </div>
