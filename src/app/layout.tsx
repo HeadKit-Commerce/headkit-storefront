@@ -8,6 +8,7 @@ import { makeRootMetadata } from "@/lib/headkit/utils/make-metadata";
 import { AppContextProvider } from "@/components/context/app-context";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/contexts/auth-context";
+import { StripeProvider } from '@/components/context/stripe-context';
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
@@ -115,9 +116,11 @@ export default async function RootLayout({
       >
         <AuthProvider>
           <AppContextProvider>
-            <Header menus={headerMenusByLocation} />
-            {children}
-            <Footer menus={footerMenusByLocation} />
+            <StripeProvider>
+              <Header menus={headerMenusByLocation} />
+              {children}
+              <Footer menus={footerMenusByLocation} />
+            </StripeProvider>
           </AppContextProvider>
         </AuthProvider>
       </body>

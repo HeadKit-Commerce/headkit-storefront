@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { ContactFormStep } from "./steps/contact-form-step";
 import { DeliveryMethodStep } from "./steps/delivery-method-step";
 import { BillingAddressStep } from "./steps/billing-address-step";
@@ -21,7 +21,7 @@ import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpressCheckout } from "../stripe/express-checkout";
-import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
+import { useStripe } from "@/components/context/stripe-context";
 
 interface FormData {
   email?: string;
@@ -61,7 +61,7 @@ interface FormData {
 
 const CheckoutForm = () => {
   const router = useRouter();
-  const { cartData, stripeConfig } = useAppContext();
+  const { cartData } = useAppContext();
   const [currentStep, setCurrentStep] = useState<CheckoutFormStepEnum>(
     CheckoutFormStepEnum.CONTACT
   );
@@ -100,12 +100,7 @@ const CheckoutForm = () => {
   const [isLoading, setIsLoading] = useState(true);
 
 
-  const enableStripe = useMemo(
-    () => !!(stripeConfig?.publishableKey && stripeConfig?.accountId),
-    [stripeConfig]
-  );
-
-  const stripePromise = useMemo(() => enableStripe ? getStripePromise(stripeConfig?.publishableKey ?? "", stripeConfig?.accountId ?? "") : null, [enableStripe, stripeConfig]);
+  const { stripe } = useStripe();
 
 
   useEffect(() => {
@@ -360,7 +355,7 @@ const CheckoutForm = () => {
         >
           {step === CheckoutFormStepEnum.CONTACT && (
             <ContactFormStep
-              enableStripe={enableStripe}
+              enableStripe={!!stripe}
               onNext={(data) =>
                 handleNextStep(CheckoutFormStepEnum.CONTACT, data)
               }
@@ -370,7 +365,7 @@ const CheckoutForm = () => {
           )}
           {step === CheckoutFormStepEnum.DELIVERY_METHOD && (
             <DeliveryMethodStep
-              enableStripe={enableStripe}
+              enableStripe={!!stripe}
               onNext={(data) =>
                 handleNextStep(CheckoutFormStepEnum.DELIVERY_METHOD, data)
               }
@@ -391,7 +386,7 @@ const CheckoutForm = () => {
               {formData.deliveryMethod ===
                 DeliveryStepEnum.CLICK_AND_COLLECT ? (
                 <BillingAddressStep
-                  enableStripe={enableStripe}
+                  enableStripe={!!stripe}
                   onNext={(data) =>
                     handleNextStep(CheckoutFormStepEnum.ADDRESS, data)
                   }
@@ -422,7 +417,7 @@ const CheckoutForm = () => {
           )}
           {step === CheckoutFormStepEnum.PAYMENT && (
             <PaymentStep
-              enableStripe={enableStripe}
+              enableStripe={!!stripe}
               onSubmit={handlePaymentSubmit}
               buttonLabel="Pay Now"
             />
@@ -449,9 +444,9 @@ const CheckoutForm = () => {
         </span>
       </div> */}
 
-      {enableStripe ? (
+      {!!stripe ? (
         <Elements
-          stripe={stripePromise}
+          stripe={stripe}
           options={{
             mode: "payment",
             payment_method_types: cartData?.needsShippingAddress ? [] : ["card", "link"],

@@ -2,12 +2,11 @@
 
 import { Elements } from "@stripe/react-stripe-js";
 import { StripeElementsOptions } from "@stripe/stripe-js";
-import { getStripePromise } from "@/lib/stripe/get-stripe-promise";
 import { useAppContext } from "@/components/context/app-context";
 import { getFloatVal } from "@/lib/utils";
 import { ExpressCheckoutButton } from "@/components/stripe/express-checkout-button";
-import { useEffect, useMemo, useState } from "react";
-import { Stripe } from "@stripe/stripe-js";
+import { useMemo } from "react";
+import { useStripe } from "@/components/context/stripe-context";
 
 interface ExpressCheckoutProps {
   disabled: boolean;
@@ -26,42 +25,33 @@ export function ExpressCheckout({
   productName,
   singleCheckout = false,
 }: ExpressCheckoutProps) {
-  const { initCurrency, cartData, stripeConfig } = useAppContext();
-  const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
+  const { initCurrency, cartData } = useAppContext();
+  const { stripe, isLoading } = useStripe();
 
-  useEffect(() => {
-    console.log("stripeConfig", stripeConfig);
-    if (stripeConfig?.publishableKey && stripeConfig?.accountId) {
-      setStripePromise(getStripePromise(stripeConfig.publishableKey, stripeConfig.accountId));
-    }
-  }, [stripeConfig]);
-
-  const options: StripeElementsOptions = useMemo(() => {
-    return {
-      mode: "payment",
-      amount: singleCheckout
-        ? Math.round((price ?? 0) * 100)
-        : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
-      currency: initCurrency.toLowerCase(),
-      appearance: {
-        theme: "stripe",
-        variables: {
-          colorText: "#23102E",
-          colorTextSecondary: "#23102E",
-          fontSizeBase: "16px",
-          spacingUnit: "10px",
-          fontFamily: '"Urbanist", system-ui, sans-serif',
-        },
+  const options: StripeElementsOptions = useMemo(() => ({
+    mode: "payment",
+    amount: singleCheckout
+      ? Math.round((price ?? 0) * 100)
+      : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
+    currency: initCurrency.toLowerCase(),
+    appearance: {
+      theme: "stripe",
+      variables: {
+        colorText: "#23102E",
+        colorTextSecondary: "#23102E",
+        fontSizeBase: "16px",
+        spacingUnit: "10px",
+        fontFamily: '"Urbanist", system-ui, sans-serif',
       },
-    };
-  }, [singleCheckout, price, cartData?.total, initCurrency]);
+    },
+  }), [singleCheckout, price, cartData?.total, initCurrency]);
 
-  if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripePromise) {
+  if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripe || isLoading) {
     return null;
   }
 
   return (
-    <Elements options={options} stripe={stripePromise}>
+    <Elements options={options} stripe={stripe}>
       <ExpressCheckoutButton
         productId={productId}
         variationId={variationId}
