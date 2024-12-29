@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { emptyCart } from "@/lib/headkit/actions";
 
 interface ClearCartProps {

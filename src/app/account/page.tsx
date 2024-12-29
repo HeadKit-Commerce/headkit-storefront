@@ -118,7 +118,7 @@ export default function Page() {
     <div className="container mx-auto px-4 py-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
         {/* Sign In */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-6">Sign In</h2>
           {error && (
             <div className="mb-4 p-4 text-red-700 bg-red-50 border border-red-200 rounded-lg">
@@ -138,6 +138,7 @@ export default function Page() {
                         type="email"
                         placeholder="Enter your email"
                         className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        autoComplete="username"
                         {...field}
                       />
                     </FormControl>
@@ -184,7 +185,7 @@ export default function Page() {
         </div>
 
         {/* Sign Up */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-6">Create Account</h2>
           <Form {...registerForm}>
             <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
@@ -237,6 +238,7 @@ export default function Page() {
                         type="email"
                         placeholder="Enter your email"
                         className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        autoComplete="email"
                         {...field}
                       />
                     </FormControl>

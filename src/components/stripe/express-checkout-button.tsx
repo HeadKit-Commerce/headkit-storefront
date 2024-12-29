@@ -3,7 +3,7 @@
 import { ExpressCheckoutElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { ClickResolveDetails, StripeExpressCheckoutElementConfirmEvent } from "@stripe/stripe-js";
 import { useRouter } from "next/navigation";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { useState } from "react";
 import { AlertBox } from "@/components/alert-box/alert-box";
 import { getFloatVal } from "@/lib/utils";

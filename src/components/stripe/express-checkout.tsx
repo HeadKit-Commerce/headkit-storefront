@@ -2,11 +2,11 @@
 
 import { Elements } from "@stripe/react-stripe-js";
 import { StripeElementsOptions } from "@stripe/stripe-js";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal } from "@/lib/utils";
 import { ExpressCheckoutButton } from "@/components/stripe/express-checkout-button";
 import { useMemo } from "react";
-import { useStripe } from "@/components/context/stripe-context";
+import { useStripe } from "@/contexts/stripe-context";
 
 interface ExpressCheckoutProps {
   disabled: boolean;

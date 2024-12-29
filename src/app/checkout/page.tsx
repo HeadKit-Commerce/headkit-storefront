@@ -5,7 +5,7 @@ import Link from "next/link";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
 import { Cart } from "@/components/checkout/cart";
 

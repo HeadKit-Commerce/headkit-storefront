@@ -5,7 +5,7 @@ import {
 } from "@/lib/headkit/generated";
 import { Button } from "@/components/ui/button";
 import { forwardRef, useState } from "react";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { addToCart } from "@/lib/headkit/actions";
 
 interface AddToCartProps {

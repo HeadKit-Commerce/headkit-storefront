@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { cn, currencyFormatter, getFloatVal } from "@/lib/utils";
 
 interface Props {

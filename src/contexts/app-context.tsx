@@ -7,7 +7,6 @@ import { getStripeConfig } from "@/lib/headkit/actions";
 interface AppContextState {
   cartDrawer: boolean;
   cartData: Cart | null;
-  isLogin: boolean;
   isGlobalDisabled: boolean;
   wishlists: number[];
   initLang: string;
@@ -18,7 +17,6 @@ interface AppContextState {
 interface AppContextActions {
   toggleCartDrawer: (enable?: boolean) => void;
   setCartData: (cartData: Cart | null) => void;
-  setIsLogin: (isLogin: boolean) => void;
   setIsGlobalDisabled: (isGlobalDisabled: boolean) => void;
   setWishlists: (wishlists: number[]) => void;
   currencyFormatter: (formatterData: {
@@ -44,7 +42,6 @@ interface AppContextProviderProps {
 const initialState: AppContextState = {
   cartDrawer: false,
   cartData: null,
-  isLogin: false,
   isGlobalDisabled: false,
   wishlists: [],
   initLang: "en-AU",
@@ -73,8 +70,6 @@ const reducer = (
       };
     case "SET_CART_DATA":
       return { ...state, cartData: action.payload ?? null };
-    case "SET_IS_LOGIN":
-      return { ...state, isLogin: action.payload };
     case "SET_IS_GLOBAL_DISABLED":
       return { ...state, isGlobalDisabled: action.payload };
     case "SET_WISHLISTS":
@@ -88,14 +83,12 @@ const reducer = (
 
 export const AppContextProvider = ({
   children,
-  initialIsLogin = false,
   initialWishlists = [],
   initialLang = "en-AU",
   initialCurrency = "AUD",
 }: AppContextProviderProps) => {
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
-    isLogin: initialIsLogin,
     wishlists: initialWishlists,
     initLang: initialLang,
     initCurrency: initialCurrency,
@@ -121,9 +114,6 @@ export const AppContextProvider = ({
     },
     setCartData: (cartData: Cart | null) => {
       dispatch({ type: "SET_CART_DATA", payload: cartData });
-    },
-    setIsLogin: (isLogin: boolean) => {
-      dispatch({ type: "SET_IS_LOGIN", payload: isLogin });
     },
     setIsGlobalDisabled: (isGlobalDisabled: boolean) => {
       dispatch({ type: "SET_IS_GLOBAL_DISABLED", payload: isGlobalDisabled });

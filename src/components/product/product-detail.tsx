@@ -31,6 +31,7 @@ import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
 import { getFloatVal } from "@/lib/utils";
 import { DeliveryType, GiftCardForm } from "../gift-card-form";
 import { GiftCardFormValues } from "../gift-card-form";
+import { ProductWishlist } from "./product-wishlist";
 
 interface Props {
   product: ProductContentFullWithGroupFragment;
@@ -210,7 +211,7 @@ export const ProductDetail = ({ product }: Props) => {
                   />
                 )}
               </div>
-              {/* <ProductWishlist parentProduct={product as SimpleProduct} /> */}
+              <ProductWishlist parentProduct={product} />
             </div>
           </Suspense>
 

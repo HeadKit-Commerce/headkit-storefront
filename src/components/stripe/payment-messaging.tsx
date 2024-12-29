@@ -1,8 +1,8 @@
 "use client";
 
 import { Elements, PaymentMethodMessagingElement } from "@stripe/react-stripe-js";
-import { useAppContext } from "@/components/context/app-context";
-import { useStripe } from "@/components/context/stripe-context";
+import { useAppContext } from "@/contexts/app-context";
+import { useStripe } from "@/contexts/stripe-context";
 
 interface PaymentMethodMessagingProps {
   disabled: boolean;

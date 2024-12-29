@@ -25,6 +25,7 @@ import {
 import { Button } from "../ui/button";
 import { SearchDrawer } from "./search-drawer";
 import { useAuth } from "@/contexts/auth-context";
+import { useAppContext } from "@/contexts/app-context";
 
 interface Props {
   menus: Record<
@@ -45,6 +46,7 @@ interface Props {
 }
 
 function Header({ menus }: Props) {
+  const { wishlists } = useAppContext();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -88,6 +90,25 @@ function Header({ menus }: Props) {
           </div>
           <NavigationMenuItem>
             <SearchDrawer />
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <div className="relative">
+              <Link href={isAuthenticated ? "/account/wishlist" : "/account"}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden md:inline-flex !pr-0 relative justify-end"
+                  aria-label="Wishlist"
+                >
+                  <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
+                  {isAuthenticated && wishlists.length > 0 && (
+                    <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-white text-xs">
+                      {wishlists.length}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            </div>
           </NavigationMenuItem>
           <NavigationMenuItem>
             <div className="relative">

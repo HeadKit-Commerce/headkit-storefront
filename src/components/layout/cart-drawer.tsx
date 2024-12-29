@@ -9,7 +9,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { useAppContext } from "../context/app-context";
+import { useAppContext } from "../../contexts/app-context";
 import { Icon } from "../icon";
 import { useEffect } from "react";
 import { getCart as getCartAction } from "@/lib/headkit/actions";

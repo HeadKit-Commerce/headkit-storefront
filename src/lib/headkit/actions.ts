@@ -2,6 +2,7 @@
 
 import { headkit } from "./client";
 import {
+  ActionWishlistInput,
   AddToCartInput,
   CheckoutInput,
   GetCustomerQueryVariables,
@@ -192,7 +193,9 @@ const updateCustomer = async ({
   withCart?: boolean;
   singleCheckout?: boolean;
 }) => {
-  const response = await headkit(await getClientConfig(singleCheckout)).updateCustomer({
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).updateCustomer({
     input,
     withCustomer,
     withCart,
@@ -297,7 +300,9 @@ const getAvailablePaymentMethods = async () => {
 };
 
 const getOrder = async ({ id }: { id: string }) => {
-  const singleCheckoutToken = (await cookies()).get(COOKIE_NAMES.SINGLE_CHECKOUT)?.value;
+  const singleCheckoutToken = (await cookies()).get(
+    COOKIE_NAMES.SINGLE_CHECKOUT
+  )?.value;
   const config = await getClientConfig(!!singleCheckoutToken);
 
   if (config.authToken) {
@@ -311,9 +316,9 @@ const getOrder = async ({ id }: { id: string }) => {
   }
 
   // Guest user - try both session tokens
-  const guestOrder = await getGuestOrder({ 
+  const guestOrder = await getGuestOrder({
     orderId: id,
-    sessionToken: singleCheckoutToken || config.woocommerceSession 
+    sessionToken: singleCheckoutToken || config.woocommerceSession,
   });
 
   return {
@@ -375,15 +380,17 @@ const getOrders = async () => {
 };
 
 // For guest users in checkout success
-const getGuestOrder = async ({ 
-  orderId, 
-  sessionToken 
-}: { 
+const getGuestOrder = async ({
+  orderId,
+  sessionToken,
+}: {
   orderId: string;
   sessionToken?: string;
 }) => {
-  const config = sessionToken ? { woocommerceSession: sessionToken } : await getClientConfig();
-  
+  const config = sessionToken
+    ? { woocommerceSession: sessionToken }
+    : await getClientConfig();
+
   const response = await headkit(config).getCustomer({
     withAddress: true,
     withOrders: true,
@@ -403,6 +410,13 @@ const getGuestOrder = async ({
       },
     },
   };
+};
+
+const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
+  const response = await headkit(await getClientConfig()).actionWishlist({
+    input,
+  });
+  return response;
 };
 
 export {
@@ -436,4 +450,5 @@ export {
   getWoocommerceAuthToken,
   getOrders,
   getGuestOrder,
+  actionWishlist,
 };

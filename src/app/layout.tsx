@@ -5,10 +5,11 @@ import { Header } from "@/components/layout/header";
 import { Urbanist } from "next/font/google";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
 import { makeRootMetadata } from "@/lib/headkit/utils/make-metadata";
-import { AppContextProvider } from "@/components/context/app-context";
+import { AppContextProvider } from "@/contexts/app-context";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/contexts/auth-context";
-import { StripeProvider } from '@/components/context/stripe-context';
+import { StripeProvider } from '@/contexts/stripe-context';
+import { Toaster } from "@/components/ui/toaster";
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
@@ -119,6 +120,7 @@ export default async function RootLayout({
             <StripeProvider>
               <Header menus={headerMenusByLocation} />
               {children}
+              <Toaster />
               <Footer menus={footerMenusByLocation} />
             </StripeProvider>
           </AppContextProvider>

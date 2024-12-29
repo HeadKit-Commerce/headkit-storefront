@@ -52266,6 +52266,13 @@ export type VariableProductContentFragment = { __typename?: 'VariableProduct', d
 
 export type TaxonomySeoContentFragment = { __typename?: 'TaxonomySEO', title?: string | null, canonical?: string | null, cornerstone?: boolean | null, focuskw?: string | null, metaDesc?: string | null, metaKeywords?: string | null, metaRobotsNofollow?: string | null, metaRobotsNoindex?: string | null, opengraphAuthor?: string | null, opengraphDescription?: string | null, opengraphModifiedTime?: string | null, opengraphPublishedTime?: string | null, opengraphPublisher?: string | null, opengraphSiteName?: string | null, opengraphTitle?: string | null, opengraphType?: string | null, opengraphUrl?: string | null, twitterDescription?: string | null, twitterTitle?: string | null, breadcrumbs?: Array<{ __typename?: 'SEOPostTypeBreadcrumbs', text?: string | null, url?: string | null } | null> | null, opengraphImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null, twitterImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null };
 
+export type ActionWishlistMutationVariables = Exact<{
+  input: ActionWishlistInput;
+}>;
+
+
+export type ActionWishlistMutation = { __typename?: 'Mutation', actionWishlist?: { __typename?: 'ActionWishlistPayload', success?: boolean | null } | null };
+
 export type AddToCartMutationVariables = Exact<{
   input: AddToCartInput;
 }>;
@@ -53340,6 +53347,13 @@ export const TaxonomySeoContentFragmentDoc = gql`
   }
 }
     `;
+export const ActionWishlistDocument = gql`
+    mutation actionWishlist($input: ActionWishlistInput!) {
+  actionWishlist(input: $input) {
+    success
+  }
+}
+    `;
 export const AddToCartDocument = gql`
     mutation addToCart($input: AddToCartInput!) {
   addToCart(input: $input) {
@@ -54352,6 +54366,7 @@ export type SdkFunctionWrapper = <T>(action: (requestHeaders?:Record<string, str
 
 
 const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationType, _variables) => action();
+const ActionWishlistDocumentString = print(ActionWishlistDocument);
 const AddToCartDocumentString = print(AddToCartDocument);
 const ApplyCouponDocumentString = print(ApplyCouponDocument);
 const CheckoutDocumentString = print(CheckoutDocument);
@@ -54393,6 +54408,9 @@ const GetProductsDocumentString = print(GetProductsDocument);
 const GetStripeConfigDocumentString = print(GetStripeConfigDocument);
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
+    actionWishlist(variables: ActionWishlistMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: ActionWishlistMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<ActionWishlistMutation>(ActionWishlistDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'actionWishlist', 'mutation', variables);
+    },
     addToCart(variables: AddToCartMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: AddToCartMutation; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<AddToCartMutation>(AddToCartDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'addToCart', 'mutation', variables);
     },

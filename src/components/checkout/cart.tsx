@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { CouponBox } from "@/components/checkout/coupon-box";
 import { getFloatVal } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";

@@ -3,14 +3,17 @@ import { LogoSvg } from "./svg/logo-svg";
 import { LoadingSvg } from "./svg/loading-svg";
 import {
   HiBars3,
+  HiHeart,
   HiOutlineArrowSmallDown,
   HiOutlineArrowSmallRight,
   HiOutlineCheck,
   HiOutlineChevronDown,
+  HiOutlineHeart,
   HiOutlineMagnifyingGlass,
   HiOutlineMinus,
   HiOutlinePlus,
   HiOutlineShoppingBag,
+  HiOutlineTrash,
   HiOutlineTruck,
   HiOutlineUser,
   HiOutlineXMark,
@@ -53,7 +56,7 @@ const Icon = {
   applePay: (props: IconProps) => <FaApplePay {...props} />,
   paypal: (props: IconProps) => <FaPaypal {...props} />,
   amex: (props: IconProps) => <FaCcAmex {...props} />,
-  
+
   // misc
   loading: (props: IconProps) => <LoadingSvg {...props} />,
   arrowRight: (props: IconProps) => <HiOutlineArrowSmallRight {...props} />,
@@ -68,6 +71,9 @@ const Icon = {
   chevronDown: (props: IconProps) => <HiOutlineChevronDown {...props} />,
   search: (props: IconProps) => <HiOutlineMagnifyingGlass {...props} />,
   user: (props: IconProps) => <HiOutlineUser {...props} />,
+  heart: (props: IconProps) => <HiHeart {...props} />,
+  heartOutline: (props: IconProps) => <HiOutlineHeart {...props} />,
+  trash: (props: IconProps) => <HiOutlineTrash {...props} />,
 };
 
 type IconType = keyof typeof Icon;

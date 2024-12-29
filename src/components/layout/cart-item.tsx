@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { cn, getFloatVal } from "@/lib/utils";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { Icon } from "../icon";
 import { removeCartItem, updateCartItem } from "@/lib/headkit/actions";
 

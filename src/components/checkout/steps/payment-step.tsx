@@ -23,7 +23,7 @@ import { createPaymentIntent, getPaymentGateways } from "@/lib/headkit/actions";
 import { useEffect, useState } from "react";
 import { PaymentGateway } from "@/lib/headkit/generated";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal } from "@/lib/utils";
 
 const paymentSchema = z.object({

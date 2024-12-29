@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { Cart } from "@/lib/headkit/generated";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { z } from "zod";

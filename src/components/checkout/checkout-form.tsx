@@ -15,13 +15,13 @@ import {
 } from "@/lib/headkit/generated";
 import { Elements } from "@stripe/react-stripe-js";
 import { getFloatVal } from "@/lib/utils";
-import { useAppContext } from "../context/app-context";
+import { useAppContext } from "../../contexts/app-context";
 import { checkout, getCustomer } from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpressCheckout } from "../stripe/express-checkout";
-import { useStripe } from "@/components/context/stripe-context";
+import { useStripe } from "@/contexts/stripe-context";
 
 interface FormData {
   email?: string;

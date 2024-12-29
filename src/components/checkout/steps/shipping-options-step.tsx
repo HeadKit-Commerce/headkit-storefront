@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Cart, ShippingRate } from "@/lib/headkit/generated";
-import { useAppContext } from "@/components/context/app-context";
+import { useAppContext } from "@/contexts/app-context";
 import { Button } from "@/components/ui/button";
 import { updateShippingMethod } from "@/lib/headkit/actions";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
