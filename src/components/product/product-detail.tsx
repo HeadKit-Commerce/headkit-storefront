@@ -29,6 +29,8 @@ import { CONFIG } from "@/config/app-config";
 import { ExpressCheckout } from "@/components/stripe/express-checkout";
 import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
 import { getFloatVal } from "@/lib/utils";
+import { DeliveryType, GiftCardForm } from "../gift-card-form";
+import { GiftCardFormValues } from "../gift-card-form";
 
 interface Props {
   product: ProductContentFullWithGroupFragment;
@@ -36,7 +38,8 @@ interface Props {
 
 export const ProductDetail = ({ product }: Props) => {
   const pathname = usePathname();
-  const [giftCardFormValid] = useState(false);
+  const [giftCardFormValid, setGiftCardFormValid] = useState(false);
+  const [productExtraData, setProductExtraData] = useState<string>("");
   const [selectedProduct, setSelectedProduct] = useState<
     ProductContentFullWithGroupFragment | ProductVariationContentFragment
   >();
@@ -76,7 +79,29 @@ export const ProductDetail = ({ product }: Props) => {
     }
   }, [product]);
 
+  const handleGiftCardEvent = (formData: GiftCardFormValues): void => {
+    console.log('Received form data in ProductDetail:', formData);
+    
+    const newGiftCardData = { ...formData };
+    if (
+      newGiftCardData.wc_gc_giftcard_select_delivery === DeliveryType.Later &&
+      newGiftCardData.wc_gc_giftcard_delivery
+    ) {
+      const date = new Date(newGiftCardData.wc_gc_giftcard_delivery);
+      const unixTimestamp = Math.floor(date.getTime() / 1000);
+      newGiftCardData.wc_gc_giftcard_delivery = unixTimestamp?.toString() ?? "";
+    } else {
+      newGiftCardData.wc_gc_giftcard_delivery = "";
+    }
+    
+    const jsonData = JSON.stringify(newGiftCardData);
+    console.log('Setting productExtraData:', jsonData);
+    setProductExtraData(jsonData);
+  };
 
+  useEffect(() => {
+    console.log('productExtraData updated:', productExtraData);
+  }, [productExtraData]);
 
   return (
     <>
@@ -145,14 +170,17 @@ export const ProductDetail = ({ product }: Props) => {
               __html: product.shortDescription!,
             }}
           />
-          {/* {isGiftCard && (
+          {isGiftCard && (
             <div className="mb-8">
               <GiftCardForm
                 emitClickEvent={handleGiftCardEvent}
-                onFormValid={setGiftCardFormValid}
+                onFormValid={(isValid) => {
+                  console.log('Form validity changed:', isValid);
+                  setGiftCardFormValid(isValid);
+                }}
               />
             </div>
-          )} */}
+          )}
           <Suspense>
             <div className="grid grid-cols-2">
               <div>
@@ -198,6 +226,7 @@ export const ProductDetail = ({ product }: Props) => {
               quantity={1}
               stockStatus={(selectedProduct as SimpleProduct)?.stockStatus ?? StockStatusEnum.InStock}
               disabled={isGiftCard ? !giftCardFormValid : false}
+              productExtraData={productExtraData}
             />
           </div>
 

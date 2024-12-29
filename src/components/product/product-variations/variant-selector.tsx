@@ -49,7 +49,10 @@ export const VariantSelector = ({
     );
     const localAttributes = attributes?.filter(
       (attr) => attr.scope === ProductAttributeTypesEnum.Local
-    );
+    ).map(attr => ({
+      ...attr,
+      name: attr.name?.toLowerCase()
+    }));
 
     // Sort GLOBAL attributes: prioritize color first, then size (sorted)
     const sortedGlobalAttributes = globalAttributes?.sort((a, b) => {
@@ -129,20 +132,20 @@ export const VariantSelector = ({
     } else {
       // Build options attribute by attribute
       const defaultOptions: { [key: string]: string } = {};
-      
+
       filteredAttributes.forEach((attribute) => {
         if (!attribute.name || !attribute.fullOptions?.length) return;
 
         // Find all variations that match our current selected options
         const compatibleVariations = variations.filter((variant) => {
-          return Object.entries(defaultOptions).every(([key, value]) => 
+          return Object.entries(defaultOptions).every(([key, value]) =>
             variant.attributeKeyValue[key]?.value === value
           );
         });
 
         // First try to find an in-stock option
         let availableOption = attribute.fullOptions.find((option) => {
-          return compatibleVariations.some((variant) => 
+          return compatibleVariations.some((variant) =>
             variant.attributeKeyValue[attribute.name ?? ""]?.value === option?.slug &&
             variant.stockStatus === StockStatusEnum.InStock
           );
@@ -173,7 +176,8 @@ export const VariantSelector = ({
 
   useEffect(() => {
     onChange(selectedOptions);
-  }, [selectedOptions, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedOptions]);
 
   const handleOptionSelect = (attributeName: string, optionValue: string) => {
     setSelectedOptions((prev) => ({
@@ -184,7 +188,8 @@ export const VariantSelector = ({
 
   const filterOptions = (
     attribute: GlobalProductAttribute | LocalProductAttribute
-  ) => {
+  ): Array<{ name: string; slug: string; hk_swatch_colour?: string; hk_swatch_colour_2?: string }> => {
+    // Handle size filtering when color is selected
     if (attribute.name === "pa_size" && selectedOptions["pa_colour"]) {
       const selectedColor = selectedOptions["pa_colour"];
       const validSizes = variations
@@ -194,12 +199,32 @@ export const VariantSelector = ({
         )
         .map((variation) => variation.attributeKeyValue["pa_size"]?.value);
 
-      return attribute?.fullOptions?.filter((option) =>
+      return (attribute?.fullOptions?.filter((option) =>
         validSizes?.includes(option?.slug ?? "")
-      );
+      ).map(option => ({
+        name: option?.name ?? "",
+        slug: option?.slug ?? "",
+        hk_swatch_colour: option?.hk_swatch_colour ?? "",
+        hk_swatch_colour_2: option?.hk_swatch_colour_2 ?? undefined
+      })) ?? []);
     }
 
-    return attribute.fullOptions;
+    // Handle Value attribute
+    if (attribute.name?.toLowerCase() === "value") {
+      if (!attribute.fullOptions || attribute.fullOptions.length === 0) {
+        return (attribute.options?.map(option => ({
+          name: option ?? "",
+          slug: option ?? "",
+        })) ?? []);
+      }
+    }
+
+    return (attribute.fullOptions?.map(option => ({
+      name: option?.name ?? "",
+      slug: option?.slug ?? "",
+      hk_swatch_colour: option?.hk_swatch_colour ?? "",
+      hk_swatch_colour_2: option?.hk_swatch_colour_2 ?? undefined
+    })) ?? []);
   };
 
   const checkIsUnavailable = (attributeName: string, value: string) => {
@@ -210,7 +235,7 @@ export const VariantSelector = ({
           return attr.name === attributeName
             ? value.toLowerCase() === attr?.value?.toLowerCase()
             : selectedOptions[attr?.name ?? ""]?.toLowerCase() ===
-                attr?.value?.toLowerCase();
+            attr?.value?.toLowerCase();
         })
       );
     });
