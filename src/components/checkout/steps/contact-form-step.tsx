@@ -40,7 +40,7 @@ const ContactFormStep: React.FC<ContactFormStepProps> = ({
   });
 
   const handleSubmit = async (data: z.infer<typeof contactSchema>) => {
-    await updateCustomer({
+    const response = await updateCustomer({
       input: {
         email: data.email,
         billing: {
@@ -48,6 +48,10 @@ const ContactFormStep: React.FC<ContactFormStepProps> = ({
         },
       },
     });
+
+    console.log("updateCustomer response", response);
+
+
     onNext(data);
   };
 

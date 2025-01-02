@@ -6,7 +6,6 @@ query getCustomer(
   customer {
     id
     databaseId
-    sessionToken
     username
     firstName
     lastName

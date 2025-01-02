@@ -16,15 +16,16 @@ import {
 } from "./generated";
 import { cookies } from "next/headers";
 import { v7 as uuidv7 } from "uuid";
-import {
-  getWoocommerceSession,
-  getWoocommerceAuthToken,
-  shouldUpdateToken,
-} from "./actions/auth";
+import { getWoocommerceAuthToken } from "./actions/auth";
 import { COOKIE_NAMES } from "./constants";
+import {
+  parseCookies,
+  getSessionKeyFromCookies,
+  encodeSessionCookie,
+} from "./utils/cookies";
 
 const getClientConfig = async (singleCheckout?: boolean) => {
-  const config: { authToken?: string; woocommerceSession?: string } = {};
+  const config: { authToken?: string; woocommerceSession?: string; mailchimpUserEmail?: string; mailchimpUserPreviousEmail?: string } = {};
 
   const authToken = await getWoocommerceAuthToken();
   if (authToken) {
@@ -39,11 +40,26 @@ const getClientConfig = async (singleCheckout?: boolean) => {
       config.woocommerceSession = singleCheckoutToken;
     }
   } else {
-    const sessionToken = await getWoocommerceSession();
+    const sessionToken = (await cookies()).get(COOKIE_NAMES.SESSION)?.value;
     if (sessionToken) {
       config.woocommerceSession = sessionToken;
     }
   }
+
+  const mailchimpUserEmail = (await cookies()).get(
+    "mailchimp_user_email"
+  )?.value;
+  if (mailchimpUserEmail) {
+    config.mailchimpUserEmail = mailchimpUserEmail;
+  }
+
+  const mailchimpUserPreviousEmail = (await cookies()).get(
+    "mailchimp_user_previous_email"
+  )?.value;
+  if (mailchimpUserPreviousEmail) {
+    config.mailchimpUserPreviousEmail = mailchimpUserPreviousEmail;
+  }
+  
 
   return config;
 };
@@ -53,23 +69,38 @@ const handleSessionResponse = async (
   response: any,
   singleCheckout?: boolean
 ) => {
-  const currentSession = await getWoocommerceSession();
-  const newSession = response.headers.get(COOKIE_NAMES.SESSION);
+  const setCookieHeader = response.headers.get("set-cookie");
+  if (!setCookieHeader) {
+    return;
+  }
 
-  if (newSession) {
+  const cookiesObj = parseCookies(setCookieHeader);
+  const cookieStore = await cookies();
+
+  const sessionKey = getSessionKeyFromCookies(cookiesObj);
+
+  if (sessionKey) {
+    const sessionValue = cookiesObj[sessionKey];
+    const encodedSession = encodeSessionCookie(sessionKey, sessionValue);
+
     if (singleCheckout) {
-      // Save to single checkout cookie when singleCheckout is true
-      (await cookies()).set(COOKIE_NAMES.SINGLE_CHECKOUT, newSession);
-    } else if (!currentSession) {
-      (await cookies()).set(COOKIE_NAMES.SESSION, newSession);
-    } else if (await shouldUpdateToken(currentSession)) {
-      (await cookies()).set(COOKIE_NAMES.SESSION, newSession);
+      cookieStore.set(COOKIE_NAMES.SINGLE_CHECKOUT, encodedSession);
+    } else {
+      cookieStore.set(COOKIE_NAMES.SESSION, encodedSession);
     }
   }
+
+  Object.entries(cookiesObj).forEach(([name, value]) => {
+    if (!name.startsWith("wp_woocommerce_session_")) {
+      cookieStore.set(name, value);
+    }
+  });
 };
 
 const getCart = async () => {
-  const response = await headkit(await getClientConfig()).getCart();
+  const config = await getClientConfig();
+
+  const response = await headkit(config).getCart();
   await handleSessionResponse(response);
   return response;
 };
@@ -81,10 +112,9 @@ const addToCart = async ({
   input: AddToCartInput;
   singleCheckout?: boolean;
 }) => {
-  const response = await headkit(
-    await getClientConfig(singleCheckout)
-  ).addToCart({ input });
+  const config = await getClientConfig(singleCheckout);
 
+  const response = await headkit(config).addToCart({ input });
   await handleSessionResponse(response, singleCheckout);
   return response;
 };
@@ -130,9 +160,8 @@ const checkout = async ({
 };
 
 const getCustomer = async (variables: GetCustomerQueryVariables) => {
-  const response = await headkit(await getClientConfig()).getCustomer(
-    variables
-  );
+  const config = await getClientConfig();
+  const response = await headkit(config).getCustomer(variables);
 
   return response;
 };
@@ -193,9 +222,8 @@ const updateCustomer = async ({
   withCart?: boolean;
   singleCheckout?: boolean;
 }) => {
-  const response = await headkit(
-    await getClientConfig(singleCheckout)
-  ).updateCustomer({
+  const config = await getClientConfig(singleCheckout);
+  const response = await headkit(config).updateCustomer({
     input,
     withCustomer,
     withCart,
@@ -397,7 +425,7 @@ const getGuestOrder = async ({
   });
 
   const order = response.data?.customer?.orders?.nodes?.find(
-    (order) => order.databaseId === Number(orderId)
+    (order) => order?.databaseId === Number(orderId)
   );
 
   return {

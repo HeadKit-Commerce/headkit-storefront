@@ -1,6 +1,6 @@
 export const COOKIE_NAMES = {
   AUTH_TOKEN: "woocommerce-auth",
-  SESSION: "woocommerce-session",
+  SESSION: "wp-woocommerce-session",
   SINGLE_CHECKOUT: "woocommerce-session-single-checkout",
 } as const;
 

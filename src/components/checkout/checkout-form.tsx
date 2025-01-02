@@ -106,10 +106,14 @@ const CheckoutForm = () => {
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
-        const { data: { customer } } = await getCustomer({
+        const { data } = await getCustomer({
           withAddress: true,
           withOrders: false
         });
+
+        console.log("data", data);
+
+        const customer = data?.customer;
 
         console.log("customer", customer);
         console.log("cartData", cartData);
@@ -280,7 +284,7 @@ const CheckoutForm = () => {
               },
               {
                 key: "_stripe_payment_method",
-                value: JSON.stringify(data?.stripePaymentMethod ?? {}),
+                value: data?.stripePaymentMethod ?? "",
               },
             ]
             : [],

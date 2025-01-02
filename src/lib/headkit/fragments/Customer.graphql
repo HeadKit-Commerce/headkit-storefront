@@ -1,8 +1,6 @@
 fragment CustomerContent on Customer {
   id
-  sessionToken
   databaseId
-  sessionToken
   firstName
   lastName
   email
