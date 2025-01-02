@@ -6,6 +6,8 @@ import { useCollection } from "./collection-context";
 import { VariantSwatch } from "@/components/product/product-variations/variant-swatch";
 import { GetProductFiltersQuery } from "@/lib/headkit/generated";
 import { FilterValues } from "./types";
+import { Icon } from "@/components/icon";
+import { cn } from "@/lib/utils";
 
 interface AttributeFilterProps {
   attribute: NonNullable<NonNullable<GetProductFiltersQuery["productFilters"]>["attributes"]>[0] & {
@@ -78,7 +80,7 @@ export const AttributeFilter = ({ attribute }: AttributeFilterProps) => {
                     selectedOptionValue={isSelected ? option.slug : undefined}
                     size="small"
                   />
-                  <span className="text-sm cursor-pointer">
+                  <span className={cn("cursor-pointer", isSelected ? "font-bold" : "")}>
                     {option.name}
                   </span>
                 </label>
@@ -87,8 +89,10 @@ export const AttributeFilter = ({ attribute }: AttributeFilterProps) => {
                   <Checkbox
                     checked={isSelected}
                     onCheckedChange={handleChange}
+                    hidden
                   />
-                  <span className="text-sm cursor-pointer">
+                  {isSelected && <Icon.check className="w-4 h-4 stroke-pink-500" />}
+                  <span className={cn("cursor-pointer", isSelected ? "font-bold" : "")}>
                     {option.name}
                   </span>
                 </label>

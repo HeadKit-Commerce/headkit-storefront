@@ -21,7 +21,7 @@ const CollectionHeader = ({
   return (
     <div className="overflow-x-hidden">
       <div className="mb-5 grid grid-cols-1 gap-5 px-4 md:grid-cols-2 md:px-10">
-        <div>
+        <div className="pt-5">
           {breadcrumbData && <Breadcrumb items={breadcrumbData} />}
           <h1 className="mb-[10px] mt-5 text-3xl font-bold">{name}</h1>
           <p

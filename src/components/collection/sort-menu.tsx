@@ -11,6 +11,7 @@ import { SortKey, SortKeyLabels, SortKeyType } from "./utils";
 import { useFormContext } from "react-hook-form";
 import { FilterValues } from "./types";
 import { FormField } from "@/components/ui/form";
+import { Icon } from "@/components/icon";
 
 export const SortMenu = () => {
   const { setFilterValues, filterValues } = useCollection();
@@ -24,14 +25,14 @@ export const SortMenu = () => {
           control={form.control}
           name="sort"
           render={({ field }) => (
-            <div className="p-4 text-right">
+            <div className="p-4 flex flex-col gap-2 items-end">
               {Object.entries(SortKey).map(([key]) => {
                 const sortKey = key as SortKeyType;
                 return (
                   <div
                     key={sortKey}
                     className={cn(
-                      "cursor-pointer p-2 hover:text-purple-500",
+                      "cursor-pointer p-2 hover:text-purple-500 flex items-center w-fit gap-x-2",
                       field.value === sortKey && "font-bold"
                     )}
                     onClick={() => {
@@ -42,6 +43,7 @@ export const SortMenu = () => {
                       });
                     }}
                   >
+                    {field.value === sortKey && <Icon.check className="w-4 h-4 stroke-pink-500" />}
                     {SortKeyLabels[sortKey]}
                   </div>
                 );

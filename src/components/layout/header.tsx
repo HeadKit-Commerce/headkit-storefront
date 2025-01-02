@@ -73,7 +73,7 @@ function Header({ menus }: Props) {
       }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-sm")}>
 
         <Transition show={menuOpen}>
-          <div className="fixed inset-0 z-0 top-[130px] bg-black/30 backdrop-blur-sm transition duration-300 ease-in-out data-[closed]:opacity-0 data-[leave]:opacity-0" />
+          <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-sm transition duration-300 ease-in-out data-[closed]:opacity-0 data-[leave]:opacity-0" />
         </Transition>
 
         <NavigationMenuList>

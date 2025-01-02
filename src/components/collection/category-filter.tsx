@@ -5,6 +5,8 @@ import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { useCollection } from "./collection-context";
 import { useFormContext } from "react-hook-form";
 import { FilterValues } from "./types";
+import { Icon } from "@/components/icon";
+import { cn } from "@/lib/utils";
 
 interface CategoryFilterProps {
   categories: {
@@ -40,8 +42,10 @@ export const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                         categories: newValue,
                       });
                     }}
+                    hidden
                   />
-                  <span className="text-sm cursor-pointer">
+                  {field.value.includes(category.slug) && <Icon.check className="w-4 h-4 stroke-pink-500" />}
+                  <span className={cn("cursor-pointer", field.value.includes(category.slug) ? "font-bold" : "")}>
                     {category.name}
                   </span>
                 </label>
