@@ -47,7 +47,7 @@ export default async function Page({ params }: Props) {
 
   const paymentMethod = getPaymentMethodDisplay(order?.metaData as { key: string; value: string }[]);
 
-  const initLang = "en";
+  const initLang = "en-AU";
   const initCurrency = "AUD";
 
   return (

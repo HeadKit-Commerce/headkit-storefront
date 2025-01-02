@@ -54,8 +54,8 @@ const CartDrawer = () => {
         </Button>
       </SheetTrigger>
       <SheetContent>
-        <SheetHeader hidden>
-          <SheetTitle hidden />
+        <SheetHeader>
+          <SheetTitle className="mt-3">Your Bag</SheetTitle>
           <SheetDescription hidden />
         </SheetHeader>
         <div className="mt-20">
@@ -107,6 +107,7 @@ const CartDrawer = () => {
                     {currencyFormatter({
                       price: getFloatVal(cartData?.contentsTotal || "0"),
                       currency: "AUD",
+                      lang: "en-AU",
                     })}
                   </p>
                 </div>

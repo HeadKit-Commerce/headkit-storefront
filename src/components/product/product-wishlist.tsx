@@ -92,7 +92,7 @@ export const ProductWishlist = ({ parentProduct }: Props) => {
       </div>
       {showLogin && (
         <div className="col-span-2 mt-3 pt-[20px] pb-[30px] px-[20px] border-[2px] border-purple-500 rounded-[6px]">
-          <div className="flex content-center text-hall-metal-700">
+          <div className="flex content-center">
             <div>
               <span className="underline">Sign in</span> or <span className="underline">Create an Account</span> to save products for later.
             </div>

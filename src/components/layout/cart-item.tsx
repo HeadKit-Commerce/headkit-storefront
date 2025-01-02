@@ -81,14 +81,14 @@ const CartItem = ({
   const renderPrice = (price: number, quantity: number, onSale: boolean) => (
     <>
       {onSale && (
-        <p className="font-medium text-[#343A40] line-through">
+        <p className="font-medium line-through">
           {currencyFormatter({ price: getFloatVal(price.toString()) * quantity })}
         </p>
       )}
       <p
         className={cn(
-          "font-medium text-[#343A40]",
-          onSale && "text-hall-ochre-900"
+          "font-medium",
+          onSale && "text-pink-500"
         )}
       >
         {priceIncludeTax
@@ -197,7 +197,7 @@ const CartItem = ({
             quantity,
             !!cartItem?.variation?.node?.onSale
           )}
-          {removeable && (
+          {/* {removeable && (
             <button
               onClick={handleRemoveItem}
               className={cn(
@@ -207,6 +207,18 @@ const CartItem = ({
               disabled={loading}
             >
               <Icon.close className="h-3 w-3 bg-transparent stroke-white" />
+            </button>
+          )} */}
+          {removeable && (
+            <button
+              onClick={handleRemoveItem}
+              className={cn(
+                "cursor-pointer hover:opacity-80",
+                loading && "cursor-not-allowed opacity-40"
+              )}
+              disabled={loading}
+            >
+              <Icon.close className="h-4 w-4 bg-transparent stroke-pink-500 stroke-2" />
             </button>
           )}
         </div>
