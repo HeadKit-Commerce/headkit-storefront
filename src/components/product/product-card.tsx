@@ -119,7 +119,7 @@ export const ProductCard = ({
 
   return (
     <div className={cn("relative w-full", className)}>
-      <div className="absolute left-1 top-1 z-10">
+      <div className="absolute left-2 top-2 z-10">
         <BadgeList
           isSale={product?.onSale || false}
           isNewIn={isProductNew(product)}

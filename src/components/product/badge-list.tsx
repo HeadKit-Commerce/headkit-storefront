@@ -8,7 +8,7 @@ interface Props {
 
 const BadgeList = ({ isNewIn, isSale }: Props) => {
   const badgeStyle = cva(
-    "outline rounded-[6px] text-[12px] uppercase font-semibold text-center px-[10px] py-[4px]",
+    "outline rounded-[6px] uppercase font-semibold text-center px-2 py-1",
     {
       variants: {
         variant: {

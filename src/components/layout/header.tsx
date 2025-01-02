@@ -26,6 +26,7 @@ import { Button } from "../ui/button";
 import { SearchDrawer } from "./search-drawer";
 import { useAuth } from "@/contexts/auth-context";
 import { useAppContext } from "@/contexts/app-context";
+import { CONFIG } from "@/config/app-config";
 
 interface Props {
   menus: Record<
@@ -74,7 +75,7 @@ function Header({ menus }: Props) {
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
               <Link href="/">
-                <Icon.logo className="h-6 md:h-9 w-auto" />
+                <Icon.logo className="h-8 md:h-9 w-auto" />
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
@@ -84,7 +85,7 @@ function Header({ menus }: Props) {
         </NavigationMenuList>
 
         {/* Main Right Menu */}
-        <NavigationMenuList>
+        <NavigationMenuList className="space-x-0">
           <div className="hidden md:flex">
             {mainRightMenu && <MenuSection menuItems={mainRightMenu.menuItems.nodes} />}
           </div>
@@ -155,6 +156,28 @@ function Header({ menus }: Props) {
                       onSelect={() => setOpen(false)}
                     />
                   )}
+                  <div className="flex gap-4">
+                    <Link href={isAuthenticated ? "/account/wishlist" : "/account"} onClick={() => setOpen(false)}>
+                      <div className="relative">
+                        <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2" />
+                        {isAuthenticated && wishlists.length > 0 && (
+                          <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-white text-xs">
+                            {wishlists.length}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                    <Link href="/account" onClick={() => setOpen(false)}>
+                      <div className="relative">
+                        <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2" />
+                        {isAuthenticated && (
+                          <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
+                            <Icon.check className="h-2 w-2 text-white" />
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -176,6 +199,7 @@ interface MenuSectionProps {
 }
 
 const MenuSection = ({ menuItems }: MenuSectionProps) => {
+
   const formattedMenu = formatNodeTree({
     nodes: menuItems.map((item) => ({
       id: item.id,
@@ -208,13 +232,19 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
             </>
           ) : (
             <Link href={menuItem.payload.uri} legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink
+                className={`${navigationMenuTriggerStyle()} ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
+                  ? '!text-pink-500'
+                  : ''
+                  }`}
+              >
                 {menuItem.payload.label}
               </NavigationMenuLink>
             </Link>
           )}
         </NavigationMenuItem>
       ))}
+
     </>
   );
 };
@@ -234,7 +264,7 @@ const MenuItem = ({ menuItem }: MenuItemProps) => (
         <div>
           <div className="text-sm font-medium">{menuItem.payload.label}</div>
           {menuItem.payload.description && (
-            <p className="text-muted-foreground text-sm">
+            <p className="text-muted-foreground">
               {menuItem.payload.description}
             </p>
           )}
@@ -286,7 +316,10 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
         <div key={menuItem.id}>
           <Link
             href={menuItem.payload.uri}
-            className="text-lg font-medium"
+            className={`text-lg font-semibold ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
+              ? 'text-pink-500'
+              : ''
+              }`}
             onClick={onSelect}
           >
             {menuItem.payload.label}
@@ -307,6 +340,7 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
           )}
         </div>
       ))}
+
     </div>
   );
 };

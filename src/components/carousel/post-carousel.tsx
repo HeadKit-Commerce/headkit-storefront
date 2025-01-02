@@ -49,8 +49,8 @@ const PostCarousel = ({ posts }: Props) => {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white hidden md:block" />
-      <CarouselNext className="-right-4 bg-white hidden md:block" />
+      <CarouselPrevious className="-left-4 bg-white" />
+      <CarouselNext className="-right-4 bg-white" />
       {scrollSnaps.length > 1 && (
         <CarouselPagination
           itemLength={scrollSnaps.length}

@@ -56,7 +56,7 @@ const AccordionWrapper = ({
           "text-purple-500": isActive || isCompleted,
         })}>
           <span>{order}.</span>
-          <span className="uppercase">{title}</span>
+          <span>{title}</span>
         </div>
         {isActive && rightMenu && <div className="flex">{rightMenu}</div>}
         {!isActive && isCompleted && briefValue && (

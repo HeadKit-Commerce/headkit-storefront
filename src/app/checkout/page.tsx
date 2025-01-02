@@ -22,7 +22,7 @@ export default function Page() {
   const renderEmptyCart = () => (
     <div className="px-[20px] md:px-[32] pb-[30px] md:py-[60px] text-center">
       <div className="w-[500px] max-w-full mx-auto">
-        <p className="mb-4 text-header2 font-bold uppercase leading-10 text-black-1">
+        <p className="mb-4 font-bold leading-10 ">
           No products in your cart!
         </p>
         <p className="mb-10">

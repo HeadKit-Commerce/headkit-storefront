@@ -17,7 +17,7 @@ const Cart = ({ showDisplayShipping }: Props) => {
   const calculateShipping = () => {
     if (!showDisplayShipping) {
       return (
-        <span className="font-normal text-base text-black-4">
+        <span className="font-normal text-base ">
           Calculated at next step
         </span>
       );
@@ -71,7 +71,7 @@ const Cart = ({ showDisplayShipping }: Props) => {
         <CouponBox cart={cartData!} />
       </div>
 
-      <div className="flex justify-between font-medium text-body3 text-black-1">
+      <div className="flex justify-between font-medium  ">
         <p>Subtotal</p>
         <p>
           {currencyFormatter({
@@ -82,13 +82,13 @@ const Cart = ({ showDisplayShipping }: Props) => {
         </p>
       </div>
 
-      <div className="flex justify-between font-medium text-body3 text-black-1 mt-[8px]">
+      <div className="flex justify-between font-medium   mt-[8px]">
         <p>Shipping</p>
         <p>{calculateShipping()}</p>
       </div>
 
       {!cartData?.displayPricesIncludeTax && (
-        <div className="flex justify-between font-medium text-body3 text-black-1 mt-[8px]">
+        <div className="flex justify-between font-medium   mt-[8px]">
           <p>Tax</p>
           <p>
             {currencyFormatter({
@@ -100,10 +100,10 @@ const Cart = ({ showDisplayShipping }: Props) => {
 
       <div className="flex justify-between text-xl mt-[20px]">
         <div>
-          <p className="uppercase font-medium text-body2 text-black-1">Total</p>
-          <p className="text-[13px] text-black-4 -mt-2">{taxDescription()}</p>
+          <p className="font-medium  ">Total</p>
+          <p className="text-[13px]  -mt-2">{taxDescription()}</p>
         </div>
-        <div className="text-right font-medium text-body2 text-black-1">
+        <div className="text-right font-medium  ">
           <p>{calculateTotal()}</p>
         </div>
       </div>

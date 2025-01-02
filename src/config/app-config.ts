@@ -27,6 +27,16 @@ const CONFIG = {
     slug: "posts",
     link: "/posts",
   },
+  sale: {
+    name: "Sale",
+    slug: "sale",
+    link: "/sale",
+  },
+  account: {
+    name: "Account",
+    slug: "account",
+    link: "/account",
+  },
 };
 
 export { CONFIG };

@@ -125,7 +125,7 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
           {cart?.appliedCoupons?.map((coupon, i) => (
             <div
               key={i}
-              className="flex text-lg font-medium text-black-1 py-2"
+              className="flex text-lg font-medium  py-2"
             >
               <p className="flex-1">Coupon: {coupon?.code}</p>
               <p>
@@ -152,7 +152,7 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
       {/* cart?.appliedGiftCards?.length > 0 && (
         <div>
           {cart.appliedGiftCards.map((giftCard) => (
-            <div key={giftCard.code} className="flex text-lg font-medium text-black-1 py-2">
+            <div key={giftCard.code} className="flex text-lg font-medium  py-2">
               <p className="flex-1">Gift Card: {giftCard.code}</p>
               <p>-${getFloatVal(giftCard.amount).toFixed(2)}</p>
               <p

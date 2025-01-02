@@ -186,7 +186,7 @@ export default async function Page({ params }: Props) {
 
             {order && (
               <>
-                <div className="flex gap-4 justify-between font-medium text-body3 text-black-1">
+                <div className="flex gap-4 justify-between font-medium  ">
                   <p>Subtotal</p>
                   <p>
                     {currencyFormatter({
@@ -210,7 +210,7 @@ export default async function Page({ params }: Props) {
                 </div>
                 {order?.discountTotal &&
                   getFloatVal(order?.discountTotal || "0") != 0 && (
-                    <div className="flex gap-4 justify-between font-medium text-body3 text-black-1 mt-[8px]">
+                    <div className="flex gap-4 justify-between font-medium   mt-[8px]">
                       <p>Discount</p>
                       <p>
                         -
@@ -224,7 +224,7 @@ export default async function Page({ params }: Props) {
                       </p>
                     </div>
                   )}
-                <div className="flex gap-4 justify-between font-medium text-body3 text-black-1 mt-[8px]">
+                <div className="flex gap-4 justify-between font-medium   mt-[8px]">
                   <p>Shipping</p>
                   <p>
                     {order?.pricesIncludeTax
@@ -247,7 +247,7 @@ export default async function Page({ params }: Props) {
                   </p>
                 </div>
                 {!order?.pricesIncludeTax && (
-                  <div className="flex gap-4 justify-between font-medium text-body3 text-black-1 mt-[8px]">
+                  <div className="flex gap-4 justify-between font-medium   mt-[8px]">
                     <p>Tax</p>
                     <p>
                       {currencyFormatter({
@@ -259,10 +259,10 @@ export default async function Page({ params }: Props) {
                 )}
                 <div className="flex gap-4 justify-between text-xl mt-[20px]">
                   <div>
-                    <p className="uppercase font-medium text-body2 text-black-1">
+                    <p className="font-medium  ">
                       Total
                     </p>
-                    <p className="text-[13px] text-black-4 -mt-2">
+                    <p className="text-[13px]  -mt-2">
                       {order?.pricesIncludeTax &&
                         order?.totalTax &&
                         `Includes ${currencyFormatter({
@@ -271,7 +271,7 @@ export default async function Page({ params }: Props) {
                         })} in Tax`}
                     </p>
                   </div>
-                  <div className="text-right font-medium text-body2 text-black-1">
+                  <div className="text-right font-medium  ">
                     <p>
                       {currencyFormatter({
                         price: getFloatVal(order?.total || "0"),

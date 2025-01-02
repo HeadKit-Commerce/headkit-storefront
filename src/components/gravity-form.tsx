@@ -227,7 +227,7 @@ const RenderField = ({ field, control }: RenderFieldProps) => {
 const SuccessBox = ({ message }: { message: string }) => {
   return (
     <div className="rounded-2xl border-2 border-green-2 p-8">
-      <div className="text-center text-header5 font-medium text-green-2">
+      <div className="text-center font-medium">
         {message}
       </div>
     </div>
@@ -335,7 +335,7 @@ export const GravityForm = ({
 
   if ((!isLoading && !formData)) {
     return (
-      <div className="p-4 text-center text-body2 text-red-1">
+      <div className="p-4 text-center  ">
         Form not found for this formId
       </div>
     );
@@ -435,7 +435,7 @@ export const GravityForm = ({
         </Button>
 
         {message && (
-          <div className="mt-0.5 flex flex-wrap text-red-1">{message}</div>
+          <div className="mt-0.5 flex flex-wrap ">{message}</div>
         )}
       </form>
     </Form>
