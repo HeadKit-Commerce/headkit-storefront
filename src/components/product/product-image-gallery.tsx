@@ -45,7 +45,7 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
                 >
                   <div
                     className={cn(
-                      "absolute left-2 top-2",
+                      "absolute left-2 top-2 z-10",
                       index !== 0 && "hidden"
                     )}
                   >
@@ -75,8 +75,8 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
           />
         )}
       </div>
-      <div className="relative block md:hidden border border-gray-200 rounded-lg overflow-hidden min-h-[300px]">
-        <div className="absolute left-2 top-2">
+      <div className="relative block md:hidden border border-gray-200 rounded-lg overflow-hidden min-h-[300px] aspect-square">
+        <div className="absolute left-2 top-2 z-10">
           <BadgeList isSale={isSale} isNewIn={isNew} />
         </div>
         <Carousel

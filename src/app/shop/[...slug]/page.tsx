@@ -99,7 +99,7 @@ export default async function Product({ params }: Props) {
         <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
           <div className="container mx-auto">
             <SectionHeader
-              title="You May Also Like"
+              title="You might also like…"
               description=""
               allButton="View All"
               allButtonPath="/shop"
@@ -118,7 +118,7 @@ export default async function Product({ params }: Props) {
       {(product?.data.product.related?.nodes?.length ?? 0) > 0 && (
         <div className="overflow-hidden px-5 md:px-10 py-[30px] lg:pt-[60px] lg:pb-[30px]">
           <SectionHeader
-            title="Related Products"
+            title="Something similar"
             description=""
             allButton="View All"
             allButtonPath="/shop"

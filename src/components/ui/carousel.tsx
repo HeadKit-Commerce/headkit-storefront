@@ -279,7 +279,7 @@ const CarouselPagination = ({
           key={index}
           onClick={() => onChange(index)}
           className={cn(
-            "!w-3 !h-3 opacity-50 rounded-full inline-block cursor-pointer",
+            "!w-2 !h-2 opacity-50 rounded-full inline-block cursor-pointer",
             {
               "bg-black": theme === "light",
               "bg-black/80": theme === "dark",

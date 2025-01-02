@@ -104,15 +104,16 @@ export default async function Home() {
 
       {/* brands */}
       {(brands?.data?.brands?.nodes?.length ?? 0) > 0 && (
-        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+        <div className="mx-5 px-5 md:px-10 py-10 overflow-hidden bg-lime-400 rounded-lg">
           <SectionHeader
             title={"Leading Brands"}
             description={""}
             allButton={"All Brands"}
             allButtonPath={"/"}
+            className="!py-0"
           />
 
-          <div className="mt-5 lg:mt-[30px]">
+          <div className="mt-7">
             <BrandCarousel
               brands={
                 brands?.data.brands?.nodes.map((brand) => ({

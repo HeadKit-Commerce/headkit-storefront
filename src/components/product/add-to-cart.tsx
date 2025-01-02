@@ -61,7 +61,7 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
             buttonLoading ||
             isGlobalDisabled
           }
-          rightIcon="arrowRight"
+          rightIcon="shoppingBag"
           loading={buttonLoading}
           loadingText="Adding..."
         >

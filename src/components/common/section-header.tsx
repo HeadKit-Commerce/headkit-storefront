@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 import sanitize from "sanitize-html";
 
@@ -7,6 +8,7 @@ interface Props {
   allButton: string;
   allButtonPath?: string;
   allButtonTarget?: string;
+  className?: string;
 }
 
 const SectionHeader = ({
@@ -14,10 +16,11 @@ const SectionHeader = ({
   description,
   allButton,
   allButtonPath,
-  allButtonTarget
+  allButtonTarget,
+  className,
 }: Props) => {
   return (
-    <div className="grid w-full grid-cols-1 gap-x-8 gap-y-2 py-5 md:grid-cols-3">
+    <div className={cn("grid w-full grid-cols-1 gap-x-8 gap-y-2 py-5 md:grid-cols-3", className)}>
       <div className="flex items-center">
         <h2 className="text-2xl font-semibold">{title}</h2>
       </div>
