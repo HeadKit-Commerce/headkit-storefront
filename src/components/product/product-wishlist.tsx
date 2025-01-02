@@ -77,15 +77,15 @@ export const ProductWishlist = ({ parentProduct }: Props) => {
           onClick={() => handleWishlist(!isInWishlist)}
           disabled={isLoading}
           className={cn(
-            "flex items-center ml-auto",
+            "flex items-center ml-auto group",
             isLoading && "opacity-40"
           )}
         >
           {isInWishlist ?
-            <Icon.heart className="mr-[8px] w-[16px] text-purple-500" /> :
-            <Icon.heartOutline className="mr-[8px] w-[16px]" />
+            <Icon.heart className="mr-[8px] w-[16px] group-hover:text-pink-500" /> :
+            <Icon.heartOutline className="mr-[8px] w-[16px] group-hover:text-pink-500" />
           }
-          <span className="text-[17px] text-purple-500 hover:underline">
+          <span className="text-[17px] text-purple-800 underline group-hover:text-pink-500">
             {isInWishlist ? "Saved to Wishlist" : "Add to Wishlist"}
           </span>
         </button>

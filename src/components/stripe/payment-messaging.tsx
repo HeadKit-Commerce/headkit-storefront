@@ -31,14 +31,20 @@ export function PaymentMethodMessaging({ disabled, price }: PaymentMethodMessagi
       options={{
         fonts: [{ cssSrc: "https://fonts.googleapis.com/css2?family=Urbanist&display=swap" }],
         appearance: {
-          theme: "stripe",
+          theme: "flat",
           variables: {
+            colorPrimary: "#23102E",
             colorText: "#23102E",
             colorTextSecondary: "#23102E",
             fontSizeBase: "16px",
             spacingUnit: "10px",
             fontFamily: '"Urbanist", system-ui, sans-serif',
           },
+          // rules: {
+          //   '.PaymentMethodMessaging': {
+          //     textAlign: 'right',
+          //   },
+          // }
         },
         currency: initCurrency.toLowerCase(),
       }}

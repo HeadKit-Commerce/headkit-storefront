@@ -186,6 +186,10 @@ export function ExpressCheckoutButton({
             overflow: "never",
           },
           buttonHeight: 40,
+          paymentMethods: {
+            googlePay: 'always',
+            applePay: 'always',
+          },
         }}
         onShippingAddressChange={async (e) => {
           console.log("onShippingAddressChange", singleCheckout, e);

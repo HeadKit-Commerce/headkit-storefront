@@ -81,8 +81,7 @@ export const ProductDetail = ({ product }: Props) => {
   }, [product]);
 
   const handleGiftCardEvent = (formData: GiftCardFormValues): void => {
-    console.log('Received form data in ProductDetail:', formData);
-    
+
     const newGiftCardData = { ...formData };
     if (
       newGiftCardData.wc_gc_giftcard_select_delivery === DeliveryType.Later &&
@@ -94,7 +93,7 @@ export const ProductDetail = ({ product }: Props) => {
     } else {
       newGiftCardData.wc_gc_giftcard_delivery = "";
     }
-    
+
     const jsonData = JSON.stringify(newGiftCardData);
     console.log('Setting productExtraData:', jsonData);
     setProductExtraData(jsonData);
@@ -166,7 +165,7 @@ export const ProductDetail = ({ product }: Props) => {
             {product?.name}
           </h1>
           <div
-            className="mb-8"
+            className="mb-8 text-purple-800"
             dangerouslySetInnerHTML={{
               __html: product.shortDescription!,
             }}
@@ -187,13 +186,7 @@ export const ProductDetail = ({ product }: Props) => {
               <div>
                 {product?.type == ProductTypesEnum.Simple && (
                   <>
-                    <ProductPrice
-                      price={(product as SimpleProduct)?.price ?? ""}
-                      regularPrice={product?.regularPrice ?? ""}
-                      onSale={product?.onSale ?? false}
-                      size="big"
-                    />
-                    <div className="mt-5">
+                    <div className="mb-5">
                       <AvailabilityStatus
                         stockQuantity={
                           (product as SimpleProduct)?.stockQuantity ?? null
@@ -201,6 +194,13 @@ export const ProductDetail = ({ product }: Props) => {
                         stockStatus={(product as SimpleProduct)?.stockStatus ?? StockStatusEnum.InStock}
                       />
                     </div>
+                    <ProductPrice
+                      price={(product as SimpleProduct)?.price ?? ""}
+                      regularPrice={product?.regularPrice ?? ""}
+                      onSale={product?.onSale ?? false}
+                      size="big"
+                    />
+
                   </>
                 )}
                 {product?.type == ProductTypesEnum.Variable && (

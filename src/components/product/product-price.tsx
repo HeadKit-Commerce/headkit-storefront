@@ -22,7 +22,7 @@ const ProductPrice = ({
   const minPrice = splitPrice?.[0]?.trim();
   const maxPrice = splitPrice?.[1]?.trim() ?? null;
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 font-semibold">
       <p
         className={cn(
           "leading-4",
