@@ -8,8 +8,8 @@ export function cn(...inputs: ClassValue[]) {
 
 export const currencyFormatter = ({
   price,
-  lang,
-  currency,
+  lang = "en-AU",
+  currency = "AUD",
 }: {
   price: number;
   lang?: string;

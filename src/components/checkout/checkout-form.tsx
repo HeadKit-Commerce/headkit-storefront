@@ -14,7 +14,7 @@ import {
   ShippingRate,
 } from "@/lib/headkit/generated";
 import { Elements } from "@stripe/react-stripe-js";
-import { getFloatVal } from "@/lib/utils";
+import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../../contexts/app-context";
 import { checkout, getCustomer } from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
@@ -423,7 +423,7 @@ const CheckoutForm = () => {
             <PaymentStep
               enableStripe={!!stripe}
               onSubmit={handlePaymentSubmit}
-              buttonLabel="Pay Now"
+              buttonLabel={`Pay ${currencyFormatter({ price: getFloatVal(cartData?.total || "0") })}`}
             />
           )}
         </AccordionWrapper>

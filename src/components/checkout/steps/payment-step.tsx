@@ -232,7 +232,6 @@ const PaymentStep: React.FC<PaymentStepProps> = ({ enableStripe, onSubmit, butto
         className="w-full mt-4"
         disabled={loading || (enableStripe ? !isStripeReady : !isStandardReady)}
         loading={loading}
-        rightIcon="arrowRight"
       >
         {buttonLabel}
       </Button>

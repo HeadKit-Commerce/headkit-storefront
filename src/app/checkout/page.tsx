@@ -92,7 +92,7 @@ export default function Page() {
   );
 
   return (
-    <div className="min-h-[700px]">
+    <div className="min-h-[700px] py-5">
       {getFloatVal(cartData?.total || "0") > 0
         ? renderCheckoutPage()
         : renderEmptyCart()}

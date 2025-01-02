@@ -53,14 +53,14 @@ const AccordionWrapper = ({
 
       <div className="flex justify-between items-center">
         <div className={cn("flex items-start gap-2 text-2xl font-extrabold", {
-          "text-purple-500": isActive || isCompleted,
+          "text-purple-500": isActive,
         })}>
           <span>{order}.</span>
           <span>{title}</span>
         </div>
         {isActive && rightMenu && <div className="flex">{rightMenu}</div>}
         {!isActive && isCompleted && briefValue && (
-          <div className="text-gray-900 max-w-[50%] text-right truncate" dangerouslySetInnerHTML={{ __html: briefValue }} />
+          <div className="text-gray-900 max-w-[50%] text-right line-clamp-2" dangerouslySetInnerHTML={{ __html: briefValue }} />
         )}
       </div>
 
