@@ -1,0 +1,13 @@
+query getPostCategories($where: RootQueryToCategoryConnectionWhereArgs) {
+  categories(where: $where) {
+    nodes {
+      parentId
+      slug
+      name
+      databaseId
+      parentDatabaseId
+      count
+      uri
+    }
+  }
+}

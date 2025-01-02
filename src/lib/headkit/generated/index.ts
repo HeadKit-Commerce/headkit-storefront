@@ -52488,6 +52488,13 @@ export type GetPostQueryVariables = Exact<{
 
 export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', databaseId: number, id: string, excerpt?: string | null, content?: string | null, date?: string | null, uri?: string | null, slug?: string | null, status?: string | null, title?: string | null, featuredImage?: { __typename?: 'NodeWithFeaturedImageToMediaItemConnectionEdge', node: { __typename?: 'MediaItem', id: string, sourceUrl?: string | null, sourceUrlMobile?: string | null } } | null, categories?: { __typename?: 'PostToCategoryConnection', nodes: Array<{ __typename?: 'Category', parentId?: string | null, slug?: string | null, name?: string | null, databaseId: number, parentDatabaseId?: number | null, count?: number | null, uri?: string | null }> } | null, tags?: { __typename?: 'PostToTagConnection', nodes: Array<{ __typename?: 'Tag', slug?: string | null, name?: string | null, id: string }> } | null, seo?: { __typename?: 'PostTypeSEO', title?: string | null, canonical?: string | null, metaDesc?: string | null, metaKeywords?: string | null, metaRobotsNofollow?: string | null, metaRobotsNoindex?: string | null, opengraphDescription?: string | null, opengraphModifiedTime?: string | null, opengraphPublishedTime?: string | null, opengraphSiteName?: string | null, opengraphTitle?: string | null, opengraphUrl?: string | null, twitterDescription?: string | null, twitterTitle?: string | null, breadcrumbs?: Array<{ __typename?: 'SEOPostTypeBreadcrumbs', text?: string | null, url?: string | null } | null> | null, opengraphImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null, twitterImage?: { __typename?: 'MediaItem', sourceUrl?: string | null, altText?: string | null } | null } | null } | null };
 
+export type GetPostCategoriesQueryVariables = Exact<{
+  where?: InputMaybe<RootQueryToCategoryConnectionWhereArgs>;
+}>;
+
+
+export type GetPostCategoriesQuery = { __typename?: 'Query', categories?: { __typename?: 'RootQueryToCategoryConnection', nodes: Array<{ __typename?: 'Category', parentId?: string | null, slug?: string | null, name?: string | null, databaseId: number, parentDatabaseId?: number | null, count?: number | null, uri?: string | null }> } | null };
+
 export type GetPostsQueryVariables = Exact<{
   where?: InputMaybe<RootQueryToPostConnectionWhereArgs>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -54097,6 +54104,21 @@ export const GetPostDocument = gql`
   }
 }
     ${PostTypeSeoContentFragmentDoc}`;
+export const GetPostCategoriesDocument = gql`
+    query getPostCategories($where: RootQueryToCategoryConnectionWhereArgs) {
+  categories(where: $where) {
+    nodes {
+      parentId
+      slug
+      name
+      databaseId
+      parentDatabaseId
+      count
+      uri
+    }
+  }
+}
+    `;
 export const GetPostsDocument = gql`
     query getPosts($where: RootQueryToPostConnectionWhereArgs, $first: Int, $last: Int, $after: String, $before: String) {
   posts(first: $first, last: $last, after: $after, before: $before, where: $where) {
@@ -54394,6 +54416,7 @@ const GetPageDocumentString = print(GetPageDocument);
 const GetPaymentGatewaysDocumentString = print(GetPaymentGatewaysDocument);
 const GetPickupLocationsDocumentString = print(GetPickupLocationsDocument);
 const GetPostDocumentString = print(GetPostDocument);
+const GetPostCategoriesDocumentString = print(GetPostCategoriesDocument);
 const GetPostsDocumentString = print(GetPostsDocument);
 const GetProductDocumentString = print(GetProductDocument);
 const GetProductCategoriesDocumentString = print(GetProductCategoriesDocument);
@@ -54497,6 +54520,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getPost(variables: GetPostQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetPostQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetPostQuery>(GetPostDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPost', 'query', variables);
+    },
+    getPostCategories(variables?: GetPostCategoriesQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetPostCategoriesQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetPostCategoriesQuery>(GetPostCategoriesDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPostCategories', 'query', variables);
     },
     getPosts(variables?: GetPostsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetPostsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetPostsQuery>(GetPostsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getPosts', 'query', variables);
