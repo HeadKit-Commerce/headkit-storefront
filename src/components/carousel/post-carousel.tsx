@@ -1,16 +1,10 @@
-"use client";
-
 import {
   Carousel,
-  CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselPagination,
   CarouselPrevious,
   CarouselNext,
-  useDotButton,
 } from "@/components/ui/carousel";
-import { useState } from "react";
 import { PostCard } from "../post/post-card";
 
 interface Props {
@@ -24,12 +18,9 @@ interface Props {
   }[];
 }
 const PostCarousel = ({ posts }: Props) => {
-  const [api, setApi] = useState<CarouselApi>();
-  const { selectedIndex, scrollSnaps, onDotButtonClick } = useDotButton(api);
-
+    
   return (
     <Carousel
-      setApi={setApi}
       opts={{
         align: "start",
       }}
@@ -51,16 +42,6 @@ const PostCarousel = ({ posts }: Props) => {
       </CarouselContent>
       <CarouselPrevious className="-left-4 bg-white" />
       <CarouselNext className="-right-4 bg-white" />
-      {scrollSnaps.length > 1 && (
-        <CarouselPagination
-          itemLength={scrollSnaps.length}
-          selectedIndex={selectedIndex}
-          onChange={(index) => {
-            onDotButtonClick(index);
-          }}
-          className="!-bottom-2"
-        />
-      )}
     </Carousel>
   );
 };

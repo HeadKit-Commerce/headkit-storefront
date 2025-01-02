@@ -18,7 +18,7 @@ const PostCard = ({ title, image, uri, textStyle = "dark" }: Props) => {
 
         <div className="flex justify-between pt-2">
           <h5
-            className={cn("text-[15px] font-semibold", {
+            className={cn("text-xl font-semibold", {
               "text-pink-500": textStyle === "light",
               "text-purple-800": textStyle === "dark",
             })}

@@ -27,6 +27,8 @@ import { SearchDrawer } from "./search-drawer";
 import { useAuth } from "@/contexts/auth-context";
 import { useAppContext } from "@/contexts/app-context";
 import { CONFIG } from "@/config/app-config";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 
 interface Props {
   menus: Record<
@@ -63,13 +65,12 @@ function Header({ menus }: Props) {
         links={preheaderMenu.menuItems.nodes.map((item) => ({
           label: item.label,
           uri: item.uri,
-          target: "_blank",
         }))}
       />
       <NavigationMenu onValueChange={(val) => {
         setMenuOpen(!!val)
-      }} className="sticky top-0 flex items-center justify-between h-20 w-full bg-white max-w-full z-20 px-5 md:px-10">
-        {menuOpen && <div className="fixed inset-0 z-0 top-[130px] bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />}
+      }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-sm")}>
+        {menuOpen && <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />}
 
         <NavigationMenuList>
           <NavigationMenuItem className="mr-4 hover:opacity-75">
@@ -103,7 +104,7 @@ function Header({ menus }: Props) {
                 >
                   <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
                   {isAuthenticated && wishlists.length > 0 && (
-                    <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-white text-xs">
+                    <span className="absolute right-0 top-[10px] z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
                       {wishlists.length}
                     </span>
                   )}
@@ -122,8 +123,8 @@ function Header({ menus }: Props) {
                 >
                   <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
                   {isAuthenticated && (
-                    <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
-                      <Icon.check className="h-2 w-2 text-white" />
+                    <span className="absolute right-0 top-[10px] z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white flex items-center justify-center">
+                      <Icon.check className="h-2 w-2" />
                     </span>
                   )}
                 </Button>
@@ -143,7 +144,7 @@ function Header({ menus }: Props) {
               <SheetContent>
                 <SheetTitle hidden />
                 <SheetDescription hidden />
-                <nav className="flex flex-col gap-4 mt-8">
+                <nav className="flex flex-col gap-4 mt-20">
                   {primaryMenu && (
                     <MobileMenuSection
                       menuItems={primaryMenu.menuItems.nodes}
@@ -161,7 +162,7 @@ function Header({ menus }: Props) {
                       <div className="relative">
                         <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2" />
                         {isAuthenticated && wishlists.length > 0 && (
-                          <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500 text-white text-xs">
+                          <span className="absolute right-0 top-2 z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
                             {wishlists.length}
                           </span>
                         )}
@@ -171,8 +172,8 @@ function Header({ menus }: Props) {
                       <div className="relative">
                         <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2" />
                         {isAuthenticated && (
-                          <span className="absolute -right-2 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-purple-500">
-                            <Icon.check className="h-2 w-2 text-white" />
+                          <span className="absolute right-0 top-[10px] z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
+                            <Icon.check className="h-2 w-2" />
                           </span>
                         )}
                       </div>
@@ -276,7 +277,7 @@ const MenuItem = ({ menuItem }: MenuItemProps) => (
 
 interface PreheaderProps {
   title: string;
-  links: { label: string; uri: string; target: string }[];
+  links: { label: string; uri: string }[];
 }
 
 const Preheader = ({ title, links }: PreheaderProps) => {
@@ -284,9 +285,9 @@ const Preheader = ({ title, links }: PreheaderProps) => {
     <div className="flex h-[30px] items-center justify-end sm:justify-between bg-purple-800 px-5 text-sm text-white md:px-10">
       <div className="hidden sm:block">{title}</div>
       <div className="flex gap-4 md:gap-8">
-        {links?.map(({ label, uri, target }, i) => {
+        {links?.map(({ label, uri }, i) => {
           return (
-            <Link key={i} href={uri} target={target} className="underline">
+            <Link key={i} href={uri} className="underline">
               {label}
             </Link>
           );
@@ -312,35 +313,42 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
 
   return (
     <div className="flex flex-col gap-4">
-      {formattedMenu.map((menuItem) => (
-        <div key={menuItem.id}>
-          <Link
-            href={menuItem.payload.uri}
-            className={`text-lg font-semibold ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
-              ? 'text-pink-500'
-              : ''
-              }`}
-            onClick={onSelect}
-          >
-            {menuItem.payload.label}
-          </Link>
-          {menuItem.children && (
-            <div className="ml-4 mt-2 flex flex-col gap-2">
-              {menuItem.children.map((child) => (
-                <Link
-                  key={child.id}
-                  href={child.payload.uri}
-                  className="text-sm text-muted-foreground"
-                  onClick={onSelect}
-                >
-                  {child.payload.label}
-                </Link>
-              ))}
-            </div>
+      {formattedMenu.map((menuItem, index) => (
+        <div key={index}>
+          {menuItem.children && menuItem.children.length > 0 ? (
+            <Collapsible>
+              <CollapsibleTrigger className="text-xl font-semibold flex w-full justify-between items-center group">
+                {menuItem.payload.label}
+                <span className="text-xl group-data-[state=open]:hidden"><Icon.chevronDown size={20} /></span>
+                <span className="text-xl hidden group-data-[state=open]:block rotate-180"><Icon.chevronDown size={20} /></span>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="flex flex-col gap-2">
+                {menuItem.children.map((child) => (
+                  <Link
+                    key={child.id}
+                    href={child.payload.uri}
+                    className="text-muted-foreground first-of-type:pt-4 text-lg"
+                    onClick={onSelect}
+                  >
+                    {child.payload.label}
+                  </Link>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          ) : (
+            <Link
+              href={menuItem.payload.uri}
+              className={`text-xl font-semibold ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
+                ? 'text-pink-500'
+                : ''
+                }`}
+              onClick={onSelect}
+            >
+              {menuItem.payload.label}
+            </Link>
           )}
         </div>
       ))}
-
     </div>
   );
 };

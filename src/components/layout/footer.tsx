@@ -86,7 +86,7 @@ const Footer = ({ menus }: FooterProps) => {
               return (
                 <IconPayment
                   key={i}
-                  className="h-6 w-auto hover:opacity-70"
+                  className="!h-8 w-auto hover:opacity-70"
                 />
               );
             })}
@@ -115,7 +115,7 @@ const Footer = ({ menus }: FooterProps) => {
           <div className="flex items-center">
             Built with
             <Link
-              href="https://www.tigerheart.com/"
+              href="https://headkit.io"
               target="_blank"
               aria-label="headkit"
               className="group ml-1 flex"
