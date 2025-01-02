@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Icon } from "../icon";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
 
 interface FooterProps {
   menus: Record<
@@ -19,6 +22,28 @@ interface FooterProps {
   >;
 }
 
+const SubscriptionBox = () => {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label className="text-purple-800 font-semibold text-lg">
+        Subscribe
+      </Label>
+      <form className="flex gap-2 relative">
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          required
+        />
+        <Button
+          type="submit"
+          className="absolute right-0"
+        >
+          Subscribe
+        </Button>
+      </form></div>
+  );
+};
+
 const Footer = ({ menus }: FooterProps) => {
   const footerMenu = menus[MenuLocationEnum.Footer];
   const footer2Menu = menus[MenuLocationEnum.Footer_2];
@@ -33,7 +58,7 @@ const Footer = ({ menus }: FooterProps) => {
             <div className="shrink-0 pr-4">
               <Link href="/" className="mr-4" aria-label="home">
                 <div className="relative h-auto w-full max-w-[60px] hover:opacity-70">
-                  <Icon.brandmark className="fill-purple-800" />
+                  <Icon.monoLogo/>
                 </div>
               </Link>
             </div>
@@ -80,6 +105,7 @@ const Footer = ({ menus }: FooterProps) => {
 
         {/* Payment Icons */}
         <div className="flex flex-col justify-between">
+          <SubscriptionBox />
           <div className="mt-4 flex flex-wrap gap-3 md:justify-end">
             {["visa", "mastercard", "amex", "applePay", "googlePay", "paypal"].map((icon, i) => {
               const IconPayment = Icon[icon as keyof typeof Icon];
@@ -124,7 +150,7 @@ const Footer = ({ menus }: FooterProps) => {
                 HeadKit
               </span>
               <div className="ml-2">
-                <Icon.brandmark className="h-5 w-5 grayscale group-hover:grayscale-0" />
+                <Icon.brandmark className="h-5 w-5 grayscale group-hover:grayscale-0 transition-all duration-300" />
               </div>
             </Link>
           </div>

@@ -32,6 +32,7 @@ import {
   FaPaypal,
   FaCcAmex,
 } from "react-icons/fa";
+import { BrandmarkSvg } from "./svg/brandmark-svg";
 import { HeadkitMonoSvg } from "./svg/headkit-mono-svg";
 
 type IconProps = IconBaseProps;
@@ -39,7 +40,8 @@ type IconProps = IconBaseProps;
 const Icon = {
   // branding
   logo: (props: IconProps) => <LogoSvg {...props} />,
-  brandmark: (props: IconProps) => <HeadkitMonoSvg {...props} />,
+  monoLogo: (props: IconProps) => <HeadkitMonoSvg {...props} />,
+  brandmark: (props: IconProps) => <BrandmarkSvg {...props} />,
 
   // social
   facebook: (props: IconProps) => <FaFacebook {...props} />,

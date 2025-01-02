@@ -29,6 +29,7 @@ import { useAppContext } from "@/contexts/app-context";
 import { CONFIG } from "@/config/app-config";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { Transition } from "@headlessui/react";
 
 interface Props {
   menus: Record<
@@ -70,7 +71,10 @@ function Header({ menus }: Props) {
       <NavigationMenu onValueChange={(val) => {
         setMenuOpen(!!val)
       }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-sm")}>
-        {menuOpen && <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />}
+
+        <Transition show={menuOpen}>
+          <div className="fixed inset-0 z-0 top-[130px] bg-black/30 backdrop-blur-sm transition duration-300 ease-in-out data-[closed]:opacity-0 data-[leave]:opacity-0" />
+        </Transition>
 
         <NavigationMenuList>
           <NavigationMenuItem className="mr-4 hover:opacity-75">
@@ -185,6 +189,7 @@ function Header({ menus }: Props) {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
+
     </>
   );
 }
@@ -261,15 +266,8 @@ interface MenuItemProps {
 const MenuItem = ({ menuItem }: MenuItemProps) => (
   <li>
     <NavigationMenuLink asChild>
-      <Link href={menuItem.payload.uri}>
-        <div>
-          <div className="text-sm font-medium">{menuItem.payload.label}</div>
-          {menuItem.payload.description && (
-            <p className="text-muted-foreground">
-              {menuItem.payload.description}
-            </p>
-          )}
-        </div>
+      <Link href={menuItem.payload.uri} className="font-semibold hover:text-pink-500">
+        {menuItem.payload.label}
       </Link>
     </NavigationMenuLink>
   </li>
