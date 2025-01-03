@@ -51,7 +51,6 @@ const ContactFormStep: React.FC<ContactFormStepProps> = ({
 
     console.log("updateCustomer response", response);
 
-
     onNext(data);
   };
 

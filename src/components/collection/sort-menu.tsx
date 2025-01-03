@@ -43,7 +43,7 @@ export const SortMenu = () => {
                       });
                     }}
                   >
-                    {field.value === sortKey && <Icon.check className="w-4 h-4 stroke-pink-500" />}
+                    {field.value === sortKey && <Icon.check className="w-4 h-4 stroke-lime-800" />}
                     {SortKeyLabels[sortKey]}
                   </div>
                 );

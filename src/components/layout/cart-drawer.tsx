@@ -53,14 +53,15 @@ const CartDrawer = () => {
           <Icon.shoppingBag className="h-6 w-6 stroke-purple-800 hover:stroke-pink-500 stroke-2" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="flex flex-col">
         <SheetHeader>
-          <SheetTitle className="mt-3">Your Bag</SheetTitle>
+          <SheetTitle className="mt-3 text-left">Your Bag</SheetTitle>
           <SheetDescription hidden />
         </SheetHeader>
-        <div className="mt-20">
+
+        <div className="flex-1 relative">
           {(cartData?.contents?.nodes?.length ?? 0) > 0 ? (
-            <div className="mt-5 space-y-5">
+            <div className="absolute inset-0 space-y-5 py-10 overflow-y-auto scrollbar-hide">
               {cartData?.contents?.nodes?.map((product, i) => (
                 <CartItem
                   key={i}
@@ -91,44 +92,40 @@ const CartDrawer = () => {
           )}
         </div>
 
-        <SheetFooter className="absolute bottom-0 left-0 w-full container">
+        <SheetFooter>
           {(cartData?.contents?.nodes?.length ?? 0) > 0 && (
-            <div className="pt-[20px] w-full pb-[30px] md:py-[40px] bg-white md:bg-inherit">
-              <>
-                <PaymentMethodMessaging
-                  price={getFloatVal(cartData?.contentsTotal || "0")}
-                  disabled={false}
-                />
-                <div className="mt-5 flex text-lg font-medium">
-                  <p className="leading-[32px] flex-1 flex items-end text-[15px]">
-                    Shipping and tax calculated at checkout
-                  </p>
-                  <p className="leading-[32px] pb-[2px] flex items-end text-[20px]">
-                    {currencyFormatter({
-                      price: getFloatVal(cartData?.contentsTotal || "0"),
-                      currency: "AUD",
-                      lang: "en-AU",
-                    })}
-                  </p>
-                </div>
-                <div className="mt-5">
-                  <ExpressCheckout
-                    singleCheckout={false}
-                    disabled={false}
-                    price={getFloatVal(cartData?.total || "0")}
-                  />
-                </div>
-                <Link href="/checkout">
-                  <Button
-                    fullWidth
-                    suppressHydrationWarning
-                    onClick={() => toggleCartDrawer(false)}
-                    className="mt-3"
-                  >
-                    Checkout
-                  </Button>
-                </Link>
-              </>
+            <div className="w-full flex flex-col gap-2 mt-auto bg-white">
+              <PaymentMethodMessaging
+                price={getFloatVal(cartData?.contentsTotal || "0")}
+                disabled={false}
+              />
+              <div className="flex font-medium gap-1">
+                <p className="flex-1 flex items-end">
+                  Shipping and tax calculated at checkout
+                </p>
+                <p className="flex items-end text-xl">
+                  {currencyFormatter({
+                    price: getFloatVal(cartData?.contentsTotal || "0"),
+                    currency: "AUD",
+                    lang: "en-AU",
+                  })}
+                </p>
+              </div>
+              <ExpressCheckout
+                singleCheckout={false}
+                disabled={false}
+                price={getFloatVal(cartData?.total || "0")}
+              />
+              <Link href="/checkout">
+                <Button
+                  fullWidth
+                  suppressHydrationWarning
+                  onClick={() => toggleCartDrawer(false)}
+                  className="mt-3"
+                >
+                  Checkout
+                </Button>
+              </Link>
             </div>
           )}
         </SheetFooter>

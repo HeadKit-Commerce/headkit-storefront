@@ -80,7 +80,6 @@ export default async function Product({ params }: Props) {
   ]);
 
   if (!product?.data.product) {
-    console.error("Product not found", product);
     notFound();
   }
 
@@ -96,21 +95,19 @@ export default async function Product({ params }: Props) {
       </div>
 
       {(product?.data.product.upsell?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
-          <div className="container mx-auto">
-            <SectionHeader
-              title="You might also like…"
-              description=""
-              allButton="View All"
-              allButtonPath="/shop"
+        <div className="overflow-hidden px-5 md:px-10 py-[30px] lg:pt-[60px] lg:pb-[30px]">
+          <SectionHeader
+            title="You might also like…"
+            description=""
+            allButton="View All"
+            allButtonPath="/shop"
+          />
+          <div className="mt-5 lg:mt-[30px]">
+            <ProductCarousel
+              products={
+                (product?.data.product.upsell?.nodes || []) as ProductContentFullWithGroupFragment[]
+              }
             />
-            <div className="mt-5 px-5 lg:mt-[30px]">
-              <ProductCarousel
-                products={
-                  (product?.data.product.upsell?.nodes || []) as ProductContentFullWithGroupFragment[]
-                }
-              />
-            </div>
           </div>
         </div>
       )}
@@ -128,6 +125,7 @@ export default async function Product({ params }: Props) {
               products={
                 (product?.data.product.related?.nodes || []) as ProductContentFullWithGroupFragment[]
               }
+              carouselItemClassName="basis-10/12 sm:basis-1/3 lg:basis-1/4 pl-[30px]"
             />
           </div>
         </div>

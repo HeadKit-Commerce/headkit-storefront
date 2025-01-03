@@ -10,7 +10,6 @@ import {
 import { useEffect, useState } from "react";
 import { VariantButton } from "./variant-button";
 import { VariantSwatch } from "./variant-swatch";
-import { cn } from "@/lib/utils";
 import { customSizeSort } from "@/lib/headkit/utils/custom-size-sort";
 import { useSearchParams } from "next/navigation";
 
@@ -244,8 +243,8 @@ export const VariantSelector = ({
   return (
     <div>
       {filteredAttributes?.map((attribute) => (
-        <div key={attribute.name} className="mb-4">
-          <div className={cn("mb-1 flex items-center gap-2")}>
+        <div key={attribute.name} className="mb-5">
+          <div className="mb-2 flex items-center gap-2">
             <div className="font-semibold text-purple-800">
               {attribute.label}
             </div>

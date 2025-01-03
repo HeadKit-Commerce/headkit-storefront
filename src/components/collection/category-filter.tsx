@@ -44,7 +44,7 @@ export const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                     }}
                     hidden
                   />
-                  {field.value.includes(category.slug) && <Icon.check className="w-4 h-4 stroke-pink-500" />}
+                  {field.value.includes(category.slug) && <Icon.check className="w-4 h-4 stroke-lime-800" />}
                   <span className={cn("cursor-pointer", field.value.includes(category.slug) ? "font-bold" : "")}>
                     {category.name}
                   </span>

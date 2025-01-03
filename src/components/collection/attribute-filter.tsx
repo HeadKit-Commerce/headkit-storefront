@@ -91,7 +91,7 @@ export const AttributeFilter = ({ attribute }: AttributeFilterProps) => {
                     onCheckedChange={handleChange}
                     hidden
                   />
-                  {isSelected && <Icon.check className="w-4 h-4 stroke-pink-500" />}
+                  {isSelected && <Icon.check className="w-4 h-4 stroke-lime-800" />}
                   <span className={cn("cursor-pointer", isSelected ? "font-bold" : "")}>
                     {option.name}
                   </span>

@@ -7,12 +7,14 @@ import {
 } from "@/components/ui/carousel";
 import { ProductCard } from "../product/product-card";
 import { ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
+import { cn } from "@/lib/utils";
 
 interface Props {
   products: ProductContentFullWithGroupFragment[];
+  carouselItemClassName?: string;
 }
 
-const ProductCarousel = ({ products }: Props) => {
+const ProductCarousel = ({ products, carouselItemClassName }: Props) => {
   return (
     <Carousel
       opts={{
@@ -26,7 +28,7 @@ const ProductCarousel = ({ products }: Props) => {
           ?.map((product, index) => (
             <CarouselItem
               key={index}
-              className="basis-10/12 sm:basis-1/2 lg:basis-1/3 pl-[30px]"
+              className={cn("basis-10/12 sm:basis-1/2 lg:basis-1/3 pl-[30px]", carouselItemClassName)}
             >
               <ProductCard product={product} />
             </CarouselItem>

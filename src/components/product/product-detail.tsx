@@ -215,22 +215,6 @@ export const ProductDetail = ({ product }: Props) => {
             </div>
           </Suspense>
 
-          <div className="mt-3">
-            <AddToCart
-              productId={
-                isGiftCard
-                  ? giftCardFormValid
-                    ? selectedProduct?.databaseId ?? null
-                    : null
-                  : selectedProduct?.databaseId ?? null
-              }
-              quantity={1}
-              stockStatus={(selectedProduct as SimpleProduct)?.stockStatus ?? StockStatusEnum.InStock}
-              disabled={isGiftCard ? !giftCardFormValid : false}
-              productExtraData={productExtraData}
-            />
-          </div>
-
           {selectedProduct !== null && !isGiftCard ? (
             <div className="mt-3">
               <ExpressCheckout
@@ -248,6 +232,24 @@ export const ProductDetail = ({ product }: Props) => {
               />
             </div>
           ) : null}
+
+          <div className="mt-3">
+            <AddToCart
+              productId={
+                isGiftCard
+                  ? giftCardFormValid
+                    ? selectedProduct?.databaseId ?? null
+                    : null
+                  : selectedProduct?.databaseId ?? null
+              }
+              quantity={1}
+              stockStatus={(selectedProduct as SimpleProduct)?.stockStatus ?? StockStatusEnum.InStock}
+              disabled={isGiftCard ? !giftCardFormValid : false}
+              productExtraData={productExtraData}
+            />
+          </div>
+
+
 
           <div className="mt-5 flex w-full flex-wrap justify-between gap-2">
             <div>
@@ -277,7 +279,7 @@ export const ProductDetail = ({ product }: Props) => {
                   <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
                   <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="prose py-4">
+                <CollapsibleContent className="prose text-purple-800 py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.description,
@@ -293,7 +295,7 @@ export const ProductDetail = ({ product }: Props) => {
                   <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
                   <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="prose py-4">
+                <CollapsibleContent className="prose text-purple-800 py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.productTechnical,
@@ -309,7 +311,7 @@ export const ProductDetail = ({ product }: Props) => {
                   <span className="text-xl group-data-[state=open]:hidden"><Icon.plus size={20} /></span>
                   <span className="text-xl hidden group-data-[state=open]:block"><Icon.minus size={20} /></span>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="prose py-4">
+                <CollapsibleContent className="prose text-purple-800 py-4">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: product?.productInstructions,
