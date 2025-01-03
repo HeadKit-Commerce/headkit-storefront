@@ -10,6 +10,7 @@ import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/contexts/auth-context";
 import { StripeProvider } from '@/contexts/stripe-context';
 import { Toaster } from "@/components/ui/toaster";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
@@ -125,6 +126,7 @@ export default async function RootLayout({
             </StripeProvider>
           </AppContextProvider>
         </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
