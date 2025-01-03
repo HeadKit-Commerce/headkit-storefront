@@ -37,14 +37,14 @@ export const ShippingOptionsStep = ({ onNext, buttonLabel }: Props) => {
 
   useEffect(() => {
     const newShippingRates: Array<ShippingRate> = [];
-    cartData?.availableShippingMethods?.map((shipping) =>
+    cartData?.availableShippingMethods?.forEach((shipping) =>
       shipping?.rates
         ?.filter(
           (rate) =>
             rate?.methodId !== "local_pickup" &&
             rate?.methodId !== "pickup_location"
         )
-        .map((rate) => newShippingRates.push(rate as ShippingRate))
+        .forEach((rate) => newShippingRates.push(rate as ShippingRate))
     );
 
     const sortedNewShippingRates = newShippingRates.sort((a, b) => {

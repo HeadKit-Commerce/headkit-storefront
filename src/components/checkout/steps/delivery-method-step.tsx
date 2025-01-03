@@ -281,11 +281,10 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                         />
                         <FormLabel
                           htmlFor={location.shippingMethodId}
-                          className="font-normal"
                         >
-                          <div>
+                          <div className="flex flex-col gap-1">
                             <div className="font-medium">{location.name}</div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-gray-500">
                               {location.address}, {location.city}{" "}
                               {location.postcode}
                             </div>

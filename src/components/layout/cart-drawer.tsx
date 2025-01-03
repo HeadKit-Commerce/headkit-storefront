@@ -50,7 +50,7 @@ const CartDrawer = () => {
               {cartData?.contents?.nodes?.length}
             </div>
           )}
-          <Icon.shoppingBag className="h-6 w-6 stroke-purple-800 hover:stroke-pink-500 stroke-2" />
+          <Icon.shoppingBag className="h-6 w-6 stroke-purple-800 hover:stroke-purple-500 stroke-2" />
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col">

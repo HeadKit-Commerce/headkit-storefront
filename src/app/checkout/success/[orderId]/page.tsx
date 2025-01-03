@@ -54,18 +54,13 @@ export default async function Page({ params }: Props) {
     <>
       {order && <ClearCart singleCheckout={isSingleCheckout} />}
       <div className="grid grid-cols-12 gap-x-1 gap-y-5 md:gap-8 mt-5 px-5 md:px-10">
-        <div className="col-span-12 relative bg-gradient-to-t from-black to-purple-900 rounded-[20px] overflow-hidden w-full">
-          <div className="relative z-10 px-8 py-20 md:px-20 md:py-24">
-            <div className="font-semibold text-2xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
-              Thanks
-            </div>
-            <div className="font-semibold text-4xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 pb-4">
-              {order?.billing?.firstName || order?.shipping?.firstName}!
-            </div>
-          </div>
+        <div className="col-span-12 w-full">
+          <h1 className="font-bold text-3xl mb-[10px] text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+            Thanks, {order?.billing?.firstName || order?.shipping?.firstName}!
+          </h1>
         </div>
         <div className="col-span-12 md:col-span-7 grid grid-cols-7">
-          <div className="col-span-12 md:col-start-2 md:col-span-5">
+          <div className="col-span-12 md:col-start-1 md:col-span-5">
             <div className="mb-10">
               <p className="font-extrabold text-3xl">
                 Your order is confirmed.

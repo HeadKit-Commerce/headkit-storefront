@@ -144,7 +144,6 @@ const StandardPaymentStep: React.FC<{
             name="paymentGatewayId"
             render={({ field }) => (
               <FormItem className="space-y-3">
-                <FormLabel>Select Payment Method</FormLabel>
                 <FormControl>
                   <RadioGroup
                     onValueChange={field.onChange}
@@ -163,8 +162,8 @@ const StandardPaymentStep: React.FC<{
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
                             <div className="ml-2">
-                              <div className="font-medium">{gateway.title}</div>
-                              <div className="text-sm text-gray-600">
+                              <div className="font-semibold mb-1 text-purple-500">{gateway.title}</div>
+                              <div className="text-sm text-gray-600 leading-tight">
                                 {gateway.description}
                               </div>
                             </div>

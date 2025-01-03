@@ -78,7 +78,7 @@ export function SearchDrawer() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9 pr-0 justify-end">
-          <Icon.search className="h-6 w-6 stroke-purple-800 hover:stroke-pink-500 stroke-2" />
+          <Icon.search className="h-6 w-6 stroke-purple-800 hover:stroke-purple-500 stroke-2" />
           <span className="sr-only">Search products</span>
         </Button>
       </SheetTrigger>

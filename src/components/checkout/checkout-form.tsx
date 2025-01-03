@@ -126,11 +126,9 @@ const CheckoutForm = () => {
           ...(isPickupLocation
             ? {
               location: cartData?.chosenShippingMethods?.[0] ?? "",
-              deliveryMethod: DeliveryStepEnum.CLICK_AND_COLLECT
             }
             : {
               shippingMethod: cartData?.chosenShippingMethods?.[0] ?? "",
-              deliveryMethod: DeliveryStepEnum.SHIPPING_TO_HOME
             }
           ),
           ...(customer ? {
@@ -211,22 +209,52 @@ const CheckoutForm = () => {
     if (step === CheckoutFormStepEnum.CONTACT) {
       return formData.email;
     } else if (step === CheckoutFormStepEnum.DELIVERY_METHOD) {
-      return formData.deliveryMethod;
+      // if formData.deliveryMethod is click and collect, show formData.deliveryMethod and formData.location
+      if (formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
+        return `
+          <span>
+            <span>${formData.deliveryMethod}</span>
+            <span>${formData.location}</span>
+          </span>`;
+      }
+      // if formData.deliveryMethod is shipping to home, show formData.deliveryMethod and formData.shippingMethod
+      if (formData.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME) {
+        const address = formData.shippingAddress
+
+        if (!address?.line1) return undefined;
+        return `
+          <span>
+            <span>${formData.deliveryMethod}</span>
+          <div class="flex flex-col">
+          <span>${address.line1}</span>
+          ${address.line2 ? `<span>${address.line2}</span>` : ''}
+          <span>${address.city}, ${address.state} ${address.postalCode} ${address.country}</span>
+        </div>
+          </span>`;
+      }
+
     } else if (step === CheckoutFormStepEnum.ADDRESS) {
-      const address = formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-        ? formData.billingAddress
-        : formData.shippingAddress;
+      // if deliveryMethod is shipping to home, show shipping method from shippingRates
+      if (formData.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME) {
+        const shippingRate = cartData?.availableShippingMethods
+          ?.flatMap(shipping => shipping?.rates?.filter(rate =>
+            rate?.methodId !== "local_pickup" &&
+            rate?.methodId !== "pickup_location"
+          ) ?? [])
+          .find(rate => rate?.id === formData.shippingMethod);
+        return shippingRate?.label ?? undefined;
+      }
+
+      const address = formData.billingAddress
 
       if (!address?.line1) return undefined;
 
       return `
-        <div class="flex flex-col text-sm">
-          <span>${address.firstName} ${address.lastName}</span>
+        <div class="flex flex-col">
           <span>${address.line1}</span>
           ${address.line2 ? `<span>${address.line2}</span>` : ''}
-          <span>${address.city}, ${address.state} ${address.postalCode}</span>
-          <span>${address.country}</span>
-          <span>${address.phone}</span>
+          <span>${address.city}, ${address.state} ${address.postalCode} ${address.country}</span>
+        </div>
         </div>
       `;
     } else if (step === CheckoutFormStepEnum.PAYMENT) {

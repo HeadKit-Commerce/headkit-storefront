@@ -197,18 +197,6 @@ const CartItem = ({
             quantity,
             !!cartItem?.variation?.node?.onSale
           )}
-          {/* {removeable && (
-            <button
-              onClick={handleRemoveItem}
-              className={cn(
-                "cursor-pointer rounded-sm bg-pink-500 p-1",
-                loading && "cursor-not-allowed opacity-40"
-              )}
-              disabled={loading}
-            >
-              <Icon.close className="h-3 w-3 bg-transparent stroke-white" />
-            </button>
-          )} */}
           {removeable && (
             <button
               onClick={handleRemoveItem}
@@ -228,18 +216,18 @@ const CartItem = ({
 
   if (type === "order" && orderData) {
     return (
-      <div className="flex">
+      <div className="flex text-purple-800">
         {renderProductImage(
           orderData?.image.src || "/assets/fallback-image.webp",
           orderData?.name,
           "#"
         )}
         <div className="flex flex-1 flex-col justify-between px-[20px] pt-[12px]">
-          <p className="font-semibold capitalize text-[#343A40]">
+          <p className="font-semibold capitalize">
             {orderData?.name}
           </p>
           <div className="mt-0.5 flex">
-            <p className="font-medium text-[#343A40]">x{orderData?.quantity}</p>
+            <p className="font-medium">x{orderData?.quantity}</p>
           </div>
         </div>
       </div>

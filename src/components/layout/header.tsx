@@ -106,7 +106,7 @@ function Header({ menus }: Props) {
                   className="hidden md:inline-flex !pr-0 relative justify-end"
                   aria-label="Wishlist"
                 >
-                  <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
+                  <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-purple-500" />
                   {isAuthenticated && wishlists.length > 0 && (
                     <span className="absolute right-0 top-[10px] z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white">
                       {wishlists.length}
@@ -125,7 +125,7 @@ function Header({ menus }: Props) {
                   className="hidden md:inline-flex !pr-0 relative justify-end"
                   aria-label="Account"
                 >
-                  <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-pink-500" />
+                  <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-purple-500" />
                   {isAuthenticated && (
                     <span className="absolute right-0 top-[10px] z-10 h-[14px] w-[14px] rounded-full bg-purple-500 text-center text-[12px] font-medium leading-4 text-white flex items-center justify-center">
                       <Icon.check className="h-2 w-2" />
@@ -266,7 +266,7 @@ interface MenuItemProps {
 const MenuItem = ({ menuItem }: MenuItemProps) => (
   <li>
     <NavigationMenuLink asChild>
-      <Link href={menuItem.payload.uri} className="font-semibold hover:text-pink-500">
+      <Link href={menuItem.payload.uri} className="font-semibold hover:text-purple-500">
         {menuItem.payload.label}
       </Link>
     </NavigationMenuLink>

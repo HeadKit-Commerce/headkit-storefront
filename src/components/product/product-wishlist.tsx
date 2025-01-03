@@ -82,10 +82,10 @@ export const ProductWishlist = ({ parentProduct }: Props) => {
           )}
         >
           {isInWishlist ?
-            <Icon.heart className="mr-[8px] w-[16px] group-hover:text-pink-500" /> :
-            <Icon.heartOutline className="mr-[8px] w-[16px] group-hover:text-pink-500" />
+            <Icon.heart className="mr-[8px] w-[16px] group-hover:text-purple-500" /> :
+            <Icon.heartOutline className="mr-[8px] w-[16px] group-hover:text-purple-500" />
           }
-          <span className="text-[17px] text-purple-800 underline group-hover:text-pink-500">
+          <span className="text-[17px] text-purple-800 underline group-hover:text-purple-500">
             {isInWishlist ? "Saved to Wishlist" : "Add to Wishlist"}
           </span>
         </button>

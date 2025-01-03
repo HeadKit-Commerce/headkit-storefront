@@ -86,6 +86,7 @@ export const makeWhereProductQuery = ({
   perPage = 24,
   onSale,
   search,
+  newIn,
 }: QueryParams): RootQueryToProductUnionConnectionWhereArgs => {
   const where: RootQueryToProductUnionConnectionWhereArgs = {
     offset: page * perPage,
@@ -170,6 +171,18 @@ export const makeWhereProductQuery = ({
   // Handle search
   if (search) {
     where.search = search;
+  }
+
+  if (newIn) {
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    where.dateQuery = {
+      after: {
+        month: lastMonth.getMonth(),
+        year: lastMonth.getFullYear(),
+        day: lastMonth.getDate(),
+      },
+    };
   }
 
   return where;
