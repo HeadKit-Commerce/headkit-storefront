@@ -182,8 +182,8 @@ export function ExpressCheckoutButton({
             googlePay: "pay",
           },
           layout: {
-            maxColumns: 2,
-            overflow: "never",
+            maxRows: 1,
+            overflow: "auto",
           },
           buttonHeight: 40,
           paymentMethods: {
