@@ -15,7 +15,6 @@ import { DeliveryStepEnum } from "../utils";
 import { AddressElement } from "@stripe/react-stripe-js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
-  getPickupLocations,
   updateShippingMethod,
   updateCustomer,
 } from "@/lib/headkit/actions";
@@ -68,6 +67,20 @@ interface DeliveryMethodStepProps {
   defaultValues?: Partial<z.infer<typeof deliverySchema>>;
   buttonLabel?: string;
   enableStripe?: boolean;
+  pickupLocations: Array<{
+    address: string;
+    city: string;
+    country: string;
+    countryCode: string;
+    details: string;
+    enabled: boolean;
+    name: string;
+    postcode: string;
+    shippingMethodId: string;
+    state: string;
+    stateCode: string;
+  }>;
+  isLoading?: boolean;
 }
 
 const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
@@ -76,9 +89,10 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
   defaultValues,
   buttonLabel = "Next",
   enableStripe = false,
+  pickupLocations,
+  isLoading = false,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const form = useForm<z.infer<typeof deliverySchema>>({
     resolver: zodResolver(deliverySchema),
     defaultValues,
@@ -152,60 +166,15 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
     }
   };
 
-  const [pickupLocations, setPickupLocations] = useState<
-    {
-      address: string;
-      city: string;
-      country: string;
-      countryCode: string;
-      details: string;
-      enabled: boolean;
-      name: string;
-      postcode: string;
-      shippingMethodId: string;
-      state: string;
-      stateCode: string;
-    }[]
-  >([]);
-
   useEffect(() => {
-    const loadPickupLocations = async () => {
-      try {
-        setIsLoading(true);
-        const locations = await getPickupLocations();
-        const filteredLocations = locations?.data?.pickupLocations?.nodes
-          ?.filter((location) => location?.enabled)
-          .map((location) => {
-            return {
-              name: location?.name ?? "",
-              address: location?.address ?? "",
-              city: location?.city ?? "",
-              country: location?.country ?? "",
-              countryCode: location?.countryCode ?? "",
-              details: location?.details ?? "",
-              enabled: location?.enabled ?? false,
-              postcode: location?.postcode ?? "",
-              shippingMethodId: location?.shippingMethodId ?? "",
-              state: location?.state ?? "",
-              stateCode: location?.stateCode ?? "",
-            };
-          }) ?? [];
-
-        setPickupLocations(filteredLocations);
-
-        // If no pickup locations, force shipping to home and set initial location
-        if (filteredLocations.length === 0) {
-          form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: true });
-        } else if (filteredLocations.length === 1) {
-          // If only one location, automatically select it
-          form.setValue("location", filteredLocations[0].shippingMethodId, { shouldValidate: true });
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadPickupLocations();
-  }, [form]);
+    // If no pickup locations, force shipping to home and set initial location
+    if (pickupLocations.length === 0) {
+      form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: true });
+    } else if (pickupLocations.length === 1) {
+      // If only one location, automatically select it
+      form.setValue("location", pickupLocations[0].shippingMethodId, { shouldValidate: true });
+    }
+  }, [pickupLocations, form]);
 
   if (isLoading) {
     return <div className="text-center min-h-[200px] flex items-center justify-center bg-white/50"> <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
@@ -334,10 +303,10 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               }}
               onChange={(event) => {
                 if (event.complete) {
-                  const { address, phone, firstName, lastName } = event.value;
+                  const { address, phone, firstName, lastName, name } = event.value;
                   // Set and validate each field individually
-                  form.setValue("shippingAddress.firstName", firstName || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.lastName", lastName || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.firstName", name?.split(" ")?.[0] || firstName || "", { shouldValidate: true });
+                  form.setValue("shippingAddress.lastName", name?.split(" ")?.[1] || lastName || "", { shouldValidate: true });
                   form.setValue("shippingAddress.line1", address.line1 || "", { shouldValidate: true });
                   form.setValue("shippingAddress.line2", address.line2 || "", { shouldValidate: true });
                   form.setValue("shippingAddress.city", address.city || "", { shouldValidate: true });

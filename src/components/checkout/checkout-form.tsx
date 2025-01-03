@@ -16,7 +16,7 @@ import {
 import { Elements } from "@stripe/react-stripe-js";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../../contexts/app-context";
-import { checkout, getCustomer } from "@/lib/headkit/actions";
+import { checkout, getCustomer, getPickupLocations } from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -98,6 +98,20 @@ const CheckoutForm = () => {
     stripePaymentMethod: "",
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [pickupLocations, setPickupLocations] = useState<Array<{
+    address: string;
+    city: string;
+    country: string;
+    countryCode: string;
+    details: string;
+    enabled: boolean;
+    name: string;
+    postcode: string;
+    shippingMethodId: string;
+    state: string;
+    stateCode: string;
+  }>>([]);
+  const [isLoadingPickupLocations, setIsLoadingPickupLocations] = useState(true);
 
 
   const { stripe } = useStripe();
@@ -167,6 +181,37 @@ const CheckoutForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    const loadPickupLocations = async () => {
+      try {
+        setIsLoadingPickupLocations(true);
+        const locations = await getPickupLocations();
+        const filteredLocations = locations?.data?.pickupLocations?.nodes
+          ?.filter((location) => location?.enabled)
+          .map((location) => {
+            return {
+              name: location?.name ?? "",
+              address: location?.address ?? "",
+              city: location?.city ?? "",
+              country: location?.country ?? "",
+              countryCode: location?.countryCode ?? "",
+              details: location?.details ?? "",
+              enabled: location?.enabled ?? false,
+              postcode: location?.postcode ?? "",
+              shippingMethodId: location?.shippingMethodId ?? "",
+              state: location?.state ?? "",
+              stateCode: location?.stateCode ?? "",
+            };
+          }) ?? [];
+
+        setPickupLocations(filteredLocations);
+      } finally {
+        setIsLoadingPickupLocations(false);
+      }
+    };
+    loadPickupLocations();
+  }, []);
+
   const isStepCompleted = (step: CheckoutFormStepEnum) => {
     switch (step) {
       case CheckoutFormStepEnum.CONTACT:
@@ -211,10 +256,14 @@ const CheckoutForm = () => {
     } else if (step === CheckoutFormStepEnum.DELIVERY_METHOD) {
       // if formData.deliveryMethod is click and collect, show formData.deliveryMethod and formData.location
       if (formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
+        const address = pickupLocations.find(location => location.name === formData.location);
         return `
           <span>
             <span>${formData.deliveryMethod}</span>
-            <span>${formData.location}</span>
+        <div class="flex flex-col">
+          <span>${address?.address}</span>
+          <span>${address?.city}, ${address?.state} ${address?.postcode} ${address?.country}</span>
+        </div>
           </span>`;
       }
       // if formData.deliveryMethod is shipping to home, show formData.deliveryMethod and formData.shippingMethod
@@ -242,7 +291,11 @@ const CheckoutForm = () => {
             rate?.methodId !== "pickup_location"
           ) ?? [])
           .find(rate => rate?.id === formData.shippingMethod);
-        return shippingRate?.label ?? undefined;
+        return `
+          <span>
+            <span>${shippingRate?.label} / ${shippingRate?.cost ? currencyFormatter({ price: getFloatVal(shippingRate?.cost || "0") }) : 'Free'}</span>
+          </span>
+        `;
       }
 
       const address = formData.billingAddress
@@ -407,10 +460,11 @@ const CheckoutForm = () => {
                 shippingAddress: formData.shippingAddress,
               }}
               onChange={({ deliveryMethod }) => {
-                // set form value but dont go to next step
                 setFormData((prev) => ({ ...prev, deliveryMethod }));
               }}
               buttonLabel={`Continue To ${formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT ? 'Billing' : 'Shipping Options'}`}
+              pickupLocations={pickupLocations}
+              isLoading={isLoadingPickupLocations}
             />
           )}
           {step === CheckoutFormStepEnum.ADDRESS && (
