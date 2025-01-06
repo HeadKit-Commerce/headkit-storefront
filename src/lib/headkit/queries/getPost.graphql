@@ -9,6 +9,11 @@ query getPost($id: ID!, $type: PostIdType) {
     slug
     status
     title
+    author {
+      node {
+        name
+      }
+    }
     featuredImage {
       node {
         id

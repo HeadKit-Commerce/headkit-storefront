@@ -1,0 +1,9 @@
+query getBrand($slug: ID!) {
+  brand(idType: SLUG, id: $slug) {
+    id
+    name
+    description
+    databaseId
+    thumbnail
+  }
+}

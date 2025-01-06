@@ -12,7 +12,7 @@ import Image from "next/image";
 import { ProductImageGallery } from "./product-image-gallery";
 import { ProductPrice } from "./product-price";
 import { Suspense, useEffect, useState } from "react";
-import { Breadcrumb } from "@/components/product/breadcrumb";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
 import { differenceInDays } from "date-fns";
 import {

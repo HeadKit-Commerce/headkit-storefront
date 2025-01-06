@@ -12,19 +12,18 @@ query getBrands (
     before: $before
     where: $where
   ){
-    pageInfo {
-      hasNextPage
-      hasPreviousPage
-      endCursor
-      startCursor
-    }
     nodes {
-      id
-      name
-      slug
-      parentId
-      featured
-      thumbnail
+      ...BrandFields
+      ancestors {
+        nodes {
+          ...BrandFields
+        }
+      }
+      children {
+        nodes {
+          ...BrandFields
+        }
+      }
     }
   }
 }

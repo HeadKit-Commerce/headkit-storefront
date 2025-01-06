@@ -28,6 +28,11 @@ query getPosts (
       slug
       status
       title
+      author {
+        node {
+          name
+        }
+      }
       featuredImage {
         node {
           id

@@ -5,7 +5,10 @@ import {
   ActionWishlistInput,
   AddToCartInput,
   CheckoutInput,
+  GetBrandsQueryVariables,
   GetCustomerQueryVariables,
+  GetPostCategoriesQueryVariables,
+  GetPostsQueryVariables,
   GetProductFiltersQueryVariables,
   GetProductListQueryVariables,
   ProductCategoryIdType,
@@ -25,7 +28,12 @@ import {
 } from "./utils/cookies";
 
 const getClientConfig = async (singleCheckout?: boolean) => {
-  const config: { authToken?: string; woocommerceSession?: string; mailchimpUserEmail?: string; mailchimpUserPreviousEmail?: string } = {};
+  const config: {
+    authToken?: string;
+    woocommerceSession?: string;
+    mailchimpUserEmail?: string;
+    mailchimpUserPreviousEmail?: string;
+  } = {};
 
   const authToken = await getWoocommerceAuthToken();
   if (authToken) {
@@ -59,7 +67,6 @@ const getClientConfig = async (singleCheckout?: boolean) => {
   if (mailchimpUserPreviousEmail) {
     config.mailchimpUserPreviousEmail = mailchimpUserPreviousEmail;
   }
-  
 
   return config;
 };
@@ -446,6 +453,40 @@ const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
   });
   return response;
 };
+
+// Post Actions
+export async function getPostFilters({
+  input,
+}: {
+  input: GetPostCategoriesQueryVariables;
+}) {
+  const response = await headkit().getPostCategories(input);
+  return response;
+}
+
+export async function getPostList({
+  input,
+}: {
+  input: GetPostsQueryVariables;
+}) {
+  const response = await headkit().getPosts(input);
+  return response;
+}
+
+// Brand Actions
+export async function getBrandList({
+  input,
+}: {
+  input: GetBrandsQueryVariables;
+}) {
+  const response = await headkit().getBrands(input);
+  return response;
+}
+
+export async function getBrand({ slug }: { slug: string }) {
+  const response = await headkit().getBrand({ slug });
+  return response;
+}
 
 export {
   getCustomer,
