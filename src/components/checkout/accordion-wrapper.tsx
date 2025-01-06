@@ -58,9 +58,12 @@ const AccordionWrapper = ({
           <span>{order}.</span>
           <span>{title}</span>
         </div>
-        {isActive && rightMenu && <div className="flex">{rightMenu}</div>}
-        {!isActive && isCompleted && briefValue && (
-          <div className="text-gray-900 max-w-[50%] text-right line-clamp-2" dangerouslySetInnerHTML={{ __html: briefValue }} />
+        {isActive && rightMenu ? (
+          <div className="text-right">{rightMenu}</div>
+        ) : (
+          !isActive && isCompleted && briefValue && (
+            <div className="text-gray-900 max-w-[50%] text-right line-clamp-2" dangerouslySetInnerHTML={{ __html: briefValue }} />
+          )
         )}
       </div>
 
