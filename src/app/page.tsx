@@ -134,7 +134,7 @@ export default async function Home() {
             title="Latest News"
             description="Get the latest news and updates from our blog."
             allButton="View All"
-            allButtonPath="/blog"
+            allButtonPath="/posts"
           />
           <div className="mt-5 lg:mt-[30px]">
             <PostCarousel
