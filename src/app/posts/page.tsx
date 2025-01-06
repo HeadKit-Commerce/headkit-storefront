@@ -4,6 +4,8 @@ import { PostPage } from "@/components/post/post-page";
 import { makeWherePostQuery, SortKeyType } from "@/components/post/utils";
 import { PostHeader } from "@/components/post/post-header";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   searchParams: Promise<{
     page?: string;
@@ -34,7 +36,6 @@ export default async function Page({ searchParams }: PageProps) {
       getPostList({
         input: {
           first: perPage,
-          after: page > 0 ? btoa(`arrayconnection:${(page - 1) * perPage}`) : undefined,
           where: makeWherePostQuery({
             filterQuery,
           }),

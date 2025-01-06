@@ -4,6 +4,8 @@ import { BrandPage } from "@/components/brand/brand-page";
 import { makeWhereBrandQuery, SortKeyType } from "@/components/brand/utils";
 import { BrandHeader } from "@/components/brand/brand-header";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   searchParams: Promise<{
     page?: string;
@@ -30,7 +32,6 @@ export default async function Page({ searchParams }: PageProps) {
     const brandsData = await getBrandList({
       input: {
         first: perPage,
-        after: page > 0 ? btoa(`arrayconnection:${(page - 1) * perPage}`) : undefined,
         where: makeWhereBrandQuery({
           filterQuery,
         }),
