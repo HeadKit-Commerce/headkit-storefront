@@ -50,7 +50,7 @@ export default async function Page({ searchParams }: PageProps) {
             },
             {
               name: "Brands",
-              uri: "/brands",
+              uri: "/brand",
               current: true,
             },
           ]}

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBrand, getProductFilters, getProductList } from "@/lib/headkit/actions";
 import { CollectionPage } from "@/components/collection/collection-page";
-import { makeWhereProductQuery, SortKeyType, makeBreadcrumbFromProductCategoryData, makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
+import { makeWhereProductQuery, SortKeyType } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 
 interface BrandPageProps {
@@ -88,10 +88,21 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
         <CollectionHeader
           name={brand.data.brand?.name || ""}
           description={brand.data.brand?.description || ""}
-          breadcrumbData={makeBreadcrumbFromProductCategoryData(brand.data)}
-          categories={makeSubcategorySwiperFromProductCategoryData(
-            brand.data
-          )}
+          breadcrumbData={[{
+            name: "Home",
+            uri: "/",
+            current: false,
+          }, 
+          {
+            name: "Brand",
+            uri: "/brand",
+            current: false,
+          },
+          {
+            name: brand.data.brand?.name || "",
+            uri: `/brand/${brandSlug}`,
+            current: true,
+          }]}
         />
         <CollectionPage
           initialProducts={productsData.data}

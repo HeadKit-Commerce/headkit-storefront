@@ -11,7 +11,7 @@ interface Props {
 
 export function BrandCard({ name, slug, logo }: Props) {
   return (
-    <Link href={`/brands/${slug}`}>
+    <Link href={`/brand/${slug}`}>
       <div className="group relative flex flex-col">
         <div className="aspect-[3/2] w-full overflow-hidden flex justify-center items-center bg-white border border-gray-200 rounded-md">
           {logo ? (

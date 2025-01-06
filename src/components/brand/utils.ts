@@ -62,13 +62,13 @@ interface BrandCategoryData {
 export function makeBreadcrumbFromBrandCategoryData(data: BrandCategoryData) {
   const breadcrumb = [
     { name: "Home", href: "/" },
-    { name: "Brands", href: "/brands" },
+    { name: "Brands", href: "/brand" },
   ];
 
   if (data?.brandCategory) {
     breadcrumb.push({
       name: data.brandCategory.name || "",
-      href: `/brands/${data.brandCategory.slug}`,
+      href: `/brand/${data.brandCategory.slug}`,
     });
   }
 
