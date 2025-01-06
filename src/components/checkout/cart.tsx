@@ -6,13 +6,13 @@ import { getFloatVal } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";
 import { CartItemFragment } from "@/lib/headkit/generated";
 import { PaymentMethodMessaging } from "../stripe/payment-messaging";
-
+import { currencyFormatter } from "@/lib/utils";
 interface Props {
   showDisplayShipping?: boolean;
 }
 
 const Cart = ({ showDisplayShipping }: Props) => {
-  const { cartData, currencyFormatter } = useAppContext();
+  const { cartData } = useAppContext();
 
   const calculateShipping = () => {
     if (!showDisplayShipping) {

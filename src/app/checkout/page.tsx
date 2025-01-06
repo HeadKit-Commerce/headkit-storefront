@@ -8,9 +8,9 @@ import { Icon } from "@/components/icon";
 import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
 import { Cart } from "@/components/checkout/cart";
-
+import { currencyFormatter } from "@/lib/utils";
 export default function Page() {
-  const { cartData, currencyFormatter, toggleCartDrawer } = useAppContext();
+  const { cartData, toggleCartDrawer } = useAppContext();
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {

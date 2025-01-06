@@ -13,11 +13,11 @@ export const currencyFormatter = ({
 }: {
   price: number;
   lang?: string;
-  currency?: string;
+  currency?: string | null | undefined;
 }) => {
   return new Intl.NumberFormat(lang, {
     style: "currency",
-    currency,
+    currency: currency || "AUD",
   }).format(price);
 };
 

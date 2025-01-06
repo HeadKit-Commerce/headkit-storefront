@@ -8,7 +8,7 @@ import { cn, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "@/contexts/app-context";
 import { Icon } from "../icon";
 import { removeCartItem, updateCartItem } from "@/lib/headkit/actions";
-
+import { currencyFormatter } from "@/lib/utils";
 interface Props {
   type: "cart" | "order";
   cartItem?: CartItemFragment;
@@ -33,7 +33,7 @@ const CartItem = ({
   removeable = true,
   priceIncludeTax = false,
 }: Props) => {
-  const { toggleCartDrawer, setCartData, currencyFormatter, isGlobalDisabled } =
+  const { toggleCartDrawer, setCartData, isGlobalDisabled } =
     useAppContext();
 
   const [loading, startTransition] = useTransition();

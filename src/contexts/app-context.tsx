@@ -19,11 +19,6 @@ interface AppContextActions {
   setCartData: (cartData: Cart | null) => void;
   setIsGlobalDisabled: (isGlobalDisabled: boolean) => void;
   setWishlists: (wishlists: number[]) => void;
-  currencyFormatter: (formatterData: {
-    price: number;
-    lang?: string;
-    currency?: string | null | undefined;
-  }) => string;
   setStripeConfig: (config: StripeConfig | null) => void;
 }
 
@@ -120,12 +115,6 @@ export const AppContextProvider = ({
     },
     setWishlists: (wishlists: number[]) => {
       dispatch({ type: "SET_WISHLISTS", payload: wishlists });
-    },
-    currencyFormatter: ({ price, lang, currency }) => {
-      return new Intl.NumberFormat(lang || state.initLang, {
-        style: "currency",
-        currency: currency || state.initCurrency,
-      }).format(price);
     },
     setStripeConfig: (config: StripeConfig | null) => {
       dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
