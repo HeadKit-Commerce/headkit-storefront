@@ -28,13 +28,13 @@ const BrandCarousel = ({ brands }: Props) => {
       }}
       className="w-full"
     >
-      <CarouselContent>
+      <CarouselContent className="-ml-[30px]">
         {brands.map(
           (item, index) =>
             item?.thumbnail && (
               <CarouselItem
                 key={index}
-                className="basis-1/2 md:basis-1/3 lg:basis-1/5"
+                className="basis-1/2 md:basis-1/3 lg:basis-1/5 pl-[30px]"
               >
                 <div className="relative h-[50px] w-[160px]">
                   <Image

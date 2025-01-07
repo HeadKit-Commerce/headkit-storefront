@@ -183,7 +183,7 @@ export function ExpressCheckoutButton({
           },
           layout: {
             maxRows: 1,
-            overflow: "auto",
+            overflow: "never",
           },
           buttonHeight: 40,
           paymentMethods: {

@@ -47,44 +47,39 @@ export default async function Page({ params }: Props) {
           highlightedText={highlightedText}
           image={post?.data?.post?.featuredImage?.node?.sourceUrl || ""}
         />
-        <div className="my-[40px] grid grid-cols-12 gap-8 px-[20px] md:px-[40px]">
-          <div className="col-span-9">
-            <div className="post-content">
-              <div
-                dangerouslySetInnerHTML={{ __html: sanitize(post?.data?.post?.content || "") }}
-              ></div>
-            </div>
+        <div className="my-[40px] grid grid-cols-12 gap-2 md:gap-8 px-[20px] md:px-[40px]">
+          <div className="col-span-12 md:col-span-9">
+            <div
+              className="prose"
+              dangerouslySetInnerHTML={{ __html: sanitize(post?.data?.post?.content || "") }}
+            />
           </div>
         </div>
 
-        <div className="overflow-hidden">
-          {(postNews?.data?.posts?.nodes?.length ?? 0) > 0 && (
-            <div className="bg-sand-2 py-[30px] lg:pt-[60px] lg:pb-[30px]">
-              <div className="container mx-auto">
-                <SectionHeader
-                  title="Latest News"
-                  description="Get the latest news and updates from our blog."
-                  allButton="View All"
-                  allButtonPath="/posts"
-                />
-                <div className="mt-5 px-5 lg:mt-[30px]">
-                  <PostCarousel
-                    posts={
-                      postNews?.data?.posts?.nodes.map((post) => ({
-                        title: post?.title || "",
-                        slug: post?.slug || "",
-                        featuredImage: {
-                          src: post?.featuredImage?.node?.sourceUrl || "",
-                          alt: post?.title || "",
-                        },
-                      })) ?? []
-                    }
-                  />
-                </div>
-              </div>
+        {(postNews?.data?.posts?.nodes?.length ?? 0) > 0 && (
+          <div className="overflow-hidden px-5 md:px-10 py-[30px] lg:pt-[60px] lg:pb-[30px]">
+            <SectionHeader
+              title="Latest News"
+              description="Get the latest news and updates from our blog."
+              allButton="View All"
+              allButtonPath="/posts"
+            />
+            <div className="mt-5">
+              <PostCarousel
+                posts={
+                  postNews?.data?.posts?.nodes.map((post) => ({
+                    title: post?.title || "",
+                    slug: post?.slug || "",
+                    featuredImage: {
+                      src: post?.featuredImage?.node?.sourceUrl || "",
+                      alt: post?.title || "",
+                    },
+                  })) ?? []
+                }
+              />
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

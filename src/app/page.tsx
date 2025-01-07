@@ -45,7 +45,7 @@ export default async function Home() {
     <>
       {(mainCarousel?.data?.carousels?.nodes?.length ?? 0) > 0 && (
         <div className="overflow-hidden">
-          <div className="px-5 md:px-10">
+          <div className="mx-5">
             <MainCarousel carouselData={mainCarousel.data.carousels} />
           </div>
         </div>
