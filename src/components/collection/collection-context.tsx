@@ -82,11 +82,22 @@ export function CollectionProvider({
       page: initialPage,
     };
 
+    // Check if we're on a brand page first
+    const isBrandPage = pathname.startsWith('/brand/');
+    const brandFromPath = isBrandPage ? pathname.split('/').pop() : undefined;
+
+    // If we're on a brand page, use that brand and ignore URL brand params
+    if (brandFromPath) {
+      initialValues.brands = [brandFromPath];
+    } else {
+      // Only parse brands from URL if we're not on a brand page
+      const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
+      if (brands.length) initialValues.brands = brands;
+    }
+
     // Parse categories and brands
     const categories = searchParams.get("categories")?.split(",").filter(Boolean) || [];
-    const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
     if (categories.length) initialValues.categories = categories;
-    if (brands.length) initialValues.brands = brands;
 
     // Parse attributes from productFilter
     productFilter?.productFilters?.attributes?.forEach((attr) => {
@@ -130,13 +141,26 @@ export function CollectionProvider({
 
     try {
       setLoadingState(true);
-      // Only get categorySlug for non-special pages
-      const categorySlug = SPECIAL_PAGES.includes(pathname) ? undefined : pathname.split("/").pop();
+      
+      // Only get categorySlug for non-special pages and non-brand pages
+      const categorySlug = SPECIAL_PAGES.includes(pathname) || pathname.startsWith('/brand/') 
+        ? undefined 
+        : pathname.split("/").pop();
+
+      // Create a copy of filterValues to avoid mutating state directly
+      const queryFilters = { ...filterValues };
+
+      // For brand pages, always ensure the correct brand is set
+      if (pathname.startsWith('/brand/')) {
+        const brandSlug = pathname.split('/').pop();
+        console.log("Brand slug:", brandSlug);
+        queryFilters.brands = brandSlug ? [brandSlug] : [];
+      }
 
       const { data: fetchedProducts } = await getProductList({
         input: {
           where: makeWhereProductQuery({
-            filterQuery: filterValues,
+            filterQuery: queryFilters,
             categorySlug,
             page: pageIndex,
             perPage: itemsPerPage,
@@ -223,6 +247,27 @@ export function CollectionProvider({
       fetchProducts(currentPage - 1, "before");
     }
   };
+
+  // Add this effect after other useEffects
+  useEffect(() => {
+    const isBrandPage = pathname.startsWith('/brand/');
+    const brandFromPath = isBrandPage ? pathname.split('/').pop() : undefined;
+
+    // Update brand filter when pathname changes
+    if (isBrandPage && brandFromPath) {
+      setFilterValues(prev => ({
+        ...prev,
+        brands: [brandFromPath]
+      }));
+    } else if (!isBrandPage && filterValues.brands.length === 1 && !searchParams.get("brands")) {
+      // Clear brand filter when leaving brand page if it wasn't set by URL params
+      setFilterValues(prev => ({
+        ...prev,
+        brands: []
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <CollectionContext.Provider

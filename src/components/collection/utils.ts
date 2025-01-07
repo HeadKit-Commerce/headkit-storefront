@@ -53,7 +53,10 @@ interface QueryParams {
   newIn?: boolean;
 }
 
-const makeTaxonomyFilter = (slug: string, terms: string[]): ProductTaxonomyFilterInput => {
+const makeTaxonomyFilter = (
+  slug: string,
+  terms: string[]
+): ProductTaxonomyFilterInput => {
   let taxonomy: ProductTaxonomyEnum;
   switch (slug) {
     case "categories":
@@ -111,7 +114,10 @@ export const makeWhereProductQuery = ({
   }
 
   // Handle attribute filters
-  if (filterQuery.attributes && Object.keys(filterQuery.attributes).length > 0) {
+  if (
+    filterQuery.attributes &&
+    Object.keys(filterQuery.attributes).length > 0
+  ) {
     Object.entries(filterQuery.attributes)
       .filter(([, values]) => values.length > 0)
       .forEach(([key, values]) => {
@@ -137,28 +143,52 @@ export const makeWhereProductQuery = ({
     where.orderby = [];
     switch (filterQuery.sort) {
       case "FEATURED":
-        where.orderby.push({ field: ProductsOrderByEnum.MenuOrder, order: OrderEnum.Asc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.MenuOrder,
+          order: OrderEnum.Asc,
+        });
         break;
       case "BEST_SELLING":
-        where.orderby.push({ field: ProductsOrderByEnum.Rating, order: OrderEnum.Desc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Rating,
+          order: OrderEnum.Desc,
+        });
         break;
       case "CREATED_AT":
-        where.orderby.push({ field: ProductsOrderByEnum.Date, order: OrderEnum.Desc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Date,
+          order: OrderEnum.Desc,
+        });
         break;
       case "CREATED_AT_DESC":
-        where.orderby.push({ field: ProductsOrderByEnum.Date, order: OrderEnum.Asc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Date,
+          order: OrderEnum.Asc,
+        });
         break;
       case "PRICE":
-        where.orderby.push({ field: ProductsOrderByEnum.Price, order: OrderEnum.Asc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Price,
+          order: OrderEnum.Asc,
+        });
         break;
       case "PRICE_DESC":
-        where.orderby.push({ field: ProductsOrderByEnum.Price, order: OrderEnum.Desc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Price,
+          order: OrderEnum.Desc,
+        });
         break;
       case "TITLE":
-        where.orderby.push({ field: ProductsOrderByEnum.Name, order: OrderEnum.Asc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Name,
+          order: OrderEnum.Asc,
+        });
         break;
       case "TITLE_DESC":
-        where.orderby.push({ field: ProductsOrderByEnum.Name, order: OrderEnum.Desc });
+        where.orderby.push({
+          field: ProductsOrderByEnum.Name,
+          order: OrderEnum.Desc,
+        });
         break;
     }
   }
@@ -186,8 +216,7 @@ export const makeWhereProductQuery = ({
   }
 
   return where;
-}; 
-
+};
 
 export const makeBreadcrumbFromProductCategoryData = (
   data: GetProductCategoryQuery
