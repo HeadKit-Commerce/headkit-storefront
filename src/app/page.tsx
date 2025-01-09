@@ -30,8 +30,10 @@ export default async function Home() {
     headkit().getPosts({ first: 10 }),
   ]);
 
+  console.log(page);
+
   const editorBlocks = processBlockEditor(
-    page?.data.page?.editorBlocks as (
+    page?.data?.page?.editorBlocks as (
       | CoreGroup
       | CoreHeading
       | CoreParagraph

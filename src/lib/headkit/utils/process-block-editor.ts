@@ -42,6 +42,9 @@ export const processBlockEditor = (
     | WoocommerceProductNew
   )[]
 ): ProcessedGroup[] => {
+  if (!blocks) {
+    return [];
+  }
   const result: ProcessedGroup[] = [];
   let currentGroup: ProcessedGroup | null = null;
   let validIds = new Set<string>();
