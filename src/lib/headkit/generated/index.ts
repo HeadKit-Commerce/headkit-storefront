@@ -1424,6 +1424,14 @@ export type BrandToTaxonomyConnectionEdge = Edge & OneToOneConnection & Taxonomy
   node: Taxonomy;
 };
 
+export type Branding = {
+  __typename?: 'Branding';
+  iconUrl: Scalars['String']['output'];
+  logoUrl: Scalars['String']['output'];
+  primaryColor: Scalars['String']['output'];
+  secondaryColor: Scalars['String']['output'];
+};
+
 /** A Gravity Forms captcha field. */
 export type CaptchaField = FormField & GfFieldWithCaptchaBackgroundSetting & GfFieldWithCaptchaBadgeSetting & GfFieldWithCaptchaForegroundSetting & GfFieldWithCaptchaLanguageSetting & GfFieldWithCaptchaSizeSetting & GfFieldWithCaptchaThemeSetting & GfFieldWithCaptchaTypeSetting & GfFieldWithConditionalLogicSetting & GfFieldWithCssClassSetting & GfFieldWithDescriptionSetting & GfFieldWithErrorMessageSetting & GfFieldWithLabelPlacementSetting & GfFieldWithLabelSetting & Node & {
   __typename?: 'CaptchaField';
@@ -11721,6 +11729,7 @@ export type CreatePatternsAiDataPayload = {
 export type CreatePaymentIntentInput = {
   amount: Scalars['Int']['input'];
   currency: Scalars['String']['input'];
+  liveMode?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /** Input for the createPostFormat mutation. */
@@ -34230,6 +34239,7 @@ export type Query = {
   allowedCountries?: Maybe<Array<Maybe<CountriesEnum>>>;
   /** A 0bject */
   brand?: Maybe<Brand>;
+  branding: Branding;
   /** Connection between the RootQuery type and the brand type */
   brands?: Maybe<RootQueryToBrandConnection>;
   /** An object of the carousel Type.  */
@@ -41318,7 +41328,8 @@ export enum StockStatusEnum {
 export type StripeConfig = {
   __typename?: 'StripeConfig';
   accountId: Scalars['String']['output'];
-  publishableKey: Scalars['String']['output'];
+  publishableKeyLive?: Maybe<Scalars['String']['output']>;
+  publishableKeyTest: Scalars['String']['output'];
 };
 
 /** The Confirmation object returned on submission. Null if the submission was not successful. */
@@ -52394,6 +52405,11 @@ export type GetBrandQueryVariables = Exact<{
 
 export type GetBrandQuery = { __typename?: 'Query', brand?: { __typename?: 'Brand', id: string, name?: string | null, description?: string | null, databaseId: number, thumbnail?: string | null } | null };
 
+export type GetBrandingQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBrandingQuery = { __typename?: 'Query', branding: { __typename?: 'Branding', logoUrl: string, iconUrl: string, primaryColor: string, secondaryColor: string } };
+
 export type GetBrandsQueryVariables = Exact<{
   where?: InputMaybe<RootQueryToBrandConnectionWhereArgs>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -52583,7 +52599,7 @@ export type GetProductsQuery = { __typename?: 'Query', products?: { __typename?:
 export type GetStripeConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStripeConfigQuery = { __typename?: 'Query', stripeConfig: { __typename?: 'StripeConfig', publishableKey: string, accountId: string } };
+export type GetStripeConfigQuery = { __typename?: 'Query', stripeConfig: { __typename?: 'StripeConfig', publishableKeyTest: string, publishableKeyLive?: string | null, accountId: string } };
 
 export const BrandFieldsFragmentDoc = gql`
     fragment BrandFields on Brand {
@@ -53589,6 +53605,16 @@ export const GetBrandDocument = gql`
   }
 }
     `;
+export const GetBrandingDocument = gql`
+    query getBranding {
+  branding {
+    logoUrl
+    iconUrl
+    primaryColor
+    secondaryColor
+  }
+}
+    `;
 export const GetBrandsDocument = gql`
     query getBrands($where: RootQueryToBrandConnectionWhereArgs, $first: Int, $last: Int, $after: String, $before: String) {
   brands(
@@ -54416,7 +54442,8 @@ export const GetProductsDocument = gql`
 export const GetStripeConfigDocument = gql`
     query getStripeConfig {
   stripeConfig {
-    publishableKey
+    publishableKeyTest
+    publishableKeyLive
     accountId
   }
 }
@@ -54444,6 +54471,7 @@ const UpdateItemQuantitiesDocumentString = print(UpdateItemQuantitiesDocument);
 const UpdateShippingMethodDocumentString = print(UpdateShippingMethodDocument);
 const GetAvailablePaymentMethodsDocumentString = print(GetAvailablePaymentMethodsDocument);
 const GetBrandDocumentString = print(GetBrandDocument);
+const GetBrandingDocumentString = print(GetBrandingDocument);
 const GetBrandsDocumentString = print(GetBrandsDocument);
 const GetCarouselDocumentString = print(GetCarouselDocument);
 const GetCartDocumentString = print(GetCartDocument);
@@ -54523,6 +54551,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getBrand(variables: GetBrandQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetBrandQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetBrandQuery>(GetBrandDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBrand', 'query', variables);
+    },
+    getBranding(variables?: GetBrandingQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetBrandingQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetBrandingQuery>(GetBrandingDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBranding', 'query', variables);
     },
     getBrands(variables?: GetBrandsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetBrandsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetBrandsQuery>(GetBrandsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getBrands', 'query', variables);

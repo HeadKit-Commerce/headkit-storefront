@@ -1,0 +1,8 @@
+query getBranding {
+  branding {
+    logoUrl
+    iconUrl
+    primaryColor
+    secondaryColor
+  }
+}

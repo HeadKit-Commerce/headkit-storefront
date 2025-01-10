@@ -1,6 +1,7 @@
 query getStripeConfig {
   stripeConfig {
-    publishableKey
+    publishableKeyTest
+    publishableKeyLive
     accountId
   }
 }

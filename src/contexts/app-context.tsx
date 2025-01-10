@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useReducer, useEffect } from "react";
-import { Cart, StripeConfig } from "@/lib/headkit/generated";
+import { Branding, Cart, StripeConfig } from "@/lib/headkit/generated";
 import { getStripeConfig } from "@/lib/headkit/actions";
+import { getBranding } from "@/lib/headkit/actions";
 
 interface AppContextState {
   cartDrawer: boolean;
@@ -11,7 +12,13 @@ interface AppContextState {
   wishlists: number[];
   initLang: string;
   initCurrency: string;
-  stripeConfig: StripeConfig | null;
+  stripeConfig: {
+    publishableKey: string;
+    accountId: string;
+  } | null;
+  stripeFullConfig: StripeConfig | null;
+  isLiveMode: boolean;
+  brandingData: Branding | null;
 }
 
 interface AppContextActions {
@@ -19,7 +26,8 @@ interface AppContextActions {
   setCartData: (cartData: Cart | null) => void;
   setIsGlobalDisabled: (isGlobalDisabled: boolean) => void;
   setWishlists: (wishlists: number[]) => void;
-  setStripeConfig: (config: StripeConfig | null) => void;
+  setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => void;
+  setIsLiveMode: (isLiveMode: boolean) => void;
 }
 
 type AppContextValue = AppContextState & AppContextActions;
@@ -42,6 +50,9 @@ const initialState: AppContextState = {
   initLang: "en-AU",
   initCurrency: "AUD",
   stripeConfig: null,
+  stripeFullConfig: null,
+  isLiveMode: process.env.NODE_ENV === 'production',
+  brandingData: null,
 };
 
 type AppContextAction =
@@ -50,7 +61,10 @@ type AppContextAction =
   | { type: "SET_IS_LOGIN"; payload: boolean }
   | { type: "SET_IS_GLOBAL_DISABLED"; payload: boolean }
   | { type: "SET_WISHLISTS"; payload: number[] }
-  | { type: "SET_STRIPE_CONFIG"; payload: StripeConfig | null };
+  | { type: "SET_STRIPE_CONFIG"; payload: { publishableKey: string; accountId: string } | null }
+  | { type: "SET_IS_LIVE_MODE"; payload: boolean }
+  | { type: "SET_STRIPE_FULL_CONFIG"; payload: StripeConfig | null }
+  | { type: "SET_BRANDING_DATA"; payload: Branding | null };
 
 const reducer = (
   state: AppContextState,
@@ -71,6 +85,12 @@ const reducer = (
       return { ...state, wishlists: action.payload };
     case "SET_STRIPE_CONFIG":
       return { ...state, stripeConfig: action.payload };
+    case "SET_IS_LIVE_MODE":
+      return { ...state, isLiveMode: action.payload };
+    case "SET_STRIPE_FULL_CONFIG":
+      return { ...state, stripeFullConfig: action.payload };
+    case "SET_BRANDING_DATA":
+      return { ...state, brandingData: action.payload };
     default:
       return state;
   }
@@ -94,13 +114,46 @@ export const AppContextProvider = ({
       try {
         const response = await getStripeConfig();
         if (response?.data?.stripeConfig) {
-          dispatch({ type: "SET_STRIPE_CONFIG", payload: response.data.stripeConfig });
+          dispatch({
+            type: "SET_STRIPE_FULL_CONFIG",
+            payload: response.data.stripeConfig
+          });
         }
       } catch (error) {
         console.error('Error fetching stripe config:', error);
       }
     };
     fetchStripeConfig();
+  }, []);
+
+  useEffect(() => {
+    if (state.stripeFullConfig) {
+      const key = state.isLiveMode && state.stripeFullConfig.publishableKeyLive
+        ? state.stripeFullConfig.publishableKeyLive
+        : state.stripeFullConfig.publishableKeyTest;
+
+      dispatch({
+        type: "SET_STRIPE_CONFIG",
+        payload: { publishableKey: key, accountId: state.stripeFullConfig.accountId }
+      });
+    }
+  }, [state.isLiveMode, state.stripeFullConfig]);
+
+  useEffect(() => {
+    const fetchBranding = async () => {
+      try {
+        const response = await getBranding();
+        if (response?.data?.branding) {
+          dispatch({
+            type: "SET_BRANDING_DATA",
+            payload: response.data.branding
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching branding:', error);
+      }
+    };
+    fetchBranding();
   }, []);
 
   const actions: AppContextActions = {
@@ -116,8 +169,11 @@ export const AppContextProvider = ({
     setWishlists: (wishlists: number[]) => {
       dispatch({ type: "SET_WISHLISTS", payload: wishlists });
     },
-    setStripeConfig: (config: StripeConfig | null) => {
+    setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => {
       dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
+    },
+    setIsLiveMode: (isLiveMode: boolean) => {
+      dispatch({ type: "SET_IS_LIVE_MODE", payload: isLiveMode });
     },
   };
 

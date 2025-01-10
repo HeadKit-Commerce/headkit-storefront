@@ -30,6 +30,7 @@ import { CONFIG } from "@/config/app-config";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { Transition } from "@headlessui/react";
+import Image from "next/image";
 
 interface Props {
   menus: Record<
@@ -50,7 +51,7 @@ interface Props {
 }
 
 function Header({ menus }: Props) {
-  const { wishlists } = useAppContext();
+  const { wishlists, brandingData } = useAppContext();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -79,8 +80,8 @@ function Header({ menus }: Props) {
         <NavigationMenuList>
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
-              <Link href="/">
-                <Icon.logo className="h-8 md:h-9 w-auto" />
+              <Link href="/" className="cursor-pointer">
+                {brandingData?.logoUrl ? <Image src={brandingData?.logoUrl} alt="Logo" width={0} height={0} className="h-8 md:h-9 w-auto" /> : <Icon.logo className="h-8 md:h-9 w-auto" />}
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>

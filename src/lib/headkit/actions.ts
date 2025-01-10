@@ -488,6 +488,11 @@ export async function getBrand({ slug }: { slug: string }) {
   return response;
 }
 
+export async function getBranding() {
+  const response = await headkit().getBranding();
+  return response;
+}
+
 export {
   getCustomer,
   updateCustomer,
