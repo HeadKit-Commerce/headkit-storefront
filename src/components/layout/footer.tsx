@@ -1,13 +1,11 @@
-"use client";
-
 import Link from "next/link";
 import { Icon } from "../icon";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
-import { useAppContext } from "@/contexts/app-context";
 import Image from "next/image";
+import config from "../../../headkit.config";
 
 interface FooterProps {
   menus: Record<
@@ -49,7 +47,6 @@ const SubscriptionBox = () => {
 };
 
 const Footer = ({ menus }: FooterProps) => {
-  const { brandingData } = useAppContext();
   const footerMenu = menus[MenuLocationEnum.Footer];
   const footer2Menu = menus[MenuLocationEnum.Footer_2];
   const footerPolicyMenu = menus[MenuLocationEnum.FooterPolicy];
@@ -63,7 +60,7 @@ const Footer = ({ menus }: FooterProps) => {
             <div className="shrink-0 pr-4">
               <Link href="/" className="mr-4" aria-label="home">
                 <div className="relative h-auto w-full max-w-[60px] hover:opacity-70">
-                  {brandingData?.iconUrl ? <Image src={brandingData?.iconUrl} alt="Logo" sizes="20vw" width={0} height={0} className="h-8 md:h-9 w-auto" /> : <Icon.monoLogo />}
+                  { config ?.logo ? <Image src={ config ?.logo} alt="Logo" sizes="20vw" width={0} height={0} className="h-9 w-auto" /> : <Icon.monoLogo />}
                 </div>
               </Link>
             </div>

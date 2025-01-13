@@ -1,4 +1,5 @@
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { removeHtmlTags } from "@/lib/utils";
 import { Metadata } from "next";
 import { PostTypeSeoContentFragment } from "../generated";
@@ -11,10 +12,10 @@ interface RootMetadata {
 const makeRootMetadata = ({ title, description }: RootMetadata): Metadata => {
   return {
     title: {
-      template: `%s | ${CONFIG.metadata.appName}`,
-      default: title || CONFIG.metadata.appName,
+      template: `%s | ${ config .metadata.appName}`,
+      default: title ||  config .metadata.appName,
     },
-    description: description || CONFIG.metadata.description,
+    description: description ||  config .metadata.description,
   };
 };
 
@@ -25,7 +26,7 @@ const makeSEOMetadata = (
   options?: { fallback?: Metadata; override?: Metadata }
 ): Metadata => {
   const title =
-    seo?.title || options?.fallback?.title || CONFIG.metadata.appName;
+    seo?.title || options?.fallback?.title ||  config .metadata.appName;
   const description = removeHtmlTags(
     options?.override?.description ||
       seo?.metaDesc ||
@@ -34,7 +35,7 @@ const makeSEOMetadata = (
       seo?.opengraphDescription ||
       options?.override?.twitter?.description ||
       seo?.twitterDescription ||
-      CONFIG.metadata.description
+       config .metadata.description
   );
   const keywords =
     options?.override?.keywords ||
@@ -57,7 +58,7 @@ const makeSEOMetadata = (
     seo?.opengraphImage?.sourceUrl ||
     (options?.fallback?.openGraph?.images as unknown as { url: string }[])?.[0]
       ?.url ||
-    CONFIG.metadata.openGraphImageFallback;
+     config .metadata.openGraphImageFallback;
 
   const openGraphAltText =
     (
@@ -67,7 +68,7 @@ const makeSEOMetadata = (
     (
       options?.fallback?.openGraph?.images as unknown as { altText: string }[]
     )?.[0]?.altText ||
-    CONFIG.metadata.openGraphImageFallback;
+     config .metadata.openGraphImageFallback;
 
   const twitterImage =
     (options?.override?.twitter?.images as unknown as { url: string }[])?.[0]
@@ -75,7 +76,7 @@ const makeSEOMetadata = (
     seo?.twitterImage?.sourceUrl ||
     (options?.fallback?.twitter?.images as unknown as { url: string }[])?.[0]
       ?.url ||
-    CONFIG.metadata.openGraphImageFallback;
+     config .metadata.openGraphImageFallback;
 
   const twitterAltText =
     (options?.override?.twitter?.images as unknown as { altText: string }[])?.[0]
@@ -83,7 +84,7 @@ const makeSEOMetadata = (
     seo?.twitterImage?.altText ||
     (options?.fallback?.twitter?.images as unknown as { altText: string }[])?.[0]
       ?.altText ||
-    CONFIG.metadata.openGraphImageFallback;
+     config .metadata.openGraphImageFallback;
 
   const openGraph = {
     type: "website",
@@ -92,13 +93,13 @@ const makeSEOMetadata = (
       seo?.opengraphTitle ||
       seo?.title ||
       options?.fallback?.title ||
-      CONFIG.metadata.appName,
+       config .metadata.appName,
     description: removeHtmlTags(
       options?.override?.openGraph?.description ||
         seo?.opengraphDescription ||
         seo?.metaDesc ||
         options?.fallback?.description ||
-        CONFIG.metadata.description ||
+         config .metadata.description ||
         ""
     ),
     url: options?.override?.openGraph?.url || "",
@@ -121,12 +122,12 @@ const makeSEOMetadata = (
       seo?.twitterTitle ||
       seo?.title ||
       options?.fallback?.title ||
-      CONFIG.metadata.appName,
+       config .metadata.appName,
     description: removeHtmlTags(
       options?.override?.twitter?.description ||
         seo?.twitterDescription ||
         seo?.metaDesc ||
-        CONFIG.metadata.description ||
+         config .metadata.description ||
         ""
     ),
     ...(twitterImage && {

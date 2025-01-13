@@ -3,7 +3,8 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { BadgeList } from "./badge-list";
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Lightbox } from "@/components/ui/lightbox";
 
@@ -56,7 +57,7 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
                       src={item?.src}
                       alt={item?.alt || "image"}
                       fill
-                      className="object-contain"
+                      className="object-cover"
                       sizes="(max-width: 768px) 100vw, 50vw"
                       quality={100}
                       priority={index === 0}
@@ -94,12 +95,12 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
                     <div className="relative aspect-square bg-white">
                       <Image
                         priority={i === 0}
-                        src={image?.src || CONFIG.fallbackProductImage}
+                        src={image?.src || config.fallbackProductImage}
                         alt={image?.alt || ""}
                         fill
-                        className="object-contain object-center"
+                        className="object-cover object-center"
                         placeholder="blur"
-                        blurDataURL={CONFIG.fallbackProductImage}
+                        blurDataURL={config.fallbackProductImage}
                         sizes="100vw"
                       />
                     </div>

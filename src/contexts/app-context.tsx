@@ -3,7 +3,6 @@
 import { createContext, ReactNode, useContext, useReducer, useEffect } from "react";
 import { Branding, Cart, StripeConfig } from "@/lib/headkit/generated";
 import { getStripeConfig } from "@/lib/headkit/actions";
-import { getBranding } from "@/lib/headkit/actions";
 
 interface AppContextState {
   cartDrawer: boolean;
@@ -61,9 +60,9 @@ type AppContextAction =
   | { type: "SET_IS_LOGIN"; payload: boolean }
   | { type: "SET_IS_GLOBAL_DISABLED"; payload: boolean }
   | { type: "SET_WISHLISTS"; payload: number[] }
-  | { type: "SET_STRIPE_CONFIG"; payload: { publishableKey: string; accountId: string } | null }
+  | { type: "SET_STRIPE_ config "; payload: { publishableKey: string; accountId: string } | null }
   | { type: "SET_IS_LIVE_MODE"; payload: boolean }
-  | { type: "SET_STRIPE_FULL_CONFIG"; payload: StripeConfig | null }
+  | { type: "SET_STRIPE_FULL_ config "; payload: StripeConfig | null }
   | { type: "SET_BRANDING_DATA"; payload: Branding | null };
 
 const reducer = (
@@ -83,11 +82,11 @@ const reducer = (
       return { ...state, isGlobalDisabled: action.payload };
     case "SET_WISHLISTS":
       return { ...state, wishlists: action.payload };
-    case "SET_STRIPE_CONFIG":
+    case "SET_STRIPE_ config ":
       return { ...state, stripeConfig: action.payload };
     case "SET_IS_LIVE_MODE":
       return { ...state, isLiveMode: action.payload };
-    case "SET_STRIPE_FULL_CONFIG":
+    case "SET_STRIPE_FULL_ config ":
       return { ...state, stripeFullConfig: action.payload };
     case "SET_BRANDING_DATA":
       return { ...state, brandingData: action.payload };
@@ -115,7 +114,7 @@ export const AppContextProvider = ({
         const response = await getStripeConfig();
         if (response?.data?.stripeConfig) {
           dispatch({
-            type: "SET_STRIPE_FULL_CONFIG",
+            type: "SET_STRIPE_FULL_ config ",
             payload: response.data.stripeConfig
           });
         }
@@ -133,28 +132,28 @@ export const AppContextProvider = ({
         : state.stripeFullConfig.publishableKeyTest;
 
       dispatch({
-        type: "SET_STRIPE_CONFIG",
+        type: "SET_STRIPE_ config ",
         payload: { publishableKey: key, accountId: state.stripeFullConfig.accountId }
       });
     }
   }, [state.isLiveMode, state.stripeFullConfig]);
 
-  useEffect(() => {
-    const fetchBranding = async () => {
-      try {
-        const response = await getBranding();
-        if (response?.data?.branding) {
-          dispatch({
-            type: "SET_BRANDING_DATA",
-            payload: response.data.branding
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching branding:', error);
-      }
-    };
-    fetchBranding();
-  }, []);
+  // useEffect(() => {
+  //   const fetchBranding = async () => {
+  //     try {
+  //       const response = await getBranding();
+  //       if (response?.data?.branding) {
+  //         dispatch({
+  //           type: "SET_BRANDING_DATA",
+  //           payload: response.data.branding
+  //         });
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching branding:', error);
+  //     }
+  //   };
+  //   fetchBranding();
+  // }, []);
 
   const actions: AppContextActions = {
     toggleCartDrawer: (enable?: boolean) => {
@@ -170,7 +169,7 @@ export const AppContextProvider = ({
       dispatch({ type: "SET_WISHLISTS", payload: wishlists });
     },
     setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => {
-      dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
+      dispatch({ type: "SET_STRIPE_ config ", payload: config });
     },
     setIsLiveMode: (isLiveMode: boolean) => {
       dispatch({ type: "SET_IS_LIVE_MODE", payload: isLiveMode });

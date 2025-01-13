@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { FeaturedImage } from "../product/featured-image";
 
 interface Props {
@@ -12,7 +13,7 @@ interface Props {
 }
 const PostCard = ({ title, image, uri, textStyle = "dark" }: Props) => {
   return (
-    <Link href={`${CONFIG.article.link}/${uri}`}>
+    <Link href={`${ config .article.link}/${uri}`}>
       <div className="w-full ">
         <FeaturedImage sourceUrl={image} />
 

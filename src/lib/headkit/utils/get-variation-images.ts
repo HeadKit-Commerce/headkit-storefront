@@ -1,4 +1,5 @@
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { ProductVariationContentFragment } from "../generated";
 
 const getVariationImages = (
@@ -8,7 +9,7 @@ const getVariationImages = (
 ): { src: string; alt: string }[] => {
   const variationImages = [
     {
-      src: product.image?.sourceUrl || CONFIG.fallbackProductImage,
+      src: product.image?.sourceUrl ||  config .fallbackProductImage,
       alt: product.image?.altText || "product",
     },
   ];

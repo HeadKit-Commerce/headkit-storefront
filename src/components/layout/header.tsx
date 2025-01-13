@@ -26,7 +26,8 @@ import { Button } from "../ui/button";
 import { SearchDrawer } from "./search-drawer";
 import { useAuth } from "@/contexts/auth-context";
 import { useAppContext } from "@/contexts/app-context";
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { Transition } from "@headlessui/react";
@@ -51,7 +52,7 @@ interface Props {
 }
 
 function Header({ menus }: Props) {
-  const { wishlists, brandingData } = useAppContext();
+  const { wishlists } = useAppContext();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -81,7 +82,7 @@ function Header({ menus }: Props) {
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
               <Link href="/" className="cursor-pointer">
-                {brandingData?.logoUrl ? <Image src={brandingData?.logoUrl} alt="Logo" width={0} height={0} className="h-8 md:h-9 w-auto" /> : <Icon.logo className="h-8 md:h-9 w-auto" />}
+                { config ?.logo ? <Image src={ config ?.logo} alt="Logo" width={0} height={0} className="h-9 w-auto max-w-[160px] md:max-w-[200px]" /> : <Icon.logo className="h-9 w-auto max-w-[160px] md:max-w-[200px]" />}
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
@@ -240,7 +241,7 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
           ) : (
             <Link href={menuItem.payload.uri} legacyBehavior passHref>
               <NavigationMenuLink
-                className={`${navigationMenuTriggerStyle()} ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
+                className={`${navigationMenuTriggerStyle()} ${menuItem.payload.uri.replace(/\/$/, '') ===  config .sale.link.replace(/\/$/, '')
                   ? '!text-pink-500'
                   : ''
                   }`}
@@ -337,7 +338,7 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
           ) : (
             <Link
               href={menuItem.payload.uri}
-              className={`text-xl font-semibold ${menuItem.payload.uri.replace(/\/$/, '') === CONFIG.sale.link.replace(/\/$/, '')
+              className={`text-xl font-semibold ${menuItem.payload.uri.replace(/\/$/, '') ===  config .sale.link.replace(/\/$/, '')
                 ? 'text-pink-500'
                 : ''
                 }`}

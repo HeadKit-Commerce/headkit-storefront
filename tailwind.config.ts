@@ -26,6 +26,8 @@ const config: Config = {
         sans: ["var(--font-urbanist)"],
       },
       colors: {
+        secondary: "#7300ff",
+        primary: "#ff0000",
         purple: {
           "100": "#EAE3F2",
           "200": "#CAB9DF",

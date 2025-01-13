@@ -1,4 +1,5 @@
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import Image from "next/image";
 
 interface Props {
@@ -10,7 +11,7 @@ const FeaturedImage = ({ sourceUrl, alt }: Props) => {
     <>
       <div className="relative aspect-square overflow-hidden rounded-md bg-white">
         <Image
-          src={sourceUrl || CONFIG.fallbackProductImage}
+          src={sourceUrl || config.fallbackProductImage}
           alt={alt || ""}
           fill
           className="object-cover object-center"

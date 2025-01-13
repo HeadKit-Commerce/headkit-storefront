@@ -25,7 +25,8 @@ import { TextWithIcon } from "@/components/product/text-with-icon";
 import { Icon } from "@/components/icon";
 import { AvailabilityStatus } from "./availability-status";
 import { AddToCart } from "./add-to-cart";
-import { CONFIG } from "@/config/app-config";
+import config from "@/headkit.config";
+
 import { ExpressCheckout } from "@/components/stripe/express-checkout";
 import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
 import { getFloatVal } from "@/lib/utils";
@@ -53,7 +54,7 @@ export const ProductDetail = ({ product }: Props) => {
     const galleryImages =
       product?.attributes?.nodes.length === 1 && images.length === 1
         ? product?.galleryImages?.nodes.map((image) => ({
-          src: image?.sourceUrl || CONFIG.fallbackProductImage,
+          src: image?.sourceUrl ||  config .fallbackProductImage,
           alt: image?.altText || "product",
         })) || []
         : [];
@@ -69,11 +70,11 @@ export const ProductDetail = ({ product }: Props) => {
       setSelectedProduct(product);
       setImageVariableSelected([
         {
-          src: product?.image?.sourceUrl || CONFIG.fallbackProductImage,
+          src: product?.image?.sourceUrl ||  config .fallbackProductImage,
           alt: product?.image?.altText || "product",
         },
         ...(product?.galleryImages?.nodes?.map((image) => ({
-          src: image?.sourceUrl || CONFIG.fallbackProductImage,
+          src: image?.sourceUrl ||  config .fallbackProductImage,
           alt: image?.altText || "product",
         })) || []),
       ]);

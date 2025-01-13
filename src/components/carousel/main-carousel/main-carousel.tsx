@@ -104,7 +104,7 @@ export const MainCarousel = ({ carouselData }: Props) => {
             onChange={(index) => {
               onDotButtonClick(index);
             }}
-            className="!bottom-6"
+            className="!bottom-[240px] md:!bottom-6 flex"
           />
         )}
       </Carousel>
