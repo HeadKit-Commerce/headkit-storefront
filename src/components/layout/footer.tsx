@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import Image from "next/image";
-import config from "../../../headkit.config";
+import config from "@/headkit.config";
 
 interface FooterProps {
   menus: Record<
