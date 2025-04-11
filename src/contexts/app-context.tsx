@@ -50,7 +50,7 @@ const initialState: AppContextState = {
   initCurrency: "AUD",
   stripeConfig: null,
   stripeFullConfig: null,
-  isLiveMode: process.env.NODE_ENV === 'production',
+  isLiveMode: process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true',
   brandingData: null,
 };
 
