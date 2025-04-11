@@ -1,9 +1,109 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: var(--font-urbanist);
+
+  --color-secondary: #7300ff;
+  --color-primary: #ff0000;
+
+  --color-purple-100: #eae3f2;
+  --color-purple-200: #cab9df;
+  --color-purple-300: #b59cd3;
+  --color-purple-400: #9572c0;
+  --color-purple-500: #7f54b3;
+  --color-purple-600: #58397f;
+  --color-purple-700: #3b2654;
+  --color-purple-800: #23102e;
+  --color-purple-900: #0b050f;
+
+  --color-lime-100: #f9ffeb;
+  --color-lime-400: #dbfe87;
+  --color-lime-500: #cdfd5d;
+  --color-lime-800: #80b602;
+
+  --color-pink-500: #ed4395;
+  --color-pink-600: #e01577;
+  --color-pink-800: #a81059;
+
+  --color-blue-300: #a7e2f1;
+  --color-blue-500: #3ebfe0;
+  --color-blue-600: #1fa1c1;
+
+  --color-grey-100: #f5f5f4;
+  --color-grey-200: #ececea;
+  --color-grey-300: #e2e2df;
+  --color-grey-400: #d8d8d4;
+  --color-grey-500: #c5c5bf;
+  --color-grey-600: #a8a89f;
+  --color-grey-700: #76766b;
+  --color-grey-800: #56564e;
+
+  --color-yes: #80b602;
+  --color-maybe: #ffa333;
+  --color-no: #a81059;
+
+  --shadow-button: -3px 6px 8px 0px #23102e33;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 20px;
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 1440px) {
+    max-width: 1440px;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@layer utilities {
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
 }
 
 @layer base {

@@ -110,7 +110,7 @@ export default async function Home() {
             description={""}
             allButton={"All Brands"}
             allButtonPath={"/"}
-            className="!py-0"
+            className="py-0!"
           />
 
           <div className="mt-7">

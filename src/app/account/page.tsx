@@ -137,7 +137,7 @@ export default function Page() {
                       <input
                         type="email"
                         placeholder="Enter your email"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                         autoComplete="username"
                         {...field}
                       />
@@ -156,7 +156,7 @@ export default function Page() {
                       <input
                         type="password"
                         placeholder="Enter your password"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                         autoComplete="current-password"
                         {...field}
                       />
@@ -200,7 +200,7 @@ export default function Page() {
                         <input
                           type="text"
                           placeholder="First name"
-                          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                           {...field}
                         />
                       </FormControl>
@@ -218,7 +218,7 @@ export default function Page() {
                         <input
                           type="text"
                           placeholder="Last name"
-                          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                          className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                           {...field}
                         />
                       </FormControl>
@@ -237,7 +237,7 @@ export default function Page() {
                       <input
                         type="email"
                         placeholder="Enter your email"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                         autoComplete="email"
                         {...field}
                       />
@@ -256,7 +256,7 @@ export default function Page() {
                       <input
                         type="password"
                         placeholder="Create a password"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                         autoComplete="new-password"
                         {...field}
                       />
@@ -275,7 +275,7 @@ export default function Page() {
                       <input
                         type="password"
                         placeholder="Confirm your password"
-                        className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="w-full px-4 py-2 border rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary"
                         autoComplete="new-password"
                         {...field}
                       />

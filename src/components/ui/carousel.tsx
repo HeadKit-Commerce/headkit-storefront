@@ -206,7 +206,7 @@ const CarouselPrevious = React.forwardRef<
       variant={variant as "primary" | "secondary" | "ghost" | "link" | null}
       size={size}
       className={cn(
-        !canScrollPrev && "!hidden",
+        !canScrollPrev && "hidden!",
         "absolute h-8 w-8 rounded-full hidden md:flex items-center justify-center",
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
@@ -236,7 +236,7 @@ const CarouselNext = React.forwardRef<
       variant={variant as "primary" | "secondary" | "ghost" | "link" | null}
       size={size}
       className={cn(
-        !canScrollNext && "!hidden",
+        !canScrollNext && "hidden!",
         "absolute h-8 w-8 rounded-full hidden md:flex items-center justify-center",
         orientation === "horizontal"
           ? "-right-12 top-1/2 -translate-y-1/2"
@@ -279,12 +279,12 @@ const CarouselPagination = ({
           key={index}
           onClick={() => onChange(index)}
           className={cn(
-            "!w-2 !h-2 opacity-50 rounded-full inline-block cursor-pointer",
+            "w-2! h-2! opacity-50 rounded-full inline-block cursor-pointer",
             {
               "bg-black": theme === "light",
               "bg-black/80": theme === "dark",
             },
-            selectedIndex === index && "!opacity-100"
+            selectedIndex === index && "opacity-100!"
           )}
         />
       ))}

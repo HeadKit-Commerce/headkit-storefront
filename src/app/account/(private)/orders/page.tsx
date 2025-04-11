@@ -61,7 +61,7 @@ export default function Page() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-          <div className="bg-white rounded-lg shadow p-6 text-center">
+          <div className="bg-white rounded-lg shadow-sm p-6 text-center">
             <p className="text-gray-500 mb-4">You haven&apos;t placed any orders yet.</p>
             <Button asChild>
               <Link href="/shop">Start Shopping</Link>
@@ -81,7 +81,7 @@ export default function Page() {
             <Link
               key={order.databaseId}
               href={`/account/orders/${order.databaseId}`}
-              className="block bg-white rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+              className="block bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-center">
                 <div>

@@ -94,7 +94,7 @@ export function GiftCardForm({ emitClickEvent, onFormValid }: GiftCardFormProps)
                 <Input
                   {...field}
                   type="email"
-                  className="mt-2.5 !bg-[#E6E6E6] !bg-opacity-50"
+                  className="mt-2.5 bg-[#E6E6E6]! bg-opacity-50!"
                   placeholder="Recipient Email"
                 />
               </FormControl>
@@ -112,7 +112,7 @@ export function GiftCardForm({ emitClickEvent, onFormValid }: GiftCardFormProps)
                 <Input
                   {...field}
                   type="text"
-                  className="mt-2.5 !bg-[#E6E6E6] !bg-opacity-50"
+                  className="mt-2.5 bg-[#E6E6E6]! bg-opacity-50!"
                   placeholder="From Name"
                 />
               </FormControl>
@@ -129,7 +129,7 @@ export function GiftCardForm({ emitClickEvent, onFormValid }: GiftCardFormProps)
               <FormControl>
                 <Textarea
                   {...field}
-                  className="mb-2.5 mt-2.5 !bg-[#E6E6E6] !bg-opacity-50"
+                  className="mb-2.5 mt-2.5 bg-[#E6E6E6]! bg-opacity-50!"
                   placeholder="Add a special message to the recipient (eg. Happy Birthday! Best Wishes. Enjoy this awesome gift from me)"
                   rows={5}
                   maxLength={200}
@@ -180,7 +180,7 @@ export function GiftCardForm({ emitClickEvent, onFormValid }: GiftCardFormProps)
                   <Input
                     {...field}
                     type="date"
-                    className="mt-1.5 !bg-[#E6E6E6] !bg-opacity-50"
+                    className="mt-1.5 bg-[#E6E6E6]! bg-opacity-50!"
                     placeholder="Enter your delivery date"
                   />
                 </FormControl>

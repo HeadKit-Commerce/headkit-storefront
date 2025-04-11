@@ -51,7 +51,7 @@ export default function Page() {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">My Wishlist</h1>
         {wishlists.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <p className="text-gray-500 text-center py-8">
               Your wishlist is currently empty.
             </p>

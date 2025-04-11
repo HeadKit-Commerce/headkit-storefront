@@ -9,10 +9,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "bg-background text-foreground",
-        danger: "bg-gradient-to-r from-[#FDECF5] to-[#FCDAEA] border-pink-300",
-        warning: "bg-gradient-to-r from-[#FFF6EB] to-[#FFE3C2] border-orange-300",
-        success: "bg-gradient-to-r from-[#F9FFEB] to-[#F3FFD6] border-lime-500",
-        notice: "bg-gradient-to-r from-[#EDF9FC] to-[#CAEEF6] border-blue-300",
+        danger: "bg-linear-to-r from-[#FDECF5] to-[#FCDAEA] border-pink-300",
+        warning: "bg-linear-to-r from-[#FFF6EB] to-[#FFE3C2] border-orange-300",
+        success: "bg-linear-to-r from-[#F9FFEB] to-[#F3FFD6] border-lime-500",
+        notice: "bg-linear-to-r from-[#EDF9FC] to-[#CAEEF6] border-blue-300",
       },
     },
     defaultVariants: {

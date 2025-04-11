@@ -72,10 +72,10 @@ function Header({ menus }: Props) {
       />
       <NavigationMenu onValueChange={(val) => {
         setMenuOpen(!!val)
-      }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-sm")}>
+      }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-xs")}>
 
         <Transition show={menuOpen}>
-          <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-sm transition duration-300 ease-in-out data-[closed]:opacity-0 data-[leave]:opacity-0" />
+          <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-xs transition duration-300 ease-in-out data-closed:opacity-0 data-leave:opacity-0" />
         </Transition>
 
         <NavigationMenuList>
@@ -105,7 +105,7 @@ function Header({ menus }: Props) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden md:inline-flex !pr-0 relative justify-end"
+                  className="hidden md:inline-flex pr-0! relative justify-end"
                   aria-label="Wishlist"
                 >
                   <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-purple-500" />
@@ -124,7 +124,7 @@ function Header({ menus }: Props) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden md:inline-flex !pr-0 relative justify-end"
+                  className="hidden md:inline-flex pr-0! relative justify-end"
                   aria-label="Account"
                 >
                   <Icon.user className="h-6 w-6 stroke-purple-800 stroke-2 hover:stroke-purple-500" />
@@ -230,7 +230,7 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
               <NavigationMenuTrigger>
                 {menuItem.payload.label}
               </NavigationMenuTrigger>
-              <NavigationMenuContent className="!w-screen !rounded-none">
+              <NavigationMenuContent className="w-screen! rounded-none!">
                 <ul className="grid gap-5 w-full">
                   {menuItem.children.map((child) => (
                     <MenuItem key={child.id} menuItem={child} />
@@ -242,7 +242,7 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
             <Link href={menuItem.payload.uri} legacyBehavior passHref>
               <NavigationMenuLink
                 className={`${navigationMenuTriggerStyle()} ${menuItem.payload.uri.replace(/\/$/, '') ===  config .sale.link.replace(/\/$/, '')
-                  ? '!text-pink-500'
+                  ? 'text-pink-500!'
                   : ''
                   }`}
               >

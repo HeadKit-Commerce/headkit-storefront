@@ -28,7 +28,7 @@ export function ProductGrid() {
   } = useCollection();
 
   return (
-    <div className="px-5 md:px-10 z-[5]">
+    <div className="px-5 md:px-10 z-5">
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
         {isLoadingBefore && <LoadingSkeleton />}
         

@@ -20,7 +20,7 @@ export default function Page() {
   }, []);
 
   const renderEmptyCart = () => (
-    <div className="px-[20px] md:px-[32] pb-[30px] md:py-[60px] text-center">
+    <div className="px-[20px] md:px-32 pb-[30px] md:py-[60px] text-center">
       <div className="w-[500px] max-w-full mx-auto">
         <p className="mb-4 font-bold leading-10 ">
           No products in your cart!
@@ -55,7 +55,7 @@ export default function Page() {
       </div>
       <div className="order-1 md:order-2 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5">
         <div
-          className="px-[20px] md:px-[32] py-[17px] md:py-0 border-y-[1px] border-[#d6d6d6] md:border-0"
+          className="px-[20px] md:px-32 py-[17px] md:py-0 border-y-[1px] border-[#d6d6d6] md:border-0"
         >
           <div className="md:hidden flex justify-between" onClick={() => setShowCart(!showCart)}>
             <span className="font-medium">
@@ -81,7 +81,7 @@ export default function Page() {
           </div>
           <div
             className={cn("hidden md:block transition-all", {
-              "!block mt-[20px]": showCart,
+              "block! mt-[20px]": showCart,
             })}
           >
             <Cart showDisplayShipping={true} />

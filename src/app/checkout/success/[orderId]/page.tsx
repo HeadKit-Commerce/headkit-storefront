@@ -55,7 +55,7 @@ export default async function Page({ params }: Props) {
       {order && <ClearCart singleCheckout={isSingleCheckout} />}
       <div className="grid grid-cols-12 gap-x-1 gap-y-5 md:gap-8 mt-5 px-5 md:px-10">
         <div className="col-span-12 w-full">
-          <h1 className="font-bold text-3xl mb-[10px] text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">
+          <h1 className="font-bold text-3xl mb-[10px] text-transparent bg-clip-text bg-linear-to-r from-purple-500 to-pink-500">
             Thanks, {order?.billing?.firstName || order?.shipping?.firstName}!
           </h1>
         </div>

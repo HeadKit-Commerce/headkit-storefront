@@ -114,7 +114,7 @@ const Footer = ({ menus }: FooterProps) => {
               return (
                 <IconPayment
                   key={i}
-                  className="!h-8 w-auto hover:opacity-70"
+                  className="h-8! w-auto hover:opacity-70"
                 />
               );
             })}

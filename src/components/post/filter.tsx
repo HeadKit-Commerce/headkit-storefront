@@ -48,7 +48,7 @@ export const Filter = () => {
   })) || [];
 
   return (
-    <div className={cn("w-full sticky top-20 z-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-sm")}>
+    <div className={cn("w-full sticky top-20 z-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-xs")}>
       <div className={cn("w-full transition-opacity", {
         "opacity-50 pointer-events-none": loading,
       })}>
@@ -59,7 +59,7 @@ export const Filter = () => {
               className="z-10 w-full flex justify-between items-center relative"
             >
               <Transition show={menuOpen}>
-                <div className="absolute top-full left-0 w-full h-screen bg-black/50 backdrop-blur-sm transition duration-300 ease-in-out data-[closed]:opacity-0 data-[leave]:opacity-0" />
+                <div className="absolute top-full left-0 w-full h-screen bg-black/50 backdrop-blur-xs transition duration-300 ease-in-out data-closed:opacity-0 data-leave:opacity-0" />
               </Transition>
 
               <div className="flex w-full items-center justify-between overflow-x-auto px-5 md:px-10 py-5 scrollbar-hide">

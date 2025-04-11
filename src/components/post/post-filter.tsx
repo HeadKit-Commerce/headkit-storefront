@@ -76,7 +76,7 @@ export function PostFilter({ categories, children }: Props) {
                   <h2 className="text-lg font-medium text-gray-900">Filters</h2>
                   <button
                     type="button"
-                    className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="-mr-2 flex h-10 w-10 items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                     onClick={() => setMobileFiltersOpen(false)}
                   >
                     <span className="sr-only">Close menu</span>
@@ -161,7 +161,7 @@ export function PostFilter({ categories, children }: Props) {
                 <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
                   Sort
                   <Icon.chevronDown
-                    className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
+                    className="-mr-1 ml-1 h-5 w-5 shrink-0 text-gray-400 group-hover:text-gray-500"
                     aria-hidden="true"
                   />
                 </Menu.Button>
@@ -176,7 +176,7 @@ export function PostFilter({ categories, children }: Props) {
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
               >
-                <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-hidden">
                   <div className="py-1">
                     {sortOptions.map((option) => (
                       <Menu.Item key={option.value}>

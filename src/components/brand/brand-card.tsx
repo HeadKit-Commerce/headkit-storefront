@@ -13,7 +13,7 @@ export function BrandCard({ name, slug, logo }: Props) {
   return (
     <Link href={`/brand/${slug}`}>
       <div className="group relative flex flex-col">
-        <div className="aspect-[3/2] w-full overflow-hidden flex justify-center items-center bg-white border border-gray-200 rounded-md">
+        <div className="aspect-3/2 w-full overflow-hidden flex justify-center items-center bg-white border border-gray-200 rounded-md">
           {logo ? (
             <div className="relative h-[50px] w-[160px]">
               <Image

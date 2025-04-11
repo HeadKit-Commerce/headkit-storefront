@@ -25,7 +25,7 @@ export default async function Page({ params }: Props) {
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">Order #{order.databaseId}</h1>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <h2 className="font-medium mb-2">Order Date</h2>
@@ -46,7 +46,7 @@ export default async function Page({ params }: Props) {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="font-medium mb-4">Order Items</h2>
           <div className="space-y-4">
             {order.lineItems?.nodes.map((item, i) => (
@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
         </div>
 
         {(order.shipping || order.billing) && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {order.shipping && (
                 <div>
