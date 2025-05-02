@@ -28,7 +28,11 @@ import { useAuth } from "@/contexts/auth-context";
 import { useAppContext } from "@/contexts/app-context";
 import config from "@/headkit.config";
 
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent,
+} from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
@@ -70,10 +74,15 @@ function Header({ menus }: Props) {
           uri: item.uri,
         }))}
       />
-      <NavigationMenu onValueChange={(val) => {
-        setMenuOpen(!!val)
-      }} className={cn("sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10", menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-xs")}>
-
+      <NavigationMenu
+        onValueChange={(val) => {
+          setMenuOpen(!!val);
+        }}
+        className={cn(
+          "sticky top-0 flex items-center justify-between h-20 w-full max-w-full z-20 px-5 md:px-10",
+          menuOpen ? "bg-white" : "bg-white/80 hover:bg-white backdrop-blur-xs"
+        )}
+      >
         <Transition show={menuOpen}>
           <div className="fixed inset-0 z-0 top-[130px] bg-black/50 backdrop-blur-xs transition duration-300 ease-in-out data-closed:opacity-0 data-leave:opacity-0" />
         </Transition>
@@ -82,19 +91,33 @@ function Header({ menus }: Props) {
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
               <Link href="/" className="cursor-pointer">
-                { config ?.logo ? <Image src={ config ?.logo} alt="Logo" width={0} height={0} className="h-9 w-auto max-w-[160px] md:max-w-[200px]" /> : <Icon.logo className="h-9 w-auto max-w-[160px] md:max-w-[200px]" />}
+                {config?.logo ? (
+                  <Image
+                    src={config?.logo}
+                    alt="Logo"
+                    width={0}
+                    height={0}
+                    className="h-9 w-auto max-w-[160px] md:max-w-[200px]"
+                  />
+                ) : (
+                  <Icon.logo className="h-9 w-auto max-w-[160px] md:max-w-[200px]" />
+                )}
               </Link>
             </NavigationMenuLink>
           </NavigationMenuItem>
           <div className="hidden md:flex">
-            {primaryMenu && <MenuSection menuItems={primaryMenu.menuItems.nodes} />}
+            {primaryMenu && (
+              <MenuSection menuItems={primaryMenu.menuItems.nodes} />
+            )}
           </div>
         </NavigationMenuList>
 
         {/* Main Right Menu */}
         <NavigationMenuList className="space-x-0">
           <div className="hidden md:flex">
-            {mainRightMenu && <MenuSection menuItems={mainRightMenu.menuItems.nodes} />}
+            {mainRightMenu && (
+              <MenuSection menuItems={mainRightMenu.menuItems.nodes} />
+            )}
           </div>
           <NavigationMenuItem>
             <SearchDrawer />
@@ -164,7 +187,10 @@ function Header({ menus }: Props) {
                     />
                   )}
                   <div className="flex gap-4">
-                    <Link href={isAuthenticated ? "/account/wishlist" : "/account"} onClick={() => setOpen(false)}>
+                    <Link
+                      href={isAuthenticated ? "/account/wishlist" : "/account"}
+                      onClick={() => setOpen(false)}
+                    >
                       <div className="relative">
                         <Icon.heartOutline className="h-6 w-6 stroke-purple-800 stroke-2" />
                         {isAuthenticated && wishlists.length > 0 && (
@@ -191,7 +217,6 @@ function Header({ menus }: Props) {
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
-
     </>
   );
 }
@@ -207,7 +232,6 @@ interface MenuSectionProps {
 }
 
 const MenuSection = ({ menuItems }: MenuSectionProps) => {
-
   const formattedMenu = formatNodeTree({
     nodes: menuItems.map((item) => ({
       id: item.id,
@@ -239,20 +263,20 @@ const MenuSection = ({ menuItems }: MenuSectionProps) => {
               </NavigationMenuContent>
             </>
           ) : (
-            <Link href={menuItem.payload.uri} legacyBehavior passHref>
-              <NavigationMenuLink
-                className={`${navigationMenuTriggerStyle()} ${menuItem.payload.uri.replace(/\/$/, '') ===  config .sale.link.replace(/\/$/, '')
-                  ? 'text-pink-500!'
-                  : ''
-                  }`}
-              >
-                {menuItem.payload.label}
-              </NavigationMenuLink>
-            </Link>
+            <NavigationMenuLink
+              href={menuItem.payload.uri}
+              className={`${navigationMenuTriggerStyle()} ${
+                menuItem.payload.uri.replace(/\/$/, "") ===
+                config.sale.link.replace(/\/$/, "")
+                  ? "text-pink-500!"
+                  : ""
+              }`}
+            >
+              {menuItem.payload.label}
+            </NavigationMenuLink>
           )}
         </NavigationMenuItem>
       ))}
-
     </>
   );
 };
@@ -268,7 +292,10 @@ interface MenuItemProps {
 const MenuItem = ({ menuItem }: MenuItemProps) => (
   <li>
     <NavigationMenuLink asChild>
-      <Link href={menuItem.payload.uri} className="font-semibold hover:text-purple-500">
+      <Link
+        href={menuItem.payload.uri}
+        className="font-semibold hover:text-purple-500"
+      >
         {menuItem.payload.label}
       </Link>
     </NavigationMenuLink>
@@ -297,7 +324,10 @@ const Preheader = ({ title, links }: PreheaderProps) => {
   );
 };
 
-const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelect?: () => void }) => {
+const MobileMenuSection = ({
+  menuItems,
+  onSelect,
+}: MenuSectionProps & { onSelect?: () => void }) => {
   const formattedMenu = formatNodeTree({
     nodes: menuItems.map((item) => ({
       id: item.id,
@@ -319,8 +349,12 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
             <Collapsible>
               <CollapsibleTrigger className="text-xl font-semibold flex w-full justify-between items-center group">
                 {menuItem.payload.label}
-                <span className="text-xl group-data-[state=open]:hidden"><Icon.chevronDown size={20} /></span>
-                <span className="text-xl hidden group-data-[state=open]:block rotate-180"><Icon.chevronDown size={20} /></span>
+                <span className="text-xl group-data-[state=open]:hidden">
+                  <Icon.chevronDown size={20} />
+                </span>
+                <span className="text-xl hidden group-data-[state=open]:block rotate-180">
+                  <Icon.chevronDown size={20} />
+                </span>
               </CollapsibleTrigger>
               <CollapsibleContent className="flex flex-col gap-2">
                 {menuItem.children.map((child) => (
@@ -338,10 +372,12 @@ const MobileMenuSection = ({ menuItems, onSelect }: MenuSectionProps & { onSelec
           ) : (
             <Link
               href={menuItem.payload.uri}
-              className={`text-xl font-semibold ${menuItem.payload.uri.replace(/\/$/, '') ===  config .sale.link.replace(/\/$/, '')
-                ? 'text-pink-500'
-                : ''
-                }`}
+              className={`text-xl font-semibold ${
+                menuItem.payload.uri.replace(/\/$/, "") ===
+                config.sale.link.replace(/\/$/, "")
+                  ? "text-pink-500"
+                  : ""
+              }`}
               onClick={onSelect}
             >
               {menuItem.payload.label}
