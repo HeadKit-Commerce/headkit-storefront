@@ -47,9 +47,6 @@ export const headkit = (options?: {
     process.env.NEXT_PUBLIC_HEADKIT_API_GRAPHQL_ENDPOINT || "",
     {
       headers,
-      next: {
-        revalidate: process.env.REVALIDATE_TIME ? parseInt(process.env.REVALIDATE_TIME) : 3600,
-      },
     }
   );
 
