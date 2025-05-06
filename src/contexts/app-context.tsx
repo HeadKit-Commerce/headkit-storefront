@@ -39,6 +39,8 @@ interface AppContextProviderProps {
   initialWishlists?: number[];
   initialLang?: string;
   initialCurrency?: string;
+  stripeFullConfig?: StripeConfig | null;
+  brandingData?: Branding | null;
 }
 
 const initialState: AppContextState = {
@@ -60,9 +62,9 @@ type AppContextAction =
   | { type: "SET_IS_LOGIN"; payload: boolean }
   | { type: "SET_IS_GLOBAL_DISABLED"; payload: boolean }
   | { type: "SET_WISHLISTS"; payload: number[] }
-  | { type: "SET_STRIPE_ config "; payload: { publishableKey: string; accountId: string } | null }
+  | { type: "SET_STRIPE_CONFIG"; payload: { publishableKey: string; accountId: string } | null }
   | { type: "SET_IS_LIVE_MODE"; payload: boolean }
-  | { type: "SET_STRIPE_FULL_ config "; payload: StripeConfig | null }
+  | { type: "SET_STRIPE_FULL_CONFIG"; payload: StripeConfig | null }
   | { type: "SET_BRANDING_DATA"; payload: Branding | null };
 
 const reducer = (
@@ -82,11 +84,11 @@ const reducer = (
       return { ...state, isGlobalDisabled: action.payload };
     case "SET_WISHLISTS":
       return { ...state, wishlists: action.payload };
-    case "SET_STRIPE_ config ":
+    case "SET_STRIPE_CONFIG":
       return { ...state, stripeConfig: action.payload };
     case "SET_IS_LIVE_MODE":
       return { ...state, isLiveMode: action.payload };
-    case "SET_STRIPE_FULL_ config ":
+    case "SET_STRIPE_FULL_CONFIG":
       return { ...state, stripeFullConfig: action.payload };
     case "SET_BRANDING_DATA":
       return { ...state, brandingData: action.payload };
@@ -100,12 +102,16 @@ export const AppContextProvider = ({
   initialWishlists = [],
   initialLang = "en-AU",
   initialCurrency = "AUD",
+  stripeFullConfig = null,
+  brandingData = null,
 }: AppContextProviderProps) => {
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
     wishlists: initialWishlists,
     initLang: initialLang,
     initCurrency: initialCurrency,
+    stripeFullConfig,
+    brandingData,
   });
 
   useEffect(() => {
@@ -114,7 +120,7 @@ export const AppContextProvider = ({
         const response = await getStripeConfig();
         if (response?.data?.stripeConfig) {
           dispatch({
-            type: "SET_STRIPE_FULL_ config ",
+            type: "SET_STRIPE_FULL_CONFIG",
             payload: response.data.stripeConfig
           });
         }
@@ -132,7 +138,7 @@ export const AppContextProvider = ({
         : state.stripeFullConfig.publishableKeyTest;
 
       dispatch({
-        type: "SET_STRIPE_ config ",
+        type: "SET_STRIPE_CONFIG",
         payload: { publishableKey: key, accountId: state.stripeFullConfig.accountId }
       });
     }
@@ -169,7 +175,7 @@ export const AppContextProvider = ({
       dispatch({ type: "SET_WISHLISTS", payload: wishlists });
     },
     setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => {
-      dispatch({ type: "SET_STRIPE_ config ", payload: config });
+      dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
     },
     setIsLiveMode: (isLiveMode: boolean) => {
       dispatch({ type: "SET_IS_LIVE_MODE", payload: isLiveMode });

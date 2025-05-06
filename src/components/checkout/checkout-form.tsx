@@ -17,6 +17,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../../contexts/app-context";
 import { checkout, getCustomer, getPickupLocations } from "@/lib/headkit/actions";
+import { setCheckoutData } from "@/lib/headkit/actions/cookies";
 import { v7 as uuidv7 } from "uuid";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -56,8 +57,6 @@ interface FormData {
   customerNote?: string;
   stripePaymentMethod?: string;
 }
-
-
 
 const CheckoutForm = () => {
   const router = useRouter();
@@ -113,9 +112,7 @@ const CheckoutForm = () => {
   }>>([]);
   const [isLoadingPickupLocations, setIsLoadingPickupLocations] = useState(true);
 
-
   const { stripe } = useStripe();
-
 
   useEffect(() => {
     const fetchCustomer = async () => {
@@ -321,13 +318,17 @@ const CheckoutForm = () => {
     transactionId?: string;
     paymentIntentId?: string;
     stripePaymentMethod?: string;
+    paymentStatus?: "failed" | "processing" | "pending";
   }) => {
-    const checkoutData: { input: CheckoutInput } = {
+    const checkoutData: {
+      input: CheckoutInput;
+    } = {
       input: {
         clientMutationId: uuidv7(),
         paymentMethod: data.paymentMethod,
-        transactionId: data?.transactionId,
-        isPaid: data.paymentMethod === "stripe" && !!data.paymentIntentId,
+        isPaid: data.paymentMethod === "headkit-payments",
+        transactionId: data.transactionId ?? "",
+        customerNote: formData.customerNote,
         billing: {
           firstName: formData.billingAddress?.firstName,
           lastName: formData.billingAddress?.lastName,
@@ -336,53 +337,118 @@ const CheckoutForm = () => {
           city: formData.billingAddress?.city,
           state: formData.billingAddress?.state,
           postcode: formData.billingAddress?.postalCode,
-          country: formData.billingAddress?.country as CountriesEnum,
+          country: (formData.billingAddress?.country || "US") as CountriesEnum,
           email: formData.email,
           phone: formData.billingAddress?.phone,
         },
         shipping: {
-          firstName: formData.shippingAddress?.firstName,
-          lastName: formData.shippingAddress?.lastName,
-          address1: formData.shippingAddress?.line1,
-          address2: formData.shippingAddress?.line2,
-          city: formData.shippingAddress?.city,
-          state: formData.shippingAddress?.state,
-          postcode: formData.shippingAddress?.postalCode,
-          country: formData.shippingAddress?.country as CountriesEnum,
-          email: formData.email,
-          phone: formData.shippingAddress?.phone,
+          firstName:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.firstName,
+          lastName:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.lastName,
+          address1:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.line1,
+          address2:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.line2,
+          city:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.city,
+          state:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.state,
+          postcode:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.postalCode,
+          country:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? (undefined as unknown as CountriesEnum)
+              : (formData.shippingAddress?.country || "US") as CountriesEnum,
+          phone:
+            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
+              ? ""
+              : formData.shippingAddress?.phone,
         },
         metaData:
-          data.paymentMethod === "stripe"
+          data.paymentMethod === "headkit-payments"
             ? [
-              {
-                key: "_stripe_intent_id",
-                value: data?.paymentIntentId ?? "",
-              },
-              {
-                key: "_stripe_charge_captured",
-                value: "yes",
-              },
-              {
-                key: "_stripe_payment_method",
-                value: data?.stripePaymentMethod ?? "",
-              },
-            ]
+                {
+                  key: "_stripe_intent_id",
+                  value: data?.paymentIntentId ?? "",
+                },
+                {
+                  key: "_stripe_charge_captured",
+                  value: "yes",
+                },
+                {
+                  key: "_stripe_payment_method",
+                  value: data?.stripePaymentMethod ?? "",
+                },
+                {
+                  key: "_headkit_payments_status",
+                  value: data?.paymentStatus ?? "pending",
+                },
+              ]
             : [],
       },
     };
 
-    console.log("Payment Completed:", checkoutData);
-    // Add your checkout action here
-    const response = await checkout(checkoutData);
-    console.log("data", response.data);
-    console.log("error", response.errors);
+    // save in cookies
+    try {
+      await setCheckoutData(checkoutData.input);
+      
+      console.log("checkoutData", checkoutData);
+      const response = await checkout(checkoutData);
+      console.log("checkout response data", response.data);
+      console.log("checkout response errors", response.errors);
 
-    router.replace(
-      `/checkout/success/${response.data.checkout?.order?.databaseId}`
-    );
+      if (response.errors) {
+        console.error("Checkout errors:", response.errors);
+        router.push(
+          `/checkout/error?reason=checkout_execution_error&error=${encodeURIComponent(
+            JSON.stringify(response.errors)
+          )}`
+        );
+        return;
+      }
+
+      if (
+        data.paymentStatus === "processing" &&
+        response.data?.checkout?.order?.databaseId
+      ) {
+        router.replace(
+          `/checkout/success/${response.data.checkout?.order?.databaseId}`
+        );
+      } else if (response.data?.checkout?.order?.databaseId) {
+        router.replace(
+          `/checkout/success/${response.data.checkout?.order?.databaseId}`
+        );
+      } else if (response.data?.checkout?.redirect) {
+        // Handle external payment gateway redirect
+        window.location.href = response.data.checkout.redirect;
+      } else {
+        console.error("No order ID returned from checkout:", response);
+        router.push("/checkout/error?reason=order_creation_failed");
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error);
+      router.push(
+        `/checkout/error?reason=checkout_execution_error&error=${encodeURIComponent(
+          JSON.stringify(error)
+        )}`
+      );
+    }
   };
-
 
   const LoadingSkeleton = () => (
     <div>

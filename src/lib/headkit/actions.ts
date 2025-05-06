@@ -11,6 +11,7 @@ import {
   GetPostsQueryVariables,
   GetProductFiltersQueryVariables,
   GetProductListQueryVariables,
+  PageIdType,
   ProductCategoryIdType,
   RemoveItemsFromCartInput,
   SubmitGfFormInput,
@@ -490,6 +491,11 @@ export async function getBrand({ slug }: { slug: string }) {
 
 export async function getBranding() {
   const response = await headkit().getBranding();
+  return response;
+}
+
+export async function getPage({ id, type }: { id: string, type: PageIdType }) {
+  const response = await headkit().getPage({ id, type });
   return response;
 }
 

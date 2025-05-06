@@ -53,9 +53,10 @@ interface Props {
       };
     }
   >;
+  logoUrl?: string | null;
 }
 
-function Header({ menus }: Props) {
+function Header({ menus, logoUrl }: Props) {
   const { wishlists } = useAppContext();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
@@ -91,9 +92,9 @@ function Header({ menus }: Props) {
           <NavigationMenuItem className="mr-4 hover:opacity-75">
             <NavigationMenuLink asChild>
               <Link href="/" className="cursor-pointer">
-                {config?.logo ? (
+                {logoUrl ? (
                   <Image
-                    src={config?.logo}
+                    src={logoUrl}
                     alt="Logo"
                     width={0}
                     height={0}

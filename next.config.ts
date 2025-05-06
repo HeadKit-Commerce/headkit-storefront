@@ -6,17 +6,18 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "headkitthemetemplate.kinsta.cloud",
-      },
-      {
-        protocol: "http",
-        hostname: "headkitthemetemplate.kinsta.cloud",
+        hostname: process.env.IMAGE_DOMAIN!,
       },
       {
         protocol: "https",
         hostname: "storage.googleapis.com",
       },
     ],
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 

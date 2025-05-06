@@ -5,7 +5,6 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import Image from "next/image";
-import config from "@/headkit.config";
 
 interface FooterProps {
   menus: Record<
@@ -22,6 +21,7 @@ interface FooterProps {
       };
     }
   >;
+  iconUrl?: string | null;
 }
 
 const SubscriptionBox = () => {
@@ -46,7 +46,7 @@ const SubscriptionBox = () => {
   );
 };
 
-const Footer = ({ menus }: FooterProps) => {
+const Footer = ({ menus, iconUrl }: FooterProps) => {
   const footerMenu = menus[MenuLocationEnum.Footer];
   const footer2Menu = menus[MenuLocationEnum.Footer_2];
   const footerPolicyMenu = menus[MenuLocationEnum.FooterPolicy];
@@ -60,7 +60,7 @@ const Footer = ({ menus }: FooterProps) => {
             <div className="shrink-0 pr-4">
               <Link href="/" className="mr-4" aria-label="home">
                 <div className="relative h-auto w-full max-w-[60px] hover:opacity-70">
-                  { config ?.logo ? <Image src={ config ?.logo} alt="Logo" sizes="20vw" width={0} height={0} className="h-9 w-auto" /> : <Icon.monoLogo />}
+                  {iconUrl ? <Image src={iconUrl} alt="Logo" sizes="20vw" width={0} height={0} className="h-9 w-auto" /> : <Icon.monoLogo />}
                 </div>
               </Link>
             </div>

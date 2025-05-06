@@ -9,9 +9,39 @@ import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
 import { Cart } from "@/components/checkout/cart";
 import { currencyFormatter } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
+
 export default function Page() {
   const { cartData, toggleCartDrawer } = useAppContext();
   const [showCart, setShowCart] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const searchParams = useSearchParams();
+
+  // Check for error parameter
+  const error = searchParams.get("error");
+
+  // Handle any error messages from redirect
+  useEffect(() => {
+    if (error) {
+      switch (error) {
+        case "payment_failed":
+          setErrorMessage("Payment failed. Please try again.");
+          break;
+        case "checkout_failed":
+          setErrorMessage(
+            "There was an issue processing your order. Please try again."
+          );
+          break;
+        case "stripe_error":
+          setErrorMessage(
+            "There was an issue with the payment processor. Please try again."
+          );
+          break;
+        default:
+          setErrorMessage("An error occurred. Please try again.");
+      }
+    }
+  }, [error]);
 
   useEffect(() => {
     toggleCartDrawer(false);
@@ -55,7 +85,7 @@ export default function Page() {
       </div>
       <div className="order-1 md:order-2 col-span-12 md:col-start-7 md:col-span-6 lg:col-start-8 lg:col-span-5">
         <div
-          className="px-[20px] md:px-32 py-[17px] md:py-0 border-y-[1px] border-[#d6d6d6] md:border-0"
+          className="px-[20px] md:px-0 py-[17px] md:py-0 border-y-[1px] border-[#d6d6d6] md:border-0"
         >
           <div className="md:hidden flex justify-between" onClick={() => setShowCart(!showCart)}>
             <span className="font-medium">
@@ -93,6 +123,9 @@ export default function Page() {
 
   return (
     <div className="min-h-[700px] py-5">
+      {errorMessage && (
+        <div className="text-red-500 text-center mb-4 px-4">{errorMessage}</div>
+      )}
       {getFloatVal(cartData?.total || "0") > 0
         ? renderCheckoutPage()
         : renderEmptyCart()}

@@ -9,8 +9,11 @@ import { AppContextProvider } from "@/contexts/app-context";
 import { Footer } from "@/components/layout/footer";
 import { AuthProvider } from "@/contexts/auth-context";
 import { StripeProvider } from '@/contexts/stripe-context';
+import { ThemeProvider } from '@/contexts/theme-context';
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import config from "@/headkit.config";
+import { getBranding, getStripeConfig } from "@/lib/headkit/actions";
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
@@ -34,7 +37,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { data: menu } = await headkit().getMenu();
+  const [{ data: branding }, { data: menu }, { data: stripeConfigData }] = await Promise.all([
+    getBranding(),
+    headkit().getMenu(),
+    getStripeConfig()
+  ]);
 
   // Use the enum to fetch menus by location
   const headerMenuLocations = [
@@ -117,12 +124,23 @@ export default async function RootLayout({
         className={`${urbanist.className} ${urbanist.variable} antialiased`}
       >
         <AuthProvider>
-          <AppContextProvider>
+          <AppContextProvider 
+            brandingData={branding?.branding ?? null}
+            stripeFullConfig={stripeConfigData?.stripeConfig ?? null}
+          >
             <StripeProvider>
-              <Header menus={headerMenusByLocation} />
-              {children}
-              <Toaster />
-              <Footer menus={footerMenusByLocation} />
+              <ThemeProvider>
+                <Header 
+                  menus={headerMenusByLocation} 
+                  logoUrl={branding?.branding?.logoUrl ?? config.logo} 
+                />
+                {children}
+                <Toaster />
+                <Footer 
+                  menus={footerMenusByLocation} 
+                  iconUrl={branding?.branding?.iconUrl ?? config.icon} 
+                />
+              </ThemeProvider>
             </StripeProvider>
           </AppContextProvider>
         </AuthProvider>
