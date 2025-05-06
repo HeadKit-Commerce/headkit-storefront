@@ -6,11 +6,15 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.IMAGE_DOMAIN!,
+        hostname: process.env.IMAGE_DOMAIN
+          ? process.env.IMAGE_DOMAIN
+          : "**.kinsta.cloud",
       },
       {
         protocol: "http",
-        hostname: process.env.IMAGE_DOMAIN!,
+        hostname: process.env.IMAGE_DOMAIN
+          ? process.env.IMAGE_DOMAIN
+          : "**.kinsta.cloud",
       },
       {
         protocol: "https",

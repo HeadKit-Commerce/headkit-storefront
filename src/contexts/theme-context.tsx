@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Branding } from '@/lib/headkit/generated';
-import { getBranding } from '@/lib/headkit/actions';
+import { useAppContext } from './app-context';
 
 interface ThemeContextType {
   primaryColor: string;
@@ -13,8 +13,8 @@ interface ThemeContextType {
 }
 
 const defaultTheme: ThemeContextType = {
-  primaryColor: '#ff0000',
-  secondaryColor: '#7300ff',
+  primaryColor: '#000000',
+  secondaryColor: '#000000',
   primaryTextColor: '#ffffff',
   branding: null,
   isLoading: true,
@@ -59,39 +59,30 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<ThemeContextType>(defaultTheme);
+  const { brandingData } = useAppContext();
 
   useEffect(() => {
-    const loadBranding = async () => {
-      try {
-        const response = await getBranding();
-        if (response?.data?.branding) {
-          const primaryColor = response.data.branding.primaryColor || defaultTheme.primaryColor;
-          const secondaryColor = response.data.branding.secondaryColor || defaultTheme.secondaryColor;
-          const primaryTextColor = getTextColorForBackground(primaryColor);
-          
-          setTheme({
-            primaryColor,
-            secondaryColor,
-            primaryTextColor,
-            branding: response.data.branding,
-            isLoading: false,
-          });
-          
-          // Apply CSS variables to :root
-          document.documentElement.style.setProperty('--color-primary', primaryColor);
-          document.documentElement.style.setProperty('--color-secondary', secondaryColor);
-          document.documentElement.style.setProperty('--color-primary-text', primaryTextColor);
-        } else {
-          setTheme({ ...defaultTheme, isLoading: false });
-        }
-      } catch (error) {
-        console.error('Error loading branding:', error);
-        setTheme({ ...defaultTheme, isLoading: false });
-      }
-    };
-
-    loadBranding();
-  }, []);
+    if (brandingData) {
+      const primaryColor = brandingData.primaryColor || defaultTheme.primaryColor;
+      const secondaryColor = brandingData.secondaryColor || defaultTheme.secondaryColor;
+      const primaryTextColor = getTextColorForBackground(primaryColor);
+      
+      setTheme({
+        primaryColor,
+        secondaryColor,
+        primaryTextColor,
+        branding: brandingData,
+        isLoading: false,
+      });
+      
+      // Apply CSS variables to :root
+      document.documentElement.style.setProperty('--color-primary', primaryColor);
+      document.documentElement.style.setProperty('--color-secondary', secondaryColor);
+      document.documentElement.style.setProperty('--color-primary-text', primaryTextColor);
+    } else {
+      setTheme({ ...defaultTheme, isLoading: false });
+    }
+  }, [brandingData]);
 
   return (
     <ThemeContext.Provider value={theme}>

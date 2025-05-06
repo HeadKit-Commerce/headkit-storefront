@@ -10,8 +10,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // primary:
+        //   "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:to-blue-500 hover:shadow-button",
         primary:
-          "bg-linear-to-r from-purple-500 to-pink-500 text-white hover:to-blue-500 hover:shadow-button",
+          "bg-primary text-white hover:bg-primary/70 hover:shadow-button",
         secondary:
           "border-2 border-purple-800 bg-linear-to-r hover:from-lime-400 hover:to-lime-100",
         link: "text-purple-800 underline hover:text-purple-500",
