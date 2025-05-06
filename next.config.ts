@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
         hostname: process.env.IMAGE_DOMAIN!,
       },
       {
+        protocol: "http",
+        hostname: process.env.IMAGE_DOMAIN!,
+      },
+      {
         protocol: "https",
         hostname: "storage.googleapis.com",
       },
