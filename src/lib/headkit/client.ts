@@ -8,6 +8,8 @@ export const headkit = (options?: {
   authToken?: string;
   mailchimpUserEmail?: string;
   mailchimpUserPreviousEmail?: string;
+  revalidateTime?: number;
+  revalidateTags?: string[];
 }) => {
   const headers: Record<string, string> = {
     Authorization: `Bearer ${process.env.HEADKIT_API_TOKEN}`,
@@ -47,6 +49,10 @@ export const headkit = (options?: {
     process.env.NEXT_PUBLIC_HEADKIT_API_GRAPHQL_ENDPOINT || "",
     {
       headers,
+      next: {
+        revalidate: options?.revalidateTime,
+        tags: options?.revalidateTags,
+      },
     }
   );
 

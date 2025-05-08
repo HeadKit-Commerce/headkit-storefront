@@ -490,11 +490,14 @@ export async function getBrand({ slug }: { slug: string }) {
 }
 
 export async function getBranding() {
-  const response = await headkit().getBranding();
+  const response = await headkit({
+    revalidateTime: 86400,
+    revalidateTags: ["headkit:branding"],
+  }).getBranding();
   return response;
 }
 
-export async function getPage({ id, type }: { id: string, type: PageIdType }) {
+export async function getPage({ id, type }: { id: string; type: PageIdType }) {
   const response = await headkit().getPage({ id, type });
   return response;
 }
