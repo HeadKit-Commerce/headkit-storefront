@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
 const getErrorMessage = (reason?: string) => {
   switch (reason) {
@@ -23,13 +23,34 @@ const getErrorMessage = (reason?: string) => {
   }
 };
 
+// Separate component for handling search params
+function ErrorParamsHandler({ 
+  onParamsUpdate 
+}: { 
+  onParamsUpdate: (reason?: string, errorDetails?: string) => void 
+}) {
+  const searchParams = useSearchParams();
+  
+  useEffect(() => {
+    const reason = searchParams.get("reason") || undefined;
+    const errorDetails = searchParams.get("error") || undefined;
+    onParamsUpdate(reason, errorDetails);
+  }, [searchParams, onParamsUpdate]);
+
+  return null;
+}
+
 export default function CheckoutErrorPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const reason = searchParams.get("reason") || undefined;
-  const errorDetails = searchParams.get("error") || undefined;
+  const [reason, setReason] = useState<string | undefined>(undefined);
+  const [errorDetails, setErrorDetails] = useState<string | undefined>(undefined);
   const [errorMessage, setErrorMessage] = useState("");
   const [showDetails, setShowDetails] = useState(false);
+
+  const handleParamsUpdate = (newReason?: string, newErrorDetails?: string) => {
+    setReason(newReason);
+    setErrorDetails(newErrorDetails);
+  };
 
   useEffect(() => {
     setErrorMessage(getErrorMessage(reason));
@@ -46,6 +67,9 @@ export default function CheckoutErrorPage() {
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
+      <Suspense fallback={null}>
+        <ErrorParamsHandler onParamsUpdate={handleParamsUpdate} />
+      </Suspense>
       <div className="bg-white rounded-lg shadow-lg p-8 text-center space-y-6">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +93,7 @@ export default function CheckoutErrorPage() {
           <div className="mt-4">
             <button 
               onClick={() => setShowDetails(!showDetails)}
-              className="text-primary underline text-sm"
+              className="text-blue-600 underline text-sm"
             >
               {showDetails ? "Hide Details" : "Show Technical Details"}
             </button>

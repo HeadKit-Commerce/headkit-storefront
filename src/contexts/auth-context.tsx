@@ -20,6 +20,7 @@ type AuthContextType = {
   signOut: (redirect?: boolean) => void;
   user: Customer | null;
   setUser: (user: Customer | null) => void;
+  isLoading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -28,6 +29,7 @@ const AuthContext = createContext<AuthContextType>({
   signOut: () => { },
   user: null,
   setUser: () => { },
+  isLoading: false,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -92,8 +94,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, setAuthToken, signOut, user, setUser }}>
-      {!isLoading && children}
+    <AuthContext.Provider value={{ isAuthenticated, setAuthToken, signOut, user, setUser, isLoading }}>
+      {children}
     </AuthContext.Provider>
   );
 };

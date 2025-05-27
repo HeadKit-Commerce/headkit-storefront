@@ -1,0 +1,10 @@
+query getSEOSettings {
+  seoSettings {
+    title
+    description
+    ogImageUrl
+    enableSitemap
+    createdAt
+    updatedAt
+  }
+}

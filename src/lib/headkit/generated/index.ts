@@ -957,7 +957,7 @@ export type Brand = DatabaseIdentifier & HierarchicalNode & HierarchicalTermNode
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -1565,7 +1565,7 @@ export type Carousel = ContentNode & DatabaseIdentifier & MenuItemLinkable & Nod
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -1721,7 +1721,7 @@ export type CarouselCategory = DatabaseIdentifier & HierarchicalNode & Hierarchi
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -2929,7 +2929,7 @@ export type Category = DatabaseIdentifier & HierarchicalNode & HierarchicalTermN
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -3643,7 +3643,7 @@ export type Comment = DatabaseIdentifier & Node & UniformResourceIdentifiable & 
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -4155,7 +4155,7 @@ export type ContentNode = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -10543,7 +10543,7 @@ export type Coupon = Node & {
   individualUse?: Maybe<Scalars['Boolean']['output']>;
   /** The number of products in your cart this coupon can apply to (for product discounts) */
   limitUsageToXItems?: Maybe<Scalars['Int']['output']>;
-  /** Maximum spend amount that must be met before this coupon can be used  */
+  /** Maximum spend amount that must be met before this coupon can be used */
   maximumAmount?: Maybe<Scalars['Float']['output']>;
   /** Object meta data */
   metaData?: Maybe<Array<Maybe<MetaData>>>;
@@ -11245,7 +11245,7 @@ export type CreateCarouselInput = {
   carouselCategories?: InputMaybe<CarouselCarouselCategoriesInput>;
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** A field used for ordering posts. This is typically used with nav menu items or for special ordering of hierarchical content types. */
   menuOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -11309,7 +11309,7 @@ export type CreateCommentInput = {
   commentOn?: InputMaybe<Scalars['Int']['input']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** Parent comment ID of current comment. */
   parent?: InputMaybe<Scalars['ID']['input']>;
@@ -11389,7 +11389,7 @@ export type CreateCouponPayload = {
 export type CreateFaqInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** A field used for ordering posts. This is typically used with nav menu items or for special ordering of hierarchical content types. */
   menuOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -11416,7 +11416,7 @@ export type CreateFaqPayload = {
 export type CreateFontFaceInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** A field used for ordering posts. This is typically used with nav menu items or for special ordering of hierarchical content types. */
   menuOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -11443,7 +11443,7 @@ export type CreateFontFacePayload = {
 export type CreateFontFamilyInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** A field used for ordering posts. This is typically used with nav menu items or for special ordering of hierarchical content types. */
   menuOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -11476,7 +11476,7 @@ export type CreateLocationInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -11647,7 +11647,7 @@ export type CreatePageInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -11703,7 +11703,7 @@ export type CreatePatternsAiDataInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** A field used for ordering posts. This is typically used with nav menu items or for special ordering of hierarchical content types. */
   menuOrder?: InputMaybe<Scalars['Int']['input']>;
@@ -11767,7 +11767,7 @@ export type CreatePostInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -11841,7 +11841,7 @@ export type CreateProductInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -11980,7 +11980,7 @@ export type CreateUserInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
   /** A string containing the user's email address. */
   email?: InputMaybe<Scalars['String']['input']>;
-  /** 	The user's first name. */
+  /** The user's first name. */
   firstName?: InputMaybe<Scalars['String']['input']>;
   /** User's Jabber account. */
   jabber?: InputMaybe<Scalars['String']['input']>;
@@ -14141,7 +14141,7 @@ export type ExternalProduct = ContentNode & DatabaseIdentifier & MenuItemLinkabl
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -14567,7 +14567,7 @@ export type Faq = ContentNode & DatabaseIdentifier & MenuItemLinkable & Node & N
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -15006,7 +15006,7 @@ export type FontFace = ContentNode & DatabaseIdentifier & Node & NodeWithTemplat
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -15239,7 +15239,7 @@ export type FontFamily = ContentNode & DatabaseIdentifier & Node & NodeWithTempl
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -17780,7 +17780,7 @@ export type GroupProduct = ContentNode & DatabaseIdentifier & MenuItemLinkable &
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -18363,7 +18363,7 @@ export type HierarchicalContentNode = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -18630,7 +18630,7 @@ export type HierarchicalTermNode = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -19163,7 +19163,7 @@ export type Location = ContentNode & DatabaseIdentifier & MenuItemLinkable & Nod
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -19586,7 +19586,7 @@ export type MediaItem = ContentNode & DatabaseIdentifier & HierarchicalContentNo
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -20137,7 +20137,7 @@ export type MenuItemLinkable = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the node is a Term */
   isTermNode: Scalars['Boolean']['output'];
@@ -23072,7 +23072,7 @@ export type PaColour = DatabaseIdentifier & Node & TermNode & UniformResourceIde
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -23548,7 +23548,7 @@ export type PaSize = DatabaseIdentifier & Node & TermNode & UniformResourceIdent
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -24606,7 +24606,7 @@ export type PatternCategory = DatabaseIdentifier & Node & TermNode & UniformReso
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -24752,7 +24752,7 @@ export type PatternsAiData = ContentNode & DatabaseIdentifier & Node & NodeWithC
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -25301,7 +25301,7 @@ export type Post = ContentNode & DatabaseIdentifier & MenuItemLinkable & Node & 
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -27258,7 +27258,7 @@ export type PostFormat = DatabaseIdentifier & Node & TermNode & UniformResourceI
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -29103,7 +29103,7 @@ export type Product = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -29707,7 +29707,7 @@ export type ProductCategory = DatabaseIdentifier & HierarchicalNode & Hierarchic
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -30812,7 +30812,7 @@ export type ProductTag = DatabaseIdentifier & MenuItemLinkable & Node & TermNode
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -32882,7 +32882,7 @@ export type ProductType = DatabaseIdentifier & Node & TermNode & UniformResource
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -33386,7 +33386,7 @@ export type ProductVariation = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -34242,7 +34242,7 @@ export type Query = {
   branding: Branding;
   /** Connection between the RootQuery type and the brand type */
   brands?: Maybe<RootQueryToBrandConnection>;
-  /** An object of the carousel Type.  */
+  /** An object of the carousel Type. */
   carousel?: Maybe<Carousel>;
   /**
    * A carousel object
@@ -34298,7 +34298,7 @@ export type Query = {
    * @deprecated Use &quot;product&quot; instead.
    */
   externalProduct?: Maybe<ExternalProduct>;
-  /** An object of the faq Type.  */
+  /** An object of the faq Type. */
   faq?: Maybe<Faq>;
   /**
    * A faq object
@@ -34307,7 +34307,7 @@ export type Query = {
   faqBy?: Maybe<Faq>;
   /** Connection between the RootQuery type and the faq type */
   faqs?: Maybe<RootQueryToFaqConnection>;
-  /** An object of the fontFace Type.  */
+  /** An object of the fontFace Type. */
   fontFace?: Maybe<FontFace>;
   /**
    * A fontFace object
@@ -34318,7 +34318,7 @@ export type Query = {
   fontFaces?: Maybe<RootQueryToFontFaceConnection>;
   /** Connection between the RootQuery type and the fontFamily type */
   fontFamilies?: Maybe<RootQueryToFontFamilyConnection>;
-  /** An object of the fontFamily Type.  */
+  /** An object of the fontFamily Type. */
   fontFamily?: Maybe<FontFamily>;
   /**
    * A fontFamily object
@@ -34348,7 +34348,7 @@ export type Query = {
    * @deprecated Use &quot;product&quot; instead.
    */
   groupedProduct?: Maybe<GroupProduct>;
-  /** An object of the location Type.  */
+  /** An object of the location Type. */
   location?: Maybe<Location>;
   /**
    * A location object
@@ -34357,7 +34357,7 @@ export type Query = {
   locationBy?: Maybe<Location>;
   /** Connection between the RootQuery type and the location type */
   locations?: Maybe<RootQueryToLocationConnection>;
-  /** An object of the mediaItem Type.  */
+  /** An object of the mediaItem Type. */
   mediaItem?: Maybe<MediaItem>;
   /**
    * A mediaItem object
@@ -34386,7 +34386,7 @@ export type Query = {
   paColour?: Maybe<PaColour>;
   /** A 0bject */
   paSize?: Maybe<PaSize>;
-  /** An object of the page Type.  */
+  /** An object of the page Type. */
   page?: Maybe<Page>;
   /**
    * A page object
@@ -34399,7 +34399,7 @@ export type Query = {
   patternCategories?: Maybe<RootQueryToPatternCategoryConnection>;
   /** A 0bject */
   patternCategory?: Maybe<PatternCategory>;
-  /** An object of the patternsAIData Type.  */
+  /** An object of the patternsAIData Type. */
   patternsAIData?: Maybe<PatternsAiData>;
   /**
    * A patternsAIData object
@@ -34414,7 +34414,7 @@ export type Query = {
   plugin?: Maybe<Plugin>;
   /** Connection between the RootQuery type and the Plugin type */
   plugins?: Maybe<RootQueryToPluginConnection>;
-  /** An object of the post Type.  */
+  /** An object of the post Type. */
   post?: Maybe<Post>;
   /**
    * A post object
@@ -34460,6 +34460,7 @@ export type Query = {
   revisions?: Maybe<RootQueryToRevisionsConnection>;
   /** Returns seo site data */
   seo?: Maybe<SeoConfig>;
+  seoSettings: SeoSettings;
   /** A 0bject */
   shippingClass?: Maybe<ShippingClass>;
   /** Connection between the RootQuery type and the shippingClass type */
@@ -35568,7 +35569,7 @@ export type ReadingSettings = {
   showOnFront?: Maybe<Scalars['String']['output']>;
 };
 
-/** Determines which version of reCAPTCHA v2 will be used.  */
+/** Determines which version of reCAPTCHA v2 will be used. */
 export enum RecaptchaTypeEnum {
   /** A checkbox reCAPTCHA type. */
   Checkbox = 'CHECKBOX',
@@ -35676,7 +35677,7 @@ export type RegisterCustomerInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
   /** A string containing the user's email address. */
   email?: InputMaybe<Scalars['String']['input']>;
-  /** 	The user's first name. */
+  /** The user's first name. */
   firstName?: InputMaybe<Scalars['String']['input']>;
   /** User's Jabber account. */
   jabber?: InputMaybe<Scalars['String']['input']>;
@@ -35733,7 +35734,7 @@ export type RegisterUserInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
   /** A string containing the user's email address. */
   email?: InputMaybe<Scalars['String']['input']>;
-  /** 	The user's first name. */
+  /** The user's first name. */
   firstName?: InputMaybe<Scalars['String']['input']>;
   /** User's Jabber account. */
   jabber?: InputMaybe<Scalars['String']['input']>;
@@ -39201,7 +39202,7 @@ export type SeoPostTypeSchema = {
   raw?: Maybe<Scalars['String']['output']>;
 };
 
-/** The Yoast redirect data  (Yoast Premium only) */
+/** The Yoast redirect data (Yoast Premium only) */
 export type SeoRedirect = {
   __typename?: 'SEORedirect';
   format?: Maybe<Scalars['String']['output']>;
@@ -39331,7 +39332,7 @@ export type SeoUserSocial = {
   youTube?: Maybe<Scalars['String']['output']>;
 };
 
-/** The Yoast SEO  webmaster fields */
+/** The Yoast SEO webmaster fields */
 export type SeoWebmaster = {
   __typename?: 'SEOWebmaster';
   baiduVerify?: Maybe<Scalars['String']['output']>;
@@ -39543,6 +39544,16 @@ export type SendPasswordResetEmailPayload = {
   user?: Maybe<User>;
 };
 
+export type SeoSettings = {
+  __typename?: 'SeoSettings';
+  createdAt?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  enableSitemap: Scalars['Boolean']['output'];
+  ogImageUrl?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['String']['output']>;
+};
+
 /** Input for the setDefaultPaymentMethod mutation. */
 export type SetDefaultPaymentMethodInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
@@ -39626,7 +39637,7 @@ export type ShippingClass = DatabaseIdentifier & Node & TermNode & UniformResour
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -40534,7 +40545,7 @@ export type SimpleProduct = ContentNode & DatabaseIdentifier & DownloadableProdu
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -41139,7 +41150,7 @@ export type SimpleProductVariation = ContentNode & DownloadableProduct & Invento
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -41515,7 +41526,7 @@ export type Tag = DatabaseIdentifier & MenuItemLinkable & Node & TermNode & Unif
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -42244,7 +42255,7 @@ export type TermNode = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -42755,7 +42766,7 @@ export type UniformResourceIdentifiable = {
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the node is a Term */
   isTermNode: Scalars['Boolean']['output'];
@@ -42823,7 +42834,7 @@ export type UpdateCarouselInput = {
   carouselCategories?: InputMaybe<CarouselCarouselCategoriesInput>;
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the carousel object */
   id: Scalars['ID']['input'];
@@ -42893,7 +42904,7 @@ export type UpdateCommentInput = {
   commentOn?: InputMaybe<Scalars['Int']['input']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the comment being updated. */
   id: Scalars['ID']['input'];
@@ -42987,7 +42998,7 @@ export type UpdateCustomerInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
   /** A string containing the user's email address. */
   email?: InputMaybe<Scalars['String']['input']>;
-  /** 	The user's first name. */
+  /** The user's first name. */
   firstName?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the user */
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -43073,7 +43084,7 @@ export type UpdateEntryMetaInput = {
 export type UpdateFaqInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the faq object */
   id: Scalars['ID']['input'];
@@ -43104,7 +43115,7 @@ export type UpdateFaqPayload = {
 export type UpdateFontFaceInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the fontFace object */
   id: Scalars['ID']['input'];
@@ -43135,7 +43146,7 @@ export type UpdateFontFacePayload = {
 export type UpdateFontFamilyInput = {
   /** This is an ID that can be passed to a mutation by the client to track the progress of mutations and catch possible duplicate mutation submissions. */
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the fontFamily object */
   id: Scalars['ID']['input'];
@@ -43245,7 +43256,7 @@ export type UpdateLocationInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -43429,7 +43440,7 @@ export type UpdatePageInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -43491,7 +43502,7 @@ export type UpdatePatternsAiDataInput = {
   clientMutationId?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the patternsAIData object */
   id: Scalars['ID']['input'];
@@ -43555,7 +43566,7 @@ export type UpdatePostInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -43635,7 +43646,7 @@ export type UpdateProductInput = {
   commentStatus?: InputMaybe<Scalars['String']['input']>;
   /** The content of the object */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day (e.g. 01/31/2017) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The excerpt of the object */
   excerpt?: InputMaybe<Scalars['String']['input']>;
@@ -43740,7 +43751,7 @@ export type UpdateReviewInput = {
   commentOn?: InputMaybe<Scalars['Int']['input']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the review being updated. */
   id: Scalars['ID']['input'];
@@ -43916,7 +43927,7 @@ export type UpdateUserInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
   /** A string containing the user's email address. */
   email?: InputMaybe<Scalars['String']['input']>;
-  /** 	The user's first name. */
+  /** The user's first name. */
   firstName?: InputMaybe<Scalars['String']['input']>;
   /** The ID of the user */
   id: Scalars['ID']['input'];
@@ -44017,7 +44028,7 @@ export type User = Commenter & DatabaseIdentifier & Node & UniformResourceIdenti
   isFrontPage: Scalars['Boolean']['output'];
   /** Whether the JWT User secret has been revoked. If the secret has been revoked, auth tokens will not be issued until an admin, or user with proper capabilities re-issues a secret for the user. */
   isJwtAuthSecretRevoked: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -45050,7 +45061,7 @@ export type VariableProduct = ContentNode & DatabaseIdentifier & InventoriedProd
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is a node in the preview state */
   isPreview?: Maybe<Scalars['Boolean']['output']>;
@@ -45672,7 +45683,7 @@ export type VisibleProduct = DatabaseIdentifier & Node & TermNode & UniformResou
   isContentNode: Scalars['Boolean']['output'];
   /** Whether the node represents the front page. */
   isFrontPage: Scalars['Boolean']['output'];
-  /** Whether  the node represents the blog page. */
+  /** Whether the node represents the blog page. */
   isPostsPage: Scalars['Boolean']['output'];
   /** Whether the object is restricted from the current viewer */
   isRestricted?: Maybe<Scalars['Boolean']['output']>;
@@ -52047,7 +52058,7 @@ export type WriteReviewInput = {
   commentOn?: InputMaybe<Scalars['Int']['input']>;
   /** Content of the comment. */
   content?: InputMaybe<Scalars['String']['input']>;
-  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17  */
+  /** The date of the object. Preferable to enter as year/month/day ( e.g. 01/31/2017 ) as it will rearrange date as fit if it is not specified. Incomplete dates may have unintended results for example, "2017" as the input will use current date with timestamp 20:17 */
   date?: InputMaybe<Scalars['String']['input']>;
   /** Parent comment ID of current comment. */
   parent?: InputMaybe<Scalars['ID']['input']>;
@@ -52595,6 +52606,11 @@ export type GetProductsQueryVariables = Exact<{
 
 
 export type GetProductsQuery = { __typename?: 'Query', products?: { __typename?: 'RootQueryToProductUnionConnection', found?: number | null, pageInfo: { __typename?: 'RootQueryToProductUnionConnectionPageInfo', hasNextPage: boolean, hasPreviousPage: boolean, endCursor?: string | null, startCursor?: string | null }, nodes: Array<{ __typename?: 'ExternalProduct', slug?: string | null, databaseId: number, name?: string | null, uri?: string | null, type?: ProductTypesEnum | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'GroupProduct', slug?: string | null, databaseId: number, name?: string | null, uri?: string | null, type?: ProductTypesEnum | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null } | null } | { __typename?: 'SimpleProduct', slug?: string | null, databaseId: number, name?: string | null, uri?: string | null, type?: ProductTypesEnum | null, date?: string | null, featured?: boolean | null, onSale?: boolean | null, price?: string | null, regularPrice?: string | null, salePrice?: string | null, stockStatus?: StockStatusEnum | null, stockQuantity?: number | null, soldIndividually?: boolean | null, productTechnical?: string | null, productInstructions?: string | null, rawPrice?: string | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null } | null, galleryImages?: { __typename?: 'ProductToMediaItemConnection', nodes: Array<{ __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null, sourceUrlMobile?: string | null }> } | null, productTags?: { __typename?: 'ProductToProductTagConnection', nodes: Array<{ __typename?: 'ProductTag', slug?: string | null, name?: string | null }> } | null, productCategories?: { __typename?: 'ProductToProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null, brands?: { __typename?: 'ProductToBrandConnection', nodes: Array<{ __typename?: 'Brand', name?: string | null, slug?: string | null, parentId?: string | null, thumbnail?: string | null }> } | null, attributes?: { __typename?: 'ProductToProductAttributeConnection', nodes: Array<{ __typename?: 'GlobalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, slug?: string | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null } | { __typename?: 'LocalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null }> } | null } | { __typename?: 'SimpleProductVariation' } | { __typename?: 'VariableProduct', slug?: string | null, databaseId: number, name?: string | null, uri?: string | null, type?: ProductTypesEnum | null, date?: string | null, featured?: boolean | null, onSale?: boolean | null, price?: string | null, regularPrice?: string | null, salePrice?: string | null, stockStatus?: StockStatusEnum | null, stockQuantity?: number | null, soldIndividually?: boolean | null, productTechnical?: string | null, productInstructions?: string | null, rawPrice?: string | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null } | null, galleryImages?: { __typename?: 'ProductToMediaItemConnection', nodes: Array<{ __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null, sourceUrlMobile?: string | null }> } | null, productTags?: { __typename?: 'ProductToProductTagConnection', nodes: Array<{ __typename?: 'ProductTag', slug?: string | null, name?: string | null }> } | null, productCategories?: { __typename?: 'ProductToProductCategoryConnection', nodes: Array<{ __typename?: 'ProductCategory', slug?: string | null, name?: string | null, description?: string | null, uri?: string | null, featured?: boolean | null, thumbnail?: string | null, databaseId: number, parentDatabaseId?: number | null }> } | null, brands?: { __typename?: 'ProductToBrandConnection', nodes: Array<{ __typename?: 'Brand', name?: string | null, slug?: string | null, parentId?: string | null, thumbnail?: string | null }> } | null, attributes?: { __typename?: 'ProductToProductAttributeConnection', nodes: Array<{ __typename?: 'GlobalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, slug?: string | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null } | { __typename?: 'LocalProductAttribute', label?: string | null, name?: string | null, options?: Array<string | null> | null, variation?: boolean | null, attributeId: number, scope: ProductAttributeTypesEnum, fullOptions?: Array<{ __typename?: 'ProductAttributeOption', name: string, slug: string, hk_swatch_colour?: string | null, hk_swatch_colour_2?: string | null } | null> | null }> } | null, variations?: { __typename?: 'ProductWithVariationsToProductVariationConnection', nodes: Array<{ __typename?: 'SimpleProductVariation', databaseId: number, name?: string | null, description?: string | null, price?: string | null, regularPrice?: string | null, salePrice?: string | null, date?: string | null, featured?: boolean | null, onSale?: boolean | null, stockQuantity?: number | null, stockStatus?: StockStatusEnum | null, rawPrice?: string | null, attributes?: { __typename?: 'ProductVariationToVariationAttributeConnection', nodes: Array<{ __typename?: 'VariationAttribute', name?: string | null, label?: string | null, value?: string | null }> } | null, image?: { __typename?: 'MediaItem', databaseId: number, sourceUrl?: string | null, altText?: string | null, sourceUrlMobile?: string | null } | null, metaData?: Array<{ __typename?: 'MetaData', key: string, value?: string | null } | null> | null }> } | null }> } | null };
+
+export type GetSeoSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSeoSettingsQuery = { __typename?: 'Query', seoSettings: { __typename?: 'SeoSettings', title?: string | null, description?: string | null, ogImageUrl?: string | null, enableSitemap: boolean, createdAt?: string | null, updatedAt?: string | null } };
 
 export type GetStripeConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -54439,6 +54455,18 @@ export const GetProductsDocument = gql`
   }
 }
     ${ProductShortContentFragmentDoc}`;
+export const GetSeoSettingsDocument = gql`
+    query getSEOSettings {
+  seoSettings {
+    title
+    description
+    ogImageUrl
+    enableSitemap
+    createdAt
+    updatedAt
+  }
+}
+    `;
 export const GetStripeConfigDocument = gql`
     query getStripeConfig {
   stripeConfig {
@@ -54495,6 +54523,7 @@ const GetProductFiltersDocumentString = print(GetProductFiltersDocument);
 const GetProductListDocumentString = print(GetProductListDocument);
 const GetProductSlugsDocumentString = print(GetProductSlugsDocument);
 const GetProductsDocumentString = print(GetProductsDocument);
+const GetSeoSettingsDocumentString = print(GetSeoSettingsDocument);
 const GetStripeConfigDocumentString = print(GetStripeConfigDocument);
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
@@ -54623,6 +54652,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getProducts(variables?: GetProductsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetProductsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetProductsQuery>(GetProductsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getProducts', 'query', variables);
+    },
+    getSEOSettings(variables?: GetSeoSettingsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetSeoSettingsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetSeoSettingsQuery>(GetSeoSettingsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEOSettings', 'query', variables);
     },
     getStripeConfig(variables?: GetStripeConfigQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetStripeConfigQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetStripeConfigQuery>(GetStripeConfigDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getStripeConfig', 'query', variables);

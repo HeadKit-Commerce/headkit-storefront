@@ -216,3 +216,7 @@ export function snakeCase(str: string): string {
     .replace(/[\s-]+/g, '_') // Replace spaces and hyphens with underscores
     .toLowerCase();
 } 
+
+export const removeTrailingSlash = (str: string) => {
+  return str.replace(/\/$/, '');
+}

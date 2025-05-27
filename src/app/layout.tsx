@@ -14,17 +14,22 @@ import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import config from "@/headkit.config";
 import { getBranding, getStripeConfig } from "@/lib/headkit/actions";
+import { WebsiteJsonLD } from "@/components/seo/website-json-ld";
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
   subsets: ["latin"],
   variable: "--font-urbanist",
+  display: "swap", // Improve font loading performance
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const {
     data: { generalSettings },
-  } = await headkit().getGeneralSettings();
+  } = await headkit({
+    revalidateTime: 24 * 60 * 60,
+    revalidateTags: ["headkit:general-settings"],
+  }).getGeneralSettings();
 
   return makeRootMetadata({
     title: generalSettings?.title,
@@ -123,6 +128,7 @@ export default async function RootLayout({
       <body
         className={`${urbanist.className} ${urbanist.variable} antialiased`}
       >
+        <WebsiteJsonLD />
         <AuthProvider>
           <AppContextProvider 
             brandingData={branding?.branding ?? null}
@@ -134,7 +140,7 @@ export default async function RootLayout({
                   menus={headerMenusByLocation} 
                   logoUrl={branding?.branding?.logoUrl ?? config.logo} 
                 />
-                {children}
+                <main>{children}</main>
                 <Toaster />
                 <Footer 
                   menus={footerMenusByLocation} 

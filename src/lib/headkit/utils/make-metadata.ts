@@ -2,7 +2,7 @@ import config from "@/headkit.config";
 
 import { removeHtmlTags } from "@/lib/utils";
 import { Metadata } from "next";
-import { PostTypeSeoContentFragment } from "../generated";
+import { PostTypeSeoContentFragment, TaxonomySeoContentFragment } from "../generated";
 
 interface RootMetadata {
   title?: string | null;
@@ -11,15 +11,12 @@ interface RootMetadata {
 
 const makeRootMetadata = ({ title, description }: RootMetadata): Metadata => {
   return {
-    title: {
-      template: `%s | ${ config .metadata.appName}`,
-      default: title ||  config .metadata.appName,
-    },
-    description: description ||  config .metadata.description,
+    title: title || config.metadata.appName,
+    description: description || config.metadata.description,
   };
 };
 
-type SEOContentFragment = PostTypeSeoContentFragment | null | undefined;
+type SEOContentFragment = TaxonomySeoContentFragment | PostTypeSeoContentFragment | null | undefined;
 
 const makeSEOMetadata = (
   seo?: SEOContentFragment, // Assuming SeoContentFragment combines both types
@@ -62,12 +59,12 @@ const makeSEOMetadata = (
 
   const openGraphAltText =
     (
-      options?.override?.openGraph?.images as unknown as { altText: string }[]
-    )?.[0]?.altText ||
+      options?.override?.openGraph?.images as unknown as { alt: string }[]
+    )?.[0]?.alt ||
     seo?.opengraphImage?.altText ||
     (
-      options?.fallback?.openGraph?.images as unknown as { altText: string }[]
-    )?.[0]?.altText ||
+      options?.fallback?.openGraph?.images as unknown as { alt: string }[]
+    )?.[0]?.alt ||
      config .metadata.openGraphImageFallback;
 
   const twitterImage =
@@ -79,11 +76,11 @@ const makeSEOMetadata = (
      config .metadata.openGraphImageFallback;
 
   const twitterAltText =
-    (options?.override?.twitter?.images as unknown as { altText: string }[])?.[0]
-      ?.altText ||
+    (options?.override?.twitter?.images as unknown as { alt: string }[])?.[0]
+      ?.alt ||
     seo?.twitterImage?.altText ||
-    (options?.fallback?.twitter?.images as unknown as { altText: string }[])?.[0]
-      ?.altText ||
+    (options?.fallback?.twitter?.images as unknown as { alt: string }[])?.[0]
+      ?.alt ||
      config .metadata.openGraphImageFallback;
 
   const openGraph = {
@@ -99,7 +96,9 @@ const makeSEOMetadata = (
         seo?.opengraphDescription ||
         seo?.metaDesc ||
         options?.fallback?.description ||
-         config .metadata.description ||
+        options?.override?.description ||
+        description ||
+        config.metadata.description ||
         ""
     ),
     url: options?.override?.openGraph?.url || "",
@@ -127,7 +126,9 @@ const makeSEOMetadata = (
       options?.override?.twitter?.description ||
         seo?.twitterDescription ||
         seo?.metaDesc ||
-         config .metadata.description ||
+        options?.override?.description ||
+        description ||
+        config.metadata.description ||
         ""
     ),
     ...(twitterImage && {

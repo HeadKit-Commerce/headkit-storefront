@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { Button } from "@/components/ui/button";
@@ -11,37 +11,40 @@ import { Cart } from "@/components/checkout/cart";
 import { currencyFormatter } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 
-export default function Page() {
-  const { cartData, toggleCartDrawer } = useAppContext();
-  const [showCart, setShowCart] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+// Separate component for handling search params
+function CheckoutErrorHandler({ onError }: { onError: (error: string) => void }) {
   const searchParams = useSearchParams();
-
-  // Check for error parameter
-  const error = searchParams.get("error");
-
-  // Handle any error messages from redirect
+  
   useEffect(() => {
+    const error = searchParams.get("error");
     if (error) {
       switch (error) {
         case "payment_failed":
-          setErrorMessage("Payment failed. Please try again.");
+          onError("Payment failed. Please try again.");
           break;
         case "checkout_failed":
-          setErrorMessage(
+          onError(
             "There was an issue processing your order. Please try again."
           );
           break;
         case "stripe_error":
-          setErrorMessage(
+          onError(
             "There was an issue with the payment processor. Please try again."
           );
           break;
         default:
-          setErrorMessage("An error occurred. Please try again.");
+          onError("An error occurred. Please try again.");
       }
     }
-  }, [error]);
+  }, [searchParams, onError]);
+
+  return null;
+}
+
+export default function Page() {
+  const { cartData, toggleCartDrawer } = useAppContext();
+  const [showCart, setShowCart] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     toggleCartDrawer(false);
@@ -123,6 +126,9 @@ export default function Page() {
 
   return (
     <div className="min-h-[700px] py-5">
+      <Suspense fallback={null}>
+        <CheckoutErrorHandler onError={setErrorMessage} />
+      </Suspense>
       {errorMessage && (
         <div className="text-red-500 text-center mb-4 px-4">{errorMessage}</div>
       )}
@@ -132,3 +138,4 @@ export default function Page() {
     </div>
   );
 }
+

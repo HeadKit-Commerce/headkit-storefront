@@ -4,6 +4,7 @@ import { getProductCategory, getProductFilters, getProductList } from "@/lib/hea
 import { CollectionPage } from "@/components/collection/collection-page";
 import { makeWhereProductQuery, SortKeyType, makeBreadcrumbFromProductCategoryData, makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
+import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 
 interface CollectionPageProps {
   params: Promise<{
@@ -30,10 +31,12 @@ export async function generateMetadata({
   const { data } = await getProductCategory({ slug: categorySlug });
   if (!data?.productCategory) return notFound();
 
-  return {
-    title: data.productCategory.name || "Collection",
-    description: data.productCategory.description || `Browse our ${categorySlug} collection`,
-  };
+  return makeSEOMetadata(data.productCategory.seo, {
+    fallback: {
+      title: data.productCategory.name,
+      description: data.productCategory.description,
+    },
+  });
 }
 
 export default async function Page({ params, searchParams }: CollectionPageProps) {
