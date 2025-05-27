@@ -9,6 +9,25 @@ import { headkit } from "@/lib/headkit/client";
 import { CoreButton, CoreGroup, CoreHeading, CoreParagraph, PageIdType, ProductContentFullWithGroupFragment, WoocommerceHandpickedProducts, WoocommerceProductNew, WoocommerceProductOnSale } from "@/lib/headkit/generated";
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
+import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { getPage } from "@/lib/headkit/actions";
+
+export async function generateMetadata() {
+  const { data } = await getPage({ id: "/", type: PageIdType.Uri });
+  const seo = data?.page?.seo;
+  return await makeSEOMetadata(seo, {
+    override: {
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}`,
+      },
+    },
+    fallback: {
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}`,
+      },
+    },
+  });
+}
 
 export default async function Home() {
   const [

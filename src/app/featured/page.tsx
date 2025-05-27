@@ -1,5 +1,6 @@
 import { CollectionPage } from "@/components/collection/collection-page";
 import { getPage, getProductFilters, getProductList } from "@/lib/headkit/actions";
+
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { SortKeyType } from "@/components/collection/utils";
@@ -7,12 +8,12 @@ import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 import { PageIdType } from "@/lib/headkit/generated";
 
 export async function generateMetadata() {
-  const { data } = await getPage({ id: "/new", type: PageIdType.Uri });
+  const { data } = await getPage({ id: "/featured", type: PageIdType.Uri });
   const seo = data?.page?.seo;
   return await makeSEOMetadata(seo, {
     fallback: {
       alternates: {
-        canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/new`,
+        canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/featured`,
       },
     },
   });
@@ -41,7 +42,7 @@ export default async function Page({ searchParams }: Props) {
   const [{ data: initialProducts }, { data: productFilter }] = await Promise.all([
     getProductList({
       input: {
-        where: makeWhereProductQuery("new-products"),
+        where: makeWhereProductQuery("featured"),
         first: itemsPerPage,
       }
     }),
@@ -61,8 +62,8 @@ export default async function Page({ searchParams }: Props) {
   return (
     <>
       <CollectionHeader
-        name="New Arrivals"
-        description="Discover our latest products from the last 30 days"
+        name="Featured Products"
+        description="Discover our handpicked selection of featured products"
         breadcrumbData={[
           {
             name: "Home",
@@ -70,8 +71,8 @@ export default async function Page({ searchParams }: Props) {
             current: false,
           },
           {
-            name: "New Arrivals",
-            uri: "/new",
+            name: "Featured Products",
+            uri: "/featured",
             current: true,
           },
         ]}
@@ -84,4 +85,4 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
-}
+} 

@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { data } = await getProductCategory({ slug: categorySlug });
   if (!data?.productCategory) return notFound();
 
-  return makeSEOMetadata(data.productCategory.seo, {
+  return await makeSEOMetadata(data.productCategory.seo, {
     fallback: {
       title: data.productCategory.name,
       description: data.productCategory.description,

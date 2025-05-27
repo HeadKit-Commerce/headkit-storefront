@@ -1,8 +1,22 @@
 import { CollectionPage } from "@/components/collection/collection-page";
-import { getProductFilters, getProductList } from "@/lib/headkit/actions";
-import { makeWhereProductQuery } from "@/components/collection/utils";
+import { getPage, getProductFilters, getProductList } from "@/lib/headkit/actions";
+import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { SortKeyType } from "@/components/collection/utils";
+import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { PageIdType } from "@/lib/headkit/generated";
+
+export async function generateMetadata() {
+  const { data } = await getPage({ id: "/sale", type: PageIdType.Uri });
+  const seo = data?.page?.seo;
+  return await makeSEOMetadata(seo, {
+    fallback: {
+      alternates: {
+        canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/sale`,
+      },
+    },
+  });
+}
 
 interface Props {
   searchParams: Promise<{ [key: string]: string }>;
@@ -27,12 +41,7 @@ export default async function Page({ searchParams }: Props) {
   const [{ data: initialProducts }, { data: productFilter }] = await Promise.all([
     getProductList({
       input: {
-        where: makeWhereProductQuery({
-          filterQuery: filterState,
-          page: pageNumber,
-          perPage: itemsPerPage,
-          onSale: true,
-        }),
+        where: makeWhereProductQuery("sale"),
         first: itemsPerPage,
       }
     }),

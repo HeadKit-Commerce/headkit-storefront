@@ -48,7 +48,7 @@ export async function generateMetadata(
       };
     }
 
-    return makeSEOMetadata(seo, {
+    return await makeSEOMetadata(seo, {
       fallback: {
         title: product?.data?.product?.name,
         description: product?.data?.product?.shortDescription,

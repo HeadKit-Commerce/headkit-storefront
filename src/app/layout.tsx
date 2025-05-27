@@ -13,8 +13,9 @@ import { ThemeProvider } from '@/contexts/theme-context';
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import config from "@/headkit.config";
-import { getBranding, getStripeConfig } from "@/lib/headkit/actions";
+import { getBranding, getStoreSettings, getStripeConfig } from "@/lib/headkit/actions";
 import { WebsiteJsonLD } from "@/components/seo/website-json-ld";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 const urbanist = Urbanist({
   weight: ["400", "500", "600", "700", "800"],
@@ -31,7 +32,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     revalidateTags: ["headkit:general-settings"],
   }).getGeneralSettings();
 
-  return makeRootMetadata({
+  return await makeRootMetadata({
     title: generalSettings?.title,
     description: generalSettings?.description,
   });
@@ -42,10 +43,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [{ data: branding }, { data: menu }, { data: stripeConfigData }] = await Promise.all([
+  const [{ data: branding }, { data: menu }, { data: stripeConfigData }, { data: storeSettings }] = await Promise.all([
     getBranding(),
     headkit().getMenu(),
-    getStripeConfig()
+    getStripeConfig(),
+    getStoreSettings()
   ]);
 
   // Use the enum to fetch menus by location
@@ -128,6 +130,7 @@ export default async function RootLayout({
       <body
         className={`${urbanist.className} ${urbanist.variable} antialiased`}
       >
+        {storeSettings?.storeSettings?.gtmId && <GoogleTagManager gtmId={storeSettings?.storeSettings?.gtmId} />}
         <WebsiteJsonLD />
         <AuthProvider>
           <AppContextProvider 

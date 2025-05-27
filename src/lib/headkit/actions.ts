@@ -385,6 +385,11 @@ const getStripeConfig = async () => {
   return response;
 };
 
+const getStoreSettings = async () => {
+  const response = await headkit().getStoreSettings();
+  return response;
+};  
+
 const getPickupLocations = async () => {
   const response = await headkit().getPickupLocations();
   return response;
@@ -497,6 +502,11 @@ export async function getBranding() {
   return response;
 }
 
+export async function getSEOSettings() {
+  const response = await headkit().getSEOSettings();
+  return response;
+}
+
 export async function getPage({ id, type }: { id: string; type: PageIdType }) {
   const response = await headkit().getPage({ id, type });
   return response;
@@ -534,4 +544,5 @@ export {
   getOrders,
   getGuestOrder,
   actionWishlist,
+  getStoreSettings,
 };

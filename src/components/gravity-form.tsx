@@ -47,15 +47,7 @@ interface FormField {
   databaseId: number;
 }
 
-interface DataLayer {
-  push(event: { event: string; ecommerce: { item_list_name: string } }): void;
-}
 
-declare global {
-  interface Window {
-    dataLayer?: DataLayer;
-  }
-}
 
 // Helper function to generate Zod schema based on form fields
 const generateValidationSchema = (fields: FormField[]) => {
@@ -385,13 +377,16 @@ export const GravityForm = ({
       );
 
       // Track form submission
-      if (typeof window !== "undefined" && window.dataLayer) {
-        window.dataLayer.push({
-          event: "enquire_form",
-          ecommerce: {
-            item_list_name: values?.product_name || "",
-          },
-        });
+      if (typeof window !== "undefined") {
+        const dataLayer = (window as Window & { dataLayer?: Array<Record<string, unknown>> }).dataLayer;
+        if (dataLayer) {
+          dataLayer.push({
+            event: "enquire_form",
+            ecommerce: {
+              item_list_name: values?.product_name || "",
+            },
+          });
+        }
       }
 
       form.reset();

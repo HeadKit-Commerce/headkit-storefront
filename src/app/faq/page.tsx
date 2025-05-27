@@ -3,6 +3,7 @@ import { PageIdType, PostObjectsConnectionOrderbyEnum, OrderEnum } from "@/lib/h
 import { Metadata } from "next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import sanitize from "sanitize-html";
+import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 
 const FAQ_SLUG = "faq";
 
@@ -23,14 +24,12 @@ export async function generateMetadata(): Promise<Metadata> {
     };
   }
 
-  return {
-    title: page.seo.title || page.title,
-    description: page.seo.metaDesc,
-    robots: {
-      index: page.seo.metaRobotsNoindex === "noindex" ? false : true,
-      follow: page.seo.metaRobotsNofollow === "nofollow" ? false : true,
+  return await makeSEOMetadata(page.seo, {
+    fallback: {
+      title: page.title,
+      description: page.seo.metaDesc,
     },
-  };
+  });
 }
 
 export default async function FAQPage() {

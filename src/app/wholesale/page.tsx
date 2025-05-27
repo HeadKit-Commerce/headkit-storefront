@@ -5,18 +5,18 @@ import { headkit } from "@/lib/headkit/client";
 import sanitize from "sanitize-html";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 
-const CONTACT_SLUG = "contact";
+const WHOLESALE_SLUG = "wholesale";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { data } = await headkit().getPage({
-    id: CONTACT_SLUG,
+    id: WHOLESALE_SLUG,
     type: PageIdType.Uri,
   });
 
   const page = data?.page;
   if (!page?.seo) {
     return {
-      title: "Contact Us",
+      title: "Wholesale",
       robots: {
         index: false,
         follow: false,
@@ -32,9 +32,9 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function ContactPage() {
+export default async function Page() {
   const { data } = await headkit().getPage({
-    id: CONTACT_SLUG,
+    id: WHOLESALE_SLUG,
     type: PageIdType.Uri,
   });
 
@@ -58,17 +58,7 @@ export default async function ContactPage() {
 
         {/* Right Column - Form */}
         <div>
-          <GravityForm formId="1" />
-        </div>
-
-        {/* Full Width Map */}
-        <div className="col-span-1 mt-12 md:col-span-2">
-          <iframe
-            className="h-[450px] w-full rounded-lg"
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d414.2441332052148!2d151.208024!3d-33.839321!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6b12aef2f20f9d09%3A0x2df5ebd486d15fd6!2sSophos%20House%2C%206%2F1%20Elizabeth%20Plaza%2C%20North%20Sydney%20NSW%202060%2C%20Australia!5e0!3m2!1sen!2sth!4v1715583061026!5m2!1sen!2sth"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          <GravityForm formId="2" />
         </div>
       </div>
     </div>

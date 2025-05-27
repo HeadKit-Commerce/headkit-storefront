@@ -34474,6 +34474,7 @@ export type Query = {
    * @deprecated Use &quot;product&quot; instead.
    */
   simpleProduct?: Maybe<SimpleProduct>;
+  storeSettings: StoreSettings;
   stripeConfig: StripeConfig;
   /** A 0bject */
   tag?: Maybe<Tag>;
@@ -41335,6 +41336,18 @@ export enum StockStatusEnum {
   OnBackorder = 'ON_BACKORDER',
   OutOfStock = 'OUT_OF_STOCK'
 }
+
+export type StoreSettings = {
+  __typename?: 'StoreSettings';
+  createdAt: Scalars['String']['output'];
+  domain?: Maybe<Scalars['String']['output']>;
+  gtmId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+  updatedAt: Scalars['String']['output'];
+  webhookUrl?: Maybe<Scalars['String']['output']>;
+};
 
 export type StripeConfig = {
   __typename?: 'StripeConfig';
@@ -52612,6 +52625,11 @@ export type GetSeoSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetSeoSettingsQuery = { __typename?: 'Query', seoSettings: { __typename?: 'SeoSettings', title?: string | null, description?: string | null, ogImageUrl?: string | null, enableSitemap: boolean, createdAt?: string | null, updatedAt?: string | null } };
 
+export type GetStoreSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetStoreSettingsQuery = { __typename?: 'Query', storeSettings: { __typename?: 'StoreSettings', gtmId?: string | null } };
+
 export type GetStripeConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -54467,6 +54485,13 @@ export const GetSeoSettingsDocument = gql`
   }
 }
     `;
+export const GetStoreSettingsDocument = gql`
+    query getStoreSettings {
+  storeSettings {
+    gtmId
+  }
+}
+    `;
 export const GetStripeConfigDocument = gql`
     query getStripeConfig {
   stripeConfig {
@@ -54524,6 +54549,7 @@ const GetProductListDocumentString = print(GetProductListDocument);
 const GetProductSlugsDocumentString = print(GetProductSlugsDocument);
 const GetProductsDocumentString = print(GetProductsDocument);
 const GetSeoSettingsDocumentString = print(GetSeoSettingsDocument);
+const GetStoreSettingsDocumentString = print(GetStoreSettingsDocument);
 const GetStripeConfigDocumentString = print(GetStripeConfigDocument);
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
@@ -54655,6 +54681,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     getSEOSettings(variables?: GetSeoSettingsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetSeoSettingsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetSeoSettingsQuery>(GetSeoSettingsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getSEOSettings', 'query', variables);
+    },
+    getStoreSettings(variables?: GetStoreSettingsQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetStoreSettingsQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
+        return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetStoreSettingsQuery>(GetStoreSettingsDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getStoreSettings', 'query', variables);
     },
     getStripeConfig(variables?: GetStripeConfigQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<{ data: GetStripeConfigQuery; errors?: GraphQLError[]; extensions?: any; headers: Headers; status: number; }> {
         return withWrapper((wrappedRequestHeaders) => client.rawRequest<GetStripeConfigQuery>(GetStripeConfigDocumentString, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getStripeConfig', 'query', variables);
