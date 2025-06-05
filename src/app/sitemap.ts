@@ -55,7 +55,8 @@ const makeBrandSitemap = async (): Promise<MetadataRoute.Sitemap> => {
 };
 
 const makeCollectionSitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const response = await headkit().getProductCategories();
+  const client = await headkit();
+  const response = await client.getProductCategories();
   const categories = response.data?.productCategories?.nodes || [];
 
   return categories
@@ -79,7 +80,8 @@ const makeProductSitemap = async (): Promise<MetadataRoute.Sitemap> => {
   // Create direct recursive function with types
   async function getProducts(cursor?: string | null): Promise<ProductNode[]> {
     // Use the raw client to avoid intermediaries
-    const response = await headkit().getProductSlugs({ after: cursor });
+    const client = await headkit();
+    const response = await client.getProductSlugs({ after: cursor });
 
     const products = (response.data?.products?.nodes || []).map(
       (product: GraphQLProductNode): ProductNode => ({

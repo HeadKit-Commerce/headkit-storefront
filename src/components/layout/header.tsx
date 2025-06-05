@@ -36,6 +36,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
+import { getCart } from "@/lib/headkit/actions";
 
 interface Props {
   menus: Record<
@@ -120,6 +121,12 @@ function Header({ menus, logoUrl }: Props) {
               <MenuSection menuItems={mainRightMenu.menuItems.nodes} />
             )}
           </div>
+          <NavigationMenuItem>
+            <Button variant="ghost" size="icon" onClick={async () => {
+              const cart = await getCart();
+              console.log(cart);
+            }}>fetch cart</Button>
+          </NavigationMenuItem>
           <NavigationMenuItem>
             <SearchDrawer />
           </NavigationMenuItem>

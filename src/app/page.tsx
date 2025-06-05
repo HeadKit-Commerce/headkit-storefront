@@ -6,7 +6,17 @@ import { PostCarousel } from "@/components/carousel/post-carousel";
 import { ProductCarousel } from "@/components/carousel/product-carousel";
 import { SectionHeader } from "@/components/common/section-header";
 import { headkit } from "@/lib/headkit/client";
-import { CoreButton, CoreGroup, CoreHeading, CoreParagraph, PageIdType, ProductContentFullWithGroupFragment, WoocommerceHandpickedProducts, WoocommerceProductNew, WoocommerceProductOnSale } from "@/lib/headkit/generated";
+import {
+  CoreButton,
+  CoreGroup,
+  CoreHeading,
+  CoreParagraph,
+  PageIdType,
+  ProductContentFullWithGroupFragment,
+  WoocommerceHandpickedProducts,
+  WoocommerceProductNew,
+  WoocommerceProductOnSale,
+} from "@/lib/headkit/generated";
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
@@ -30,6 +40,7 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
+  const client = await headkit();
   const [
     page,
     mainCarousel,
@@ -38,15 +49,15 @@ export default async function Home() {
     featuredProducts,
     posts,
   ] = await Promise.all([
-    headkit().getPage({ id: "/", type: PageIdType.Uri }),
-    headkit().getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
-    headkit().getProductCategories({ where: { featured: true } }),
-    headkit().getBrands({ where: { featured: true } }),
-    headkit().getProducts({
+    client.getPage({ id: "/", type: PageIdType.Uri }),
+    client.getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
+    client.getProductCategories({ where: { featured: true } }),
+    client.getBrands({ where: { featured: true } }),
+    client.getProducts({
       first: 10,
       where: makeWhereProductQuery("featured"),
     }),
-    headkit().getPosts({ first: 10 }),
+    client.getPosts({ first: 10 }),
   ]);
 
   const editorBlocks = processBlockEditor(
@@ -170,7 +181,6 @@ export default async function Home() {
             />
           </div>
         </div>
-
       )}
     </>
   );

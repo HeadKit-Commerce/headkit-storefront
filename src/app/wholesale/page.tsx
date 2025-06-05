@@ -8,7 +8,8 @@ import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 const WHOLESALE_SLUG = "wholesale";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await headkit().getPage({
+  const client = await headkit();
+  const { data } = await client.getPage({
     id: WHOLESALE_SLUG,
     type: PageIdType.Uri,
   });
@@ -33,7 +34,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const { data } = await headkit().getPage({
+  const client = await headkit();
+  const { data } = await client.getPage({
     id: WHOLESALE_SLUG,
     type: PageIdType.Uri,
   });

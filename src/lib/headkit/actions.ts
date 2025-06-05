@@ -1,6 +1,7 @@
 "use server";
 
 import { headkit } from "./client";
+import { headkitStatic } from "./client";
 import {
   ActionWishlistInput,
   AddToCartInput,
@@ -18,240 +19,149 @@ import {
   UpdateCustomerInput,
   UpdateItemQuantitiesInput,
 } from "./generated";
-import { cookies } from "next/headers";
 import { v7 as uuidv7 } from "uuid";
 import { getWoocommerceAuthToken } from "./actions/auth";
-import { COOKIE_NAMES } from "./constants";
-import {
-  parseCookies,
-  getSessionKeyFromCookies,
-  encodeSessionCookie,
-} from "./utils/cookies";
 
-const getClientConfig = async (singleCheckout?: boolean) => {
+// Simplified client config - no cookie management needed
+const getClientConfig = async () => {
   const config: {
-    authToken?: string;
-    woocommerceSession?: string;
-    mailchimpUserEmail?: string;
-    mailchimpUserPreviousEmail?: string;
+    userAuthToken?: string; // New unified auth
+    platform?: "woocommerce" | "shopify" | "stripe" | "auto";
+    debug?: boolean;
+    forceNoCache?: boolean;
   } = {};
 
-  const authToken = await getWoocommerceAuthToken();
-  if (authToken) {
-    config.authToken = authToken;
-  }
-
-  if (singleCheckout) {
-    const singleCheckoutToken = (await cookies()).get(
-      COOKIE_NAMES.SINGLE_CHECKOUT
-    )?.value;
-    if (singleCheckoutToken) {
-      config.woocommerceSession = singleCheckoutToken;
-    }
-  } else {
-    const sessionToken = (await cookies()).get(COOKIE_NAMES.SESSION)?.value;
-    if (sessionToken) {
-      config.woocommerceSession = sessionToken;
-    }
-  }
-
-  const mailchimpUserEmail = (await cookies()).get(
-    "mailchimp_user_email"
-  )?.value;
-  if (mailchimpUserEmail) {
-    config.mailchimpUserEmail = mailchimpUserEmail;
-  }
-
-  const mailchimpUserPreviousEmail = (await cookies()).get(
-    "mailchimp_user_previous_email"
-  )?.value;
-  if (mailchimpUserPreviousEmail) {
-    config.mailchimpUserPreviousEmail = mailchimpUserPreviousEmail;
+  // Get user auth token (platform-agnostic)
+  const userAuthToken = await getWoocommerceAuthToken();
+  if (userAuthToken) {
+    config.userAuthToken = userAuthToken;
+    config.platform = "woocommerce"; // Could be auto-detected by gateway
   }
 
   return config;
 };
 
-const handleSessionResponse = async (
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  response: any,
-  singleCheckout?: boolean
-) => {
-  const setCookieHeader = response.headers.get("set-cookie");
-  if (!setCookieHeader) {
-    return;
-  }
-
-  const cookiesObj = parseCookies(setCookieHeader);
-  const cookieStore = await cookies();
-
-  const sessionKey = getSessionKeyFromCookies(cookiesObj);
-
-  if (sessionKey) {
-    const sessionValue = cookiesObj[sessionKey];
-    const encodedSession = encodeSessionCookie(sessionKey, sessionValue);
-
-    if (singleCheckout) {
-      cookieStore.set(COOKIE_NAMES.SINGLE_CHECKOUT, encodedSession);
-    } else {
-      cookieStore.set(COOKIE_NAMES.SESSION, encodedSession);
-    }
-  }
-
-  Object.entries(cookiesObj).forEach(([name, value]) => {
-    if (!name.startsWith("wp_woocommerce_session_")) {
-      cookieStore.set(name, value);
-    }
-  });
-};
-
+// Simple actions - now with automatic cookie handling via the new headkit()
 const getCart = async () => {
   const config = await getClientConfig();
-
-  const response = await headkit(config).getCart();
-  await handleSessionResponse(response);
-  return response;
-};
-
-const addToCart = async ({
-  input,
-  singleCheckout,
-}: {
-  input: AddToCartInput;
-  singleCheckout?: boolean;
-}) => {
-  const config = await getClientConfig(singleCheckout);
-
-  const response = await headkit(config).addToCart({ input });
-  await handleSessionResponse(response, singleCheckout);
-  return response;
-};
-
-const removeCartItem = async ({
-  cartInput,
-}: {
-  cartInput: RemoveItemsFromCartInput;
-}) => {
-  const response = await headkit(await getClientConfig()).removeItemsFromCart({
-    cartInput,
+  const client = await headkit({
+    ...config,
+    debug: true,
+    forceNoCache: true, // Cart is always fresh
   });
-  await handleSessionResponse(response);
+  
+  const response = await client.getCart();
+  console.log("getCart response with cookies:", JSON.stringify(response, null, 2));
+  return response;
+};
+
+const addToCart = async ({ input }: { input: AddToCartInput }) => {
+  const config = await getClientConfig();
+  const client = await headkit({
+    ...config,
+    debug: true,
+    forceNoCache: true,
+  });
+  
+  const response = await client.addToCart({ input });
+  console.log("addToCart response with cookies:", JSON.stringify(response, null, 2));
+  return response;
+};
+
+const removeCartItem = async ({ cartInput }: { cartInput: RemoveItemsFromCartInput }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.removeItemsFromCart({ cartInput });
   return response;
 };
 
 const applyCoupon = async ({ code }: { code: string }) => {
-  const response = await headkit(await getClientConfig()).applyCoupon({ code });
-  await handleSessionResponse(response);
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.applyCoupon({ code });
   return response;
 };
 
 const removeCoupons = async ({ code }: { code: string }) => {
-  const response = await headkit(await getClientConfig()).removeCoupons({
-    code,
-  });
-  await handleSessionResponse(response);
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.removeCoupons({ code });
   return response;
 };
 
-const checkout = async ({
-  input,
-  singleCheckout,
-}: {
-  input: CheckoutInput;
-  singleCheckout?: boolean;
-}) => {
-  const response = await headkit(
-    await getClientConfig(singleCheckout)
-  ).checkout({ input });
-
+const checkout = async ({ input }: { input: CheckoutInput }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.checkout({ input });
   return response;
 };
 
 const getCustomer = async (variables: GetCustomerQueryVariables) => {
   const config = await getClientConfig();
-  const response = await headkit(config).getCustomer(variables);
-
+  const client = await headkit(config);
+  const response = await client.getCustomer(variables);
   return response;
 };
 
 const emptyCart = async () => {
-  const response = await headkit(await getClientConfig()).emptyCart({
-    input: {},
-  });
-
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.emptyCart({ input: {} });
   return response;
 };
 
-const updateShippingMethod = async ({
-  shippingMethod,
-  singleCheckout,
-}: {
-  shippingMethod: string;
-  singleCheckout?: boolean;
-}) => {
-  const response = await headkit(
-    await getClientConfig(singleCheckout)
-  ).updateShippingMethod({
-    shippingMethod,
-  });
-  await handleSessionResponse(response, singleCheckout);
+const updateShippingMethod = async ({ shippingMethod }: { shippingMethod: string }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.updateShippingMethod({ shippingMethod });
   return response;
 };
 
 const getPaymentGateways = async () => {
-  const response = await headkit().getPaymentGateways();
+  const client = await headkit();
+  const response = await client.getPaymentGateways();
   return response;
 };
 
-const createPaymentIntent = async ({
-  amount,
-  currency,
-}: {
-  amount: number;
-  currency: string;
-}) => {
-  const response = await headkit(await getClientConfig()).createPaymentIntent({
-    input: {
-      amount,
-      currency,
-    },
+const createPaymentIntent = async ({ amount, currency }: { amount: number; currency: string }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.createPaymentIntent({
+    input: { amount, currency },
   });
   return response;
 };
 
-const updateCustomer = async ({
-  input,
-  withCustomer = true,
-  withCart = false,
-  singleCheckout = false,
-}: {
+const updateCustomer = async ({ input, withCustomer = true, withCart = false }: {
   input: UpdateCustomerInput;
   withCustomer?: boolean;
   withCart?: boolean;
-  singleCheckout?: boolean;
 }) => {
-  const config = await getClientConfig(singleCheckout);
-  const response = await headkit(config).updateCustomer({
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.updateCustomer({
     input,
     withCustomer,
     withCart,
   });
-  await handleSessionResponse(response, singleCheckout);
   return response;
 };
 
 const getGravityFormById = async ({ id }: { id: string }) => {
-  const response = await headkit().getGravityFormById({ id });
+  const client = await headkit();
+  const response = await client.getGravityFormById({ id });
   return response;
 };
 
 const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
-  const response = await headkit().submitGravityForm({ input });
+  const client = await headkit();
+  const response = await client.submitGravityForm({ input });
   return response;
 };
 
 const sendPasswordResetEmail = async ({ email }: { email: string }) => {
-  const response = await headkit().sendPasswordResetEmail({
+  const client = await headkit();
+  const response = await client.sendPasswordResetEmail({
     input: {
       clientMutationId: uuidv7(),
       username: email,
@@ -260,12 +170,11 @@ const sendPasswordResetEmail = async ({ email }: { email: string }) => {
   return response;
 };
 
-const resetUserPassword = async ({
-  input,
-}: {
+const resetUserPassword = async ({ input }: {
   input: { key: string; login: string; password: string };
 }) => {
-  const response = await headkit().resetUserPassword({
+  const client = await headkit();
+  const response = await client.resetUserPassword({
     input: {
       clientMutationId: uuidv7(),
       ...input,
@@ -274,14 +183,9 @@ const resetUserPassword = async ({
   return response;
 };
 
-const login = async ({
-  email,
-  password,
-}: {
-  email: string;
-  password: string;
-}) => {
-  const response = await headkit().login({
+const login = async ({ email, password }: { email: string; password: string }) => {
+  const client = await headkit();
+  const response = await client.login({
     input: {
       clientMutationId: uuidv7(),
       username: email,
@@ -302,7 +206,8 @@ const registerUser = async ({
   email: string;
   password: string;
 }) => {
-  const response = await headkit().registerUser({
+  const client = await headkit();
+  const response = await client.registerUser({
     input: {
       clientMutationId: uuidv7(),
       username: email,
@@ -316,34 +221,27 @@ const registerUser = async ({
   return response;
 };
 
-const updateItemQuantities = async ({
-  input,
-}: {
-  input: UpdateItemQuantitiesInput;
-}) => {
-  const response = await headkit(await getClientConfig()).updateItemQuantities({
-    input,
-  });
-  await handleSessionResponse(response);
+const updateItemQuantities = async ({ input }: { input: UpdateItemQuantitiesInput }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.updateItemQuantities({ input });
   return response;
 };
 
 const getAvailablePaymentMethods = async () => {
-  const response = await headkit(
-    await getClientConfig()
-  ).getAvailablePaymentMethods();
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.getAvailablePaymentMethods();
   return response;
 };
 
 const getOrder = async ({ id }: { id: string }) => {
-  const singleCheckoutToken = (await cookies()).get(
-    COOKIE_NAMES.SINGLE_CHECKOUT
-  )?.value;
-  const config = await getClientConfig(!!singleCheckoutToken);
+  const config = await getClientConfig();
 
-  if (config.authToken) {
+  if (config.userAuthToken) {
     // Logged in user - use getOrder
-    const order = await headkit(config).getOrder({ orderId: id });
+    const client = await headkit(config);
+    const order = await client.getOrder({ orderId: id });
     return {
       data: {
         order: order.data?.order,
@@ -351,12 +249,8 @@ const getOrder = async ({ id }: { id: string }) => {
     };
   }
 
-  // Guest user - try both session tokens
-  const guestOrder = await getGuestOrder({
-    orderId: id,
-    sessionToken: singleCheckoutToken || config.woocommerceSession,
-  });
-
+  // Guest user - try to get order through customer query
+  const guestOrder = await getGuestOrder({ orderId: id });
   return {
     data: {
       order: guestOrder.data?.customer?.orders?.nodes?.[0],
@@ -364,79 +258,64 @@ const getOrder = async ({ id }: { id: string }) => {
   };
 };
 
-const getProductList = async ({
-  input,
-}: {
-  input: GetProductListQueryVariables;
-}) => {
-  const response = await headkit().getProductList(input);
+const getProductList = async ({ input }: { input: GetProductListQueryVariables }) => {
+  const client = await headkit();
+  const response = await client.getProductList(input);
   return response;
 };
 
-const getProductFilters = async (
-  productFiltersQuery?: GetProductFiltersQueryVariables
-) => {
-  const response = await headkit().getProductFilters(productFiltersQuery);
+const getProductFilters = async ({ input }: { input: GetProductFiltersQueryVariables }) => {
+  const client = await headkit();
+  const response = await client.getProductFilters(input);
   return response;
 };
 
 const getStripeConfig = async () => {
-  const response = await headkit().getStripeConfig();
+  const client = await headkit();
+  const response = await client.getStripeConfig();
   return response;
 };
 
 const getStoreSettings = async () => {
-  const response = await headkit().getStoreSettings();
+  const client = await headkit();
+  const response = await client.getStoreSettings();
   return response;
-};  
+};
 
 const getPickupLocations = async () => {
-  const response = await headkit().getPickupLocations();
+  const client = await headkit();
+  const response = await client.getPickupLocations();
   return response;
 };
 
-const updateCartItem = async ({
-  input,
-}: {
-  input: UpdateItemQuantitiesInput;
-}) => {
-  const response = await headkit(await getClientConfig()).updateItemQuantities({
-    input,
-  });
-
+const updateCartItemQuantity = async ({ input }: { input: UpdateItemQuantitiesInput }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.updateItemQuantities({ input });
   return response;
 };
 
-const getProductCategory = async ({ slug }: { slug: string }) => {
-  const response = await headkit().getProductCategory({
-    id: slug,
-    type: ProductCategoryIdType.Slug,
-  });
+const getProductCategory = async ({ id, type }: { id: string; type?: ProductCategoryIdType }) => {
+  const client = await headkit();
+  const response = await client.getProductCategory({ id, type });
   return response;
 };
 
 const getOrders = async () => {
-  const response = await headkit(await getClientConfig()).getOrders();
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.getOrders({ first: 20 });
   return response;
 };
 
-// For guest users in checkout success
-const getGuestOrder = async ({
-  orderId,
-  sessionToken,
-}: {
-  orderId: string;
-  sessionToken?: string;
-}) => {
-  const config = sessionToken
-    ? { woocommerceSession: sessionToken }
-    : await getClientConfig();
-
-  const response = await headkit(config).getCustomer({
+const getGuestOrder = async ({ orderId }: { orderId: string }) => {
+  const config = await getClientConfig();
+  const client = await headkit(config);
+  const response = await client.getCustomer({
     withAddress: true,
     withOrders: true,
   });
-
+  
   const order = response.data?.customer?.orders?.nodes?.find(
     (order) => order?.databaseId === Number(orderId)
   );
@@ -453,64 +332,102 @@ const getGuestOrder = async ({
   };
 };
 
+const updateCartItemMeta = async (order: Record<string, unknown>) => {
+  return Promise.resolve(order);
+};
+
 const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
-  const response = await headkit(await getClientConfig()).actionWishlist({
-    input,
+  const config = await getClientConfig();
+  const client = await headkit({
+    ...config,
+    forceNoCache: true,
   });
+  const response = await client.actionWishlist({ input });
   return response;
 };
 
 // Post Actions
-export async function getPostFilters({
-  input,
-}: {
-  input: GetPostCategoriesQueryVariables;
-}) {
-  const response = await headkit().getPostCategories(input);
+export async function getPostFilters({ input }: { input: GetPostCategoriesQueryVariables }) {
+  const client = await headkit();
+  const response = await client.getPostCategories(input);
   return response;
 }
 
-export async function getPostList({
-  input,
-}: {
-  input: GetPostsQueryVariables;
-}) {
-  const response = await headkit().getPosts(input);
+export async function getPostList({ input }: { input: GetPostsQueryVariables }) {
+  const client = await headkit();
+  const response = await client.getPosts(input);
   return response;
 }
 
 // Brand Actions
-export async function getBrandList({
-  input,
-}: {
-  input: GetBrandsQueryVariables;
-}) {
-  const response = await headkit().getBrands(input);
+export async function getBrandList({ input }: { input: GetBrandsQueryVariables }) {
+  const client = await headkit();
+  const response = await client.getBrands(input);
   return response;
 }
 
 export async function getBrand({ slug }: { slug: string }) {
-  const response = await headkit().getBrand({ slug });
+  const client = await headkit();
+  const response = await client.getBrand({ slug });
   return response;
 }
 
 export async function getBranding() {
-  const response = await headkit({
+  const client = await headkit({
     revalidateTime: 86400,
     revalidateTags: ["headkit:branding"],
-  }).getBranding();
+  });
+  const response = await client.getBranding();
   return response;
 }
 
 export async function getSEOSettings() {
-  const response = await headkit().getSEOSettings();
+  const client = await headkit();
+  const response = await client.getSEOSettings();
   return response;
 }
 
 export async function getPage({ id, type }: { id: string; type: PageIdType }) {
-  const response = await headkit().getPage({ id, type });
+  const client = await headkit();
+  const response = await client.getPage({ id, type });
   return response;
 }
+
+export async function getMenu() {
+  const client = await headkit();
+  const response = await client.getMenu();
+  return response;
+}
+
+// Static-safe versions for use during build/static generation
+const getCartStatic = async () => {
+  // Return null during static generation - cart is user-specific
+  return { data: { cart: null } };
+};
+
+const getMenuStatic = async () => {
+  const client = await headkitStatic();
+  const response = await client.getMenu();
+  return response;
+};
+
+const getBrandingStatic = async () => {
+  const client = await headkitStatic();
+  const response = await client.getBranding();
+  return response;
+};
+
+const getStoreSettingsStatic = async () => {
+  const client = await headkitStatic();
+  const response = await client.getStoreSettings();
+  return response;
+};
+
+const getStripeConfigStatic = async () => {
+  const client = await headkitStatic();
+  const response = await client.getStripeConfig();
+  return response;
+};
 
 export {
   getCustomer,
@@ -538,11 +455,18 @@ export {
   getProductFilters,
   getStripeConfig,
   getPickupLocations,
-  updateCartItem,
+  updateCartItemQuantity,
   getProductCategory,
   getWoocommerceAuthToken,
   getOrders,
   getGuestOrder,
+  updateCartItemMeta,
   actionWishlist,
   getStoreSettings,
+  // Static-safe versions
+  getMenuStatic,
+  getBrandingStatic, 
+  getStoreSettingsStatic,
+  getStripeConfigStatic,
+  getCartStatic,
 };

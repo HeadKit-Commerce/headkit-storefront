@@ -14,8 +14,9 @@ async function getPageData(params: Props["params"]) {
   const resolvedParams = await params;
   // Create URL path with leading slash
   const finalSlug = `/${resolvedParams.slug.join("/")}`;
+  const client = await headkit();
 
-  const response = await headkit().getPage({
+  const response = await client.getPage({
     id: finalSlug,
     type: PageIdType.Uri,
   });

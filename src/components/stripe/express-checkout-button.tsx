@@ -9,7 +9,7 @@ import { AlertBox } from "@/components/alert-box/alert-box";
 import { getFloatVal } from "@/lib/utils";
 import { addToCart, createPaymentIntent, updateCustomer, updateShippingMethod, checkout } from "@/lib/headkit/actions";
 import { CheckoutInput, CountriesEnum } from "@/lib/headkit/generated";
-import { removeSingleCheckoutSession } from "@/lib/headkit/actions/auth";
+import { removeSingleCheckoutSession, setSingleCheckoutSession } from "@/lib/headkit/actions/auth";
 import { v7 as uuidv7 } from "uuid";
 
 interface ExpressCheckoutButtonProps {
@@ -206,7 +206,6 @@ export function ExpressCheckoutButton({
               },
               withCustomer: false,
               withCart: true,
-              singleCheckout,
             });
 
             console.log("customerData", customerData);
@@ -246,7 +245,6 @@ export function ExpressCheckoutButton({
           try {
             const { data: updateCartResult } = await updateShippingMethod({
               shippingMethod: e.shippingRate.id,
-              singleCheckout,
             });
 
             elements?.update({
@@ -311,13 +309,15 @@ export function ExpressCheckoutButton({
 
               //add single item to new cart
               if (singleCheckout) {
+                // Set single checkout session cookie before adding to cart
+                await setSingleCheckoutSession();
+                
                 await addToCart({
                   input: {
                     quantity: 1,
                     productId: productId!,
                     variationId: variationId!,
                   },
-                  singleCheckout,
                 });
               }
 

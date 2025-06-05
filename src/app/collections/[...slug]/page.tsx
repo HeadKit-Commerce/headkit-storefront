@@ -5,6 +5,7 @@ import { CollectionPage } from "@/components/collection/collection-page";
 import { makeWhereProductQuery, SortKeyType, makeBreadcrumbFromProductCategoryData, makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { ProductCategoryIdType } from "@/lib/headkit/generated";
 
 interface CollectionPageProps {
   params: Promise<{
@@ -28,7 +29,7 @@ export async function generateMetadata({
 
   if (!categorySlug) return notFound();
 
-  const { data } = await getProductCategory({ slug: categorySlug });
+  const { data } = await getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug });
   if (!data?.productCategory) return notFound();
 
   return await makeSEOMetadata(data.productCategory.seo, {
@@ -68,8 +69,12 @@ export default async function Page({ params, searchParams }: CollectionPageProps
     };
 
     const [productCategory, productFilter, productsData] = await Promise.all([
-      getProductCategory({ slug: categorySlug }),
-      getProductFilters({ mainCategory: categorySlug }),
+      getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug }),
+      getProductFilters({ 
+        input: {
+          mainCategory: categorySlug 
+        }
+      }),
       getProductList({
         input: {
           where: makeWhereProductQuery({

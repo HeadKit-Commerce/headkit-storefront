@@ -1,5 +1,9 @@
 import { CollectionPage } from "@/components/collection/collection-page";
-import { getPage, getProductFilters, getProductList } from "@/lib/headkit/actions";
+import {
+  getPage,
+  getProductFilters,
+  getProductList,
+} from "@/lib/headkit/actions";
 
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { CollectionHeader } from "@/components/collection/collection-header";
@@ -25,7 +29,9 @@ interface Props {
 
 export default async function Page({ searchParams }: Props) {
   const parsedSearchParams = await searchParams;
-  const pageNumber = parsedSearchParams?.page ? parseInt(parsedSearchParams.page) : 0;
+  const pageNumber = parsedSearchParams?.page
+    ? parseInt(parsedSearchParams.page)
+    : 0;
   const itemsPerPage = 24;
 
   // Create filter state from search params
@@ -39,20 +45,22 @@ export default async function Page({ searchParams }: Props) {
   };
 
   // Fetch products and filters in parallel
-  const [{ data: initialProducts }, { data: productFilter }] = await Promise.all([
-    getProductList({
-      input: {
-        where: makeWhereProductQuery("featured"),
-        first: itemsPerPage,
-      }
-    }),
-    getProductFilters()
-  ]);
+  const [{ data: initialProducts }, { data: productFilter }] =
+    await Promise.all([
+      getProductList({
+        input: {
+          where: makeWhereProductQuery("featured"),
+          first: itemsPerPage,
+        },
+      }),
+      getProductFilters({ input: {} }),
+    ]);
 
   // Parse attribute filters after getting the product filter data
   productFilter?.productFilters?.attributes?.forEach((attr) => {
     if (attr?.slug) {
-      const values = parsedSearchParams[attr.slug]?.split(",").filter(Boolean) || [];
+      const values =
+        parsedSearchParams[attr.slug]?.split(",").filter(Boolean) || [];
       if (values.length) {
         filterState.attributes[attr.slug] = values;
       }
@@ -85,4 +93,4 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
-} 
+}

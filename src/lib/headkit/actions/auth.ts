@@ -32,10 +32,18 @@ export const shouldUpdateToken = async (token: string): Promise<boolean> => {
 };
 
 const getValidToken = async (cookieName: string) => {
-  const token = (await cookies()).get(cookieName)?.value;
-  if (!token) return null;
-  
-  return (await isTokenExpired(token)) ? null : token;
+  try {
+    const token = (await cookies()).get(cookieName)?.value;
+    if (!token) return null;
+    
+    return (await isTokenExpired(token)) ? null : token;
+  } catch (error) {
+    // This is expected during static generation
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`Could not read cookie ${cookieName} (likely during static generation):`, (error as Error).message || error);
+    }
+    return null;
+  }
 };
 
 export const getWoocommerceAuthToken = async () => {
@@ -47,17 +55,65 @@ export const getWoocommerceSession = async () => {
 };
 
 export const handleAuthToken = async (token: string) => {
-  (await cookies()).set(COOKIE_NAMES.AUTH_TOKEN, token);
+  try {
+    (await cookies()).set(COOKIE_NAMES.AUTH_TOKEN, token);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Could not set auth token (likely during static generation):", (error as Error).message || error);
+    }
+  }
 };
 
 export const removeAuthToken = async () => {
-  (await cookies()).delete(COOKIE_NAMES.AUTH_TOKEN);
+  try {
+    (await cookies()).delete(COOKIE_NAMES.AUTH_TOKEN);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Could not remove auth token (likely during static generation):", (error as Error).message || error);
+    }
+  }
 };
 
 export const removeSession = async () => {
-  (await cookies()).delete(COOKIE_NAMES.SESSION);
+  try {
+    (await cookies()).delete(COOKIE_NAMES.SESSION);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Could not remove session (likely during static generation):", (error as Error).message || error);
+    }
+  }
 };
 
 export const removeSingleCheckoutSession = async () => {
-  (await cookies()).delete(COOKIE_NAMES.SINGLE_CHECKOUT);
+  try {
+    (await cookies()).delete(COOKIE_NAMES.SINGLE_CHECKOUT);
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Could not remove single checkout session (likely during static generation):", (error as Error).message || error);
+    }
+  }
+};
+
+export const setSingleCheckoutSession = async () => {
+  try {
+    (await cookies()).set(COOKIE_NAMES.SINGLE_CHECKOUT, "true", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("Could not set single checkout session (likely during static generation):", (error as Error).message || error);
+    }
+  }
+};
+
+export const getSingleCheckoutSession = async () => {
+  return getValidToken(COOKIE_NAMES.SINGLE_CHECKOUT);
+};
+
+export const isSingleCheckoutMode = async () => {
+  const session = await getSingleCheckoutSession();
+  return session === "true";
 };

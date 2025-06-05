@@ -10,7 +10,9 @@ interface Props {
 
 export default async function Page({ searchParams }: Props) {
   const parsedSearchParams = await searchParams;
-  const pageNumber = parsedSearchParams?.page ? parseInt(parsedSearchParams.page) : 0;
+  const pageNumber = parsedSearchParams?.page
+    ? parseInt(parsedSearchParams.page)
+    : 0;
   const itemsPerPage = 24;
   const searchQuery = parsedSearchParams.q || "";
 
@@ -25,25 +27,27 @@ export default async function Page({ searchParams }: Props) {
   };
 
   // Fetch products and filters in parallel
-  const [{ data: initialProducts }, { data: productFilter }] = await Promise.all([
-    getProductList({
-      input: {
-        where: makeWhereProductQuery({
-          filterQuery: filterState,
-          page: pageNumber,
-          perPage: itemsPerPage,
-          search: searchQuery,
-        }),
-        first: itemsPerPage,
-      }
-    }),
-    getProductFilters()
-  ]);
+  const [{ data: initialProducts }, { data: productFilter }] =
+    await Promise.all([
+      getProductList({
+        input: {
+          where: makeWhereProductQuery({
+            filterQuery: filterState,
+            page: pageNumber,
+            perPage: itemsPerPage,
+            search: searchQuery,
+          }),
+          first: itemsPerPage,
+        },
+      }),
+      getProductFilters({ input: {} }),
+    ]);
 
   // Parse attribute filters after getting the product filter data
   productFilter?.productFilters?.attributes?.forEach((attr) => {
     if (attr?.slug) {
-      const values = parsedSearchParams[attr.slug]?.split(",").filter(Boolean) || [];
+      const values =
+        parsedSearchParams[attr.slug]?.split(",").filter(Boolean) || [];
       if (values.length) {
         filterState.attributes[attr.slug] = values;
       }
@@ -51,11 +55,13 @@ export default async function Page({ searchParams }: Props) {
   });
 
   const totalProducts = initialProducts.products?.found || 0;
-  const searchTitle = searchQuery 
+  const searchTitle = searchQuery
     ? `Search results for "${searchQuery}"`
     : "Search products";
   const searchDescription = searchQuery
-    ? `Found ${totalProducts} product${totalProducts === 1 ? "" : "s"} for "${searchQuery}"`
+    ? `Found ${totalProducts} product${
+        totalProducts === 1 ? "" : "s"
+      } for "${searchQuery}"`
     : "Search for products in our store";
 
   return (
@@ -85,4 +91,4 @@ export default async function Page({ searchParams }: Props) {
       />
     </>
   );
-} 
+}

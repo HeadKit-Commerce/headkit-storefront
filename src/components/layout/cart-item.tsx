@@ -7,7 +7,7 @@ import Link from "next/link";
 import { cn, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "@/contexts/app-context";
 import { Icon } from "../icon";
-import { removeCartItem, updateCartItem } from "@/lib/headkit/actions";
+import { removeCartItem, updateCartItemQuantity } from "@/lib/headkit/actions";
 import { currencyFormatter } from "@/lib/utils";
 interface Props {
   type: "cart" | "order";
@@ -40,7 +40,7 @@ const CartItem = ({
   const [quantity, setQuantity] = useState(cartItem?.quantity || 1);
 
   const updateItem = async (id: string, quantity: number) => {
-    const { data } = await updateCartItem({
+    const { data } = await updateCartItemQuantity({
       input: {
         items: [{ key: id, quantity }],
       },

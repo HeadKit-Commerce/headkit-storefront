@@ -1,10 +1,10 @@
 query getMenu {
-  menus(first: 10000) {
+  menus(first: 1000) {
     nodes {
       name
       slug
       locations
-      menuItems(first: 10000) {
+      menuItems(first: 1000) {
         nodes {
           ...MenuItem
         }

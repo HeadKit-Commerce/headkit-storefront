@@ -3,7 +3,8 @@ import config from "@/headkit.config";
 import Script from "next/script";
 
 export async function WebsiteJsonLD() {
-  const { data: { generalSettings } } = await headkit().getGeneralSettings();
+  const client = await headkit();
+  const { data: { generalSettings } } = await client.getGeneralSettings();
   
   const websiteSchema = {
     "@context": "https://schema.org",

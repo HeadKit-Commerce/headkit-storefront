@@ -17,9 +17,9 @@ interface AddToCartProps {
   disabled?: boolean;
 }
 
-interface ApiError extends Error {
+interface ApiError {
   response?: {
-    errors?: Array<{ message: string }>;
+    errors?: { message?: string }[];
   };
 }
 
@@ -40,6 +40,10 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
             try {
               setError("");
               setButtonLoading(true);
+              
+              console.log("🛍️ Adding to cart with server action...");
+              
+              // Use server action instead of client-side mutation
               const response = await addToCart({
                 input: {
                   productId: productId as number,
@@ -47,9 +51,13 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
                   extraData: productExtraData ?? "",
                 },
               });
+              
+              console.log("✅ Add to cart successful:", response);
+              
               setCartData(response?.data?.addToCart?.cart as Cart);
               toggleCartDrawer();
             } catch (error) {
+              console.error("❌ Add to cart failed:", error);
               setError(JSON.stringify(error));
             }
             setButtonLoading(false);

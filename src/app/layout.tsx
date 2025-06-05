@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { headkit } from "@/lib/headkit/client";
+import { headkitStatic } from "@/lib/headkit/client";
 import { Header } from "@/components/layout/header";
 import { Urbanist } from "next/font/google";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
@@ -13,7 +13,7 @@ import { ThemeProvider } from '@/contexts/theme-context';
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import config from "@/headkit.config";
-import { getBranding, getStoreSettings, getStripeConfig } from "@/lib/headkit/actions";
+import { getBrandingStatic, getMenuStatic, getStoreSettingsStatic, getStripeConfigStatic } from "@/lib/headkit/actions";
 import { WebsiteJsonLD } from "@/components/seo/website-json-ld";
 import { GoogleTagManager } from "@next/third-parties/google";
 
@@ -25,12 +25,13 @@ const urbanist = Urbanist({
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
-  const {
-    data: { generalSettings },
-  } = await headkit({
+  const client = await headkitStatic({
     revalidateTime: 24 * 60 * 60,
     revalidateTags: ["headkit:general-settings"],
-  }).getGeneralSettings();
+  });
+  const {
+    data: { generalSettings },
+  } = await client.getGeneralSettings();
 
   return await makeRootMetadata({
     title: generalSettings?.title,
@@ -44,10 +45,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [{ data: branding }, { data: menu }, { data: stripeConfigData }, { data: storeSettings }] = await Promise.all([
-    getBranding(),
-    headkit().getMenu(),
-    getStripeConfig(),
-    getStoreSettings()
+    getBrandingStatic(),
+    getMenuStatic(),
+    getStripeConfigStatic(),
+    getStoreSettingsStatic()
   ]);
 
   // Use the enum to fetch menus by location

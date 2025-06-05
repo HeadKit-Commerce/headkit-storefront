@@ -19,11 +19,12 @@ interface Props {
 export default async function Page({ params }: Props) {
 
   const { slug } = await params;
-  const post = await headkit().getPost({ id: slug[slug.length - 1], type: PostIdType.Slug });
+  const client = await headkit();
+  const post = await client.getPost({ id: slug[slug.length - 1], type: PostIdType.Slug });
 
   const { text, highlightedText } = processText(post?.data.post?.title || "");
 
-  const postNews = await headkit().getPosts({
+  const postNews = await client.getPosts({
     first: 0,
     last: 10,
     where: {

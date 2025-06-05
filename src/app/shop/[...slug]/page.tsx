@@ -29,7 +29,8 @@ export async function generateMetadata(
 ): Promise<Metadata | ResolvedMetadata> {
   try {
     const { slug } = await params;
-    const product = await headkit().getProduct({
+    const client = await headkit();
+    const product = await client.getProduct({
       id: slug[slug.length - 1],
       type: ProductIdTypeEnum.Slug,
     });
@@ -71,12 +72,13 @@ export async function generateMetadata(
 // cannot use searchParams because it will be statically generated
 export default async function Product({ params }: Props) {
   const { slug } = await params;
+  const client = await headkit();
   const [product, generalSettings] = await Promise.all([
-    headkit().getProduct({
+    client.getProduct({
       id: slug[slug.length - 1],
       type: ProductIdTypeEnum.Slug,
     }),
-    headkit().getGeneralSettings(),
+    client.getGeneralSettings(),
   ]);
 
   if (!product?.data.product) {
@@ -135,7 +137,8 @@ export default async function Product({ params }: Props) {
 }
 
 export async function generateStaticParams() {
-  const slugs = await headkit().getProductSlugs();
+  const client = await headkit();
+  const slugs = await client.getProductSlugs();
 
   return slugs?.data.products?.nodes?.map(
     (item) => {

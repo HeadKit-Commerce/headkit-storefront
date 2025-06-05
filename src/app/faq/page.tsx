@@ -8,7 +8,8 @@ import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 const FAQ_SLUG = "faq";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await headkit().getPage({
+  const client = await headkit();
+  const { data } = await client.getPage({
     id: FAQ_SLUG,
     type: PageIdType.Uri,
   });
@@ -34,12 +35,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FAQPage() {
   // Fetch page content and FAQs in parallel
+  const client = await headkit();
   const [pageData, faqsData] = await Promise.all([
-    headkit().getPage({
+    client.getPage({
       id: FAQ_SLUG,
       type: PageIdType.Uri,
     }),
-    headkit().getFAQs({
+    client.getFAQs({
       where: {
         orderby: [{
           field: PostObjectsConnectionOrderbyEnum.Date,
