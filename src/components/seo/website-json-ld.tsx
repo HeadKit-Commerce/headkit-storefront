@@ -1,10 +1,9 @@
-import { headkit } from "@/lib/headkit/client";
 import config from "@/headkit.config";
 import Script from "next/script";
+import { getGeneralSettings } from "@/lib/headkit/actions";
 
 export async function WebsiteJsonLD() {
-  const client = await headkit();
-  const { data: { generalSettings } } = await client.getGeneralSettings();
+  const { data: { generalSettings } } = await getGeneralSettings();
   
   const websiteSchema = {
     "@context": "https://schema.org",

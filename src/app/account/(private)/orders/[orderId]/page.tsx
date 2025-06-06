@@ -1,5 +1,6 @@
 import { getOrder } from "@/lib/headkit/actions";
 import { notFound } from "next/navigation";
+import { Order } from "@/types/order";
 
 interface Props {
   params: Promise<{ orderId: string }>;
@@ -13,7 +14,7 @@ export default async function Page({ params }: Props) {
   }
 
   const response = await getOrder({ id: orderId });
-  const order = response.data?.order;
+  const order = response.data?.order as Order;
 
   if (!order) {
     return notFound();

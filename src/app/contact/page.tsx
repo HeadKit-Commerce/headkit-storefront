@@ -1,15 +1,14 @@
 import { PageIdType } from "@/lib/headkit/generated";
 import { Metadata } from "next";
 import { GravityForm } from "@/components/gravity-form";
-import { headkit } from "@/lib/headkit/client";
 import sanitize from "sanitize-html";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { getPage } from "@/lib/headkit/actions";
 
 const CONTACT_SLUG = "contact";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const client = await headkit();
-  const { data } = await client.getPage({
+  const { data } = await getPage({
     id: CONTACT_SLUG,
     type: PageIdType.Uri,
   });
@@ -34,8 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ContactPage() {
-  const client = await headkit();
-  const { data } = await client.getPage({
+  const { data } = await getPage({
     id: CONTACT_SLUG,
     type: PageIdType.Uri,
   });

@@ -9,6 +9,7 @@ import {
 import { CartItem } from "@/components/layout/cart-item";
 import { ClearCart } from "@/components/checkout/clear-cart";
 import { getOrder } from "@/lib/headkit/actions";
+import { Order } from "@/types/order";
 
 interface Props {
   params: Promise<{
@@ -35,7 +36,7 @@ export default async function Page({ params }: Props) {
   }
 
   const response = await getOrder({ id: orderId });
-  const order = response?.data?.order;
+  const order = response?.data?.order as Order;
 
   if (!order) {
     return notFound();

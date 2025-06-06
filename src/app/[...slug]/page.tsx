@@ -1,9 +1,9 @@
-import { headkit } from "@/lib/headkit/client";
 import { PageIdType } from "@/lib/headkit/generated";
 import { ResolvingMetadata, Metadata } from "next";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 import { notFound } from "next/navigation";
 import sanitize from "sanitize-html";
+import { getPage } from "@/lib/headkit/actions";
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -14,9 +14,8 @@ async function getPageData(params: Props["params"]) {
   const resolvedParams = await params;
   // Create URL path with leading slash
   const finalSlug = `/${resolvedParams.slug.join("/")}`;
-  const client = await headkit();
 
-  const response = await client.getPage({
+  const response = await getPage({
     id: finalSlug,
     type: PageIdType.Uri,
   });

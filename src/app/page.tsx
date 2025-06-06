@@ -5,7 +5,6 @@ import { MainCarousel } from "@/components/carousel/main-carousel/main-carousel"
 import { PostCarousel } from "@/components/carousel/post-carousel";
 import { ProductCarousel } from "@/components/carousel/product-carousel";
 import { SectionHeader } from "@/components/common/section-header";
-import { headkit } from "@/lib/headkit/client";
 import {
   CoreButton,
   CoreGroup,
@@ -20,7 +19,14 @@ import {
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { getPage } from "@/lib/headkit/actions";
+import { 
+  getPage, 
+  getCarousel, 
+  getProductCategories, 
+  getBrandList, 
+  getProducts, 
+  getPosts 
+} from "@/lib/headkit/actions";
 
 export async function generateMetadata() {
   const { data } = await getPage({ id: "/", type: PageIdType.Uri });
@@ -40,7 +46,7 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-  const client = await headkit();
+
   const [
     page,
     mainCarousel,
@@ -49,15 +55,15 @@ export default async function Home() {
     featuredProducts,
     posts,
   ] = await Promise.all([
-    client.getPage({ id: "/", type: PageIdType.Uri }),
-    client.getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
-    client.getProductCategories({ where: { featured: true } }),
-    client.getBrands({ where: { featured: true } }),
-    client.getProducts({
+    getPage({ id: "/", type: PageIdType.Uri }),
+    getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
+    getProductCategories({ where: { featured: true } }),
+    getBrandList({ input: { where: { featured: true } } }),
+    getProducts({
       first: 10,
       where: makeWhereProductQuery("featured"),
     }),
-    client.getPosts({ first: 10 }),
+    getPosts({ first: 10 }),
   ]);
 
   const editorBlocks = processBlockEditor(

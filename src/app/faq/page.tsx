@@ -1,15 +1,14 @@
-import { headkit } from "@/lib/headkit/client";
 import { PageIdType, PostObjectsConnectionOrderbyEnum, OrderEnum } from "@/lib/headkit/generated";
 import { Metadata } from "next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import sanitize from "sanitize-html";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { getPage, getFAQs } from "@/lib/headkit/actions";
 
 const FAQ_SLUG = "faq";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const client = await headkit();
-  const { data } = await client.getPage({
+  const { data } = await getPage({
     id: FAQ_SLUG,
     type: PageIdType.Uri,
   });
@@ -35,13 +34,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FAQPage() {
   // Fetch page content and FAQs in parallel
-  const client = await headkit();
   const [pageData, faqsData] = await Promise.all([
-    client.getPage({
+    getPage({
       id: FAQ_SLUG,
       type: PageIdType.Uri,
     }),
-    client.getFAQs({
+    getFAQs({
       where: {
         orderby: [{
           field: PostObjectsConnectionOrderbyEnum.Date,

@@ -1,7 +1,6 @@
 import { removeTrailingSlash } from "@/lib/utils";
 import { MetadataRoute } from "next";
-import { getBrandList, getPostList } from "@/lib/headkit/actions";
-import { headkit } from "@/lib/headkit/client";
+import { getBrandList, getPostList, getProductCategories, getProductSlugs } from "@/lib/headkit/actions";
 
 type BaseSitemapItem = {
   url: string;
@@ -55,8 +54,7 @@ const makeBrandSitemap = async (): Promise<MetadataRoute.Sitemap> => {
 };
 
 const makeCollectionSitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const client = await headkit();
-  const response = await client.getProductCategories();
+  const response = await getProductCategories();
   const categories = response.data?.productCategories?.nodes || [];
 
   return categories
@@ -79,9 +77,8 @@ const makeCollectionSitemap = async (): Promise<MetadataRoute.Sitemap> => {
 const makeProductSitemap = async (): Promise<MetadataRoute.Sitemap> => {
   // Create direct recursive function with types
   async function getProducts(cursor?: string | null): Promise<ProductNode[]> {
-    // Use the raw client to avoid intermediaries
-    const client = await headkit();
-    const response = await client.getProductSlugs({ after: cursor });
+    // Import here to avoid circular dependency since this is special case
+    const response = await getProductSlugs({ after: cursor });
 
     const products = (response.data?.products?.nodes || []).map(
       (product: GraphQLProductNode): ProductNode => ({

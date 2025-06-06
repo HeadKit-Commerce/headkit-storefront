@@ -11,13 +11,13 @@ import {
 import { Metadata, ResolvedMetadata, ResolvingMetadata } from "next";
 
 import { notFound } from "next/navigation";
-import { headkit } from "@/lib/headkit/client";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 import { ProductJsonLD } from "@/components/seo/product-json-ld";
 import { BreadcrumbJsonLD } from "@/components/seo/breadcrumb-json-ld";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductCarousel } from "@/components/carousel/product-carousel";
 import { SectionHeader } from "@/components/common/section-header";
+import { getProduct, getGeneralSettings, getProducts } from "@/lib/headkit/actions";
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -29,8 +29,7 @@ export async function generateMetadata(
 ): Promise<Metadata | ResolvedMetadata> {
   try {
     const { slug } = await params;
-    const client = await headkit();
-    const product = await client.getProduct({
+    const product = await getProduct({
       id: slug[slug.length - 1],
       type: ProductIdTypeEnum.Slug,
     });
@@ -72,13 +71,12 @@ export async function generateMetadata(
 // cannot use searchParams because it will be statically generated
 export default async function Product({ params }: Props) {
   const { slug } = await params;
-  const client = await headkit();
   const [product, generalSettings] = await Promise.all([
-    client.getProduct({
+    getProduct({
       id: slug[slug.length - 1],
       type: ProductIdTypeEnum.Slug,
     }),
-    client.getGeneralSettings(),
+    getGeneralSettings(),
   ]);
 
   if (!product?.data.product) {
@@ -137,10 +135,12 @@ export default async function Product({ params }: Props) {
 }
 
 export async function generateStaticParams() {
-  const client = await headkit();
-  const slugs = await client.getProductSlugs();
+  // Use the action instead of direct client call
+  const products = await getProducts({
+    first: 1000, // Get a large number of products to ensure we get all slugs
+  });
 
-  return slugs?.data.products?.nodes?.map(
+  return products?.data.products?.nodes?.map(
     (item) => {
       return {
         slug:

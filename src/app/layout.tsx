@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { headkitStatic } from "@/lib/headkit/client";
 import { Header } from "@/components/layout/header";
 import { Urbanist } from "next/font/google";
 import { MenuLocationEnum } from "@/lib/headkit/generated";
@@ -13,7 +12,7 @@ import { ThemeProvider } from '@/contexts/theme-context';
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import config from "@/headkit.config";
-import { getBrandingStatic, getMenuStatic, getStoreSettingsStatic, getStripeConfigStatic } from "@/lib/headkit/actions";
+import { getBrandingStatic, getGeneralSettingsStatic, getMenuStatic, getStoreSettingsStatic, getStripeConfigStatic } from "@/lib/headkit/actions";
 import { WebsiteJsonLD } from "@/components/seo/website-json-ld";
 import { GoogleTagManager } from "@next/third-parties/google";
 
@@ -25,18 +24,24 @@ const urbanist = Urbanist({
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
-  const client = await headkitStatic({
-    revalidateTime: 24 * 60 * 60,
-    revalidateTags: ["headkit:general-settings"],
-  });
-  const {
-    data: { generalSettings },
-  } = await client.getGeneralSettings();
+  try {
+    const {
+      data: { generalSettings },
+    } = await getGeneralSettingsStatic();
 
-  return await makeRootMetadata({
-    title: generalSettings?.title,
-    description: generalSettings?.description,
-  });
+    return await makeRootMetadata({
+      title: generalSettings?.title,
+      description: generalSettings?.description,
+    });
+  } catch (error) {
+    console.warn('Failed to fetch general settings during build, using fallback metadata:', error);
+    
+    // Provide fallback metadata
+    return await makeRootMetadata({
+      title: "Store",
+      description: "tore",
+    });
+  }
 };
 
 export default async function RootLayout({
@@ -44,12 +49,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [{ data: branding }, { data: menu }, { data: stripeConfigData }, { data: storeSettings }] = await Promise.all([
-    getBrandingStatic(),
-    getMenuStatic(),
-    getStripeConfigStatic(),
-    getStoreSettingsStatic()
-  ]);
+  // Fetch data with error handling for build-time failures
+  let branding, menu, stripeConfigData, storeSettings;
+  
+  try {
+    const results = await Promise.all([
+      getBrandingStatic(),
+      getMenuStatic(),
+      getStripeConfigStatic(),
+      getStoreSettingsStatic()
+    ]);
+    
+    [{ data: branding }, { data: menu }, { data: stripeConfigData }, { data: storeSettings }] = results;
+  } catch (error) {
+    console.warn('Failed to fetch some data during build, using fallbacks:', error);
+    
+    // Provide fallback data
+    branding = { branding: null };
+    menu = { menus: { nodes: [] } };
+    stripeConfigData = { stripeConfig: null };
+    storeSettings = { storeSettings: null };
+  }
 
   // Use the enum to fetch menus by location
   const headerMenuLocations = [

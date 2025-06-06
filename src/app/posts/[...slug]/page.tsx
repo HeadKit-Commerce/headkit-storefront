@@ -3,7 +3,6 @@ import { SectionHeader } from "@/components/common/section-header";
 import { FeaturedImageHeader } from "@/components/post/featured-image-header";
 import { ArticleJsonLD } from "@/components/seo/article-json-ld";
 import { BreadcrumbJsonLD } from "@/components/seo/breadcrumb-json-ld";
-import { headkit } from "@/lib/headkit/client";
 import {
   OrderEnum,
   PostIdType,
@@ -11,6 +10,7 @@ import {
 } from "@/lib/headkit/generated";
 import { processText } from "@/lib/utils";
 import sanitize from "sanitize-html";
+import { getPost, getPosts } from "@/lib/headkit/actions";
 
 interface Props {
   params: Promise<{ slug: string[] }>;
@@ -19,12 +19,11 @@ interface Props {
 export default async function Page({ params }: Props) {
 
   const { slug } = await params;
-  const client = await headkit();
-  const post = await client.getPost({ id: slug[slug.length - 1], type: PostIdType.Slug });
+  const post = await getPost({ id: slug[slug.length - 1], type: PostIdType.Slug });
 
   const { text, highlightedText } = processText(post?.data.post?.title || "");
 
-  const postNews = await client.getPosts({
+  const postNews = await getPosts({
     first: 0,
     last: 10,
     where: {
