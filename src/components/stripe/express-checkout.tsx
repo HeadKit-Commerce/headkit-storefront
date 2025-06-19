@@ -15,6 +15,7 @@ interface ExpressCheckoutProps {
   variationId?: number;
   productName?: string;
   singleCheckout?: boolean;
+  onComplete?: () => void;
 }
 
 export function ExpressCheckout({
@@ -24,6 +25,7 @@ export function ExpressCheckout({
   variationId,
   productName,
   singleCheckout = false,
+  onComplete,
 }: ExpressCheckoutProps) {
   const { initCurrency, cartData } = useAppContext();
   const { stripe, isLoading } = useStripe();
@@ -40,7 +42,7 @@ export function ExpressCheckout({
         colorText: "#23102E",
         colorTextSecondary: "#23102E",
         fontSizeBase: "16px",
-        spacingUnit: "10px",
+        spacingUnit: "5px",
         fontFamily: '"Urbanist", system-ui, sans-serif',
       },
     },
@@ -50,6 +52,8 @@ export function ExpressCheckout({
     return null;
   }
 
+  console.log("singleCheckout", singleCheckout, JSON.stringify(options, null, 2));
+
   return (
     <Elements options={options} stripe={stripe}>
       <ExpressCheckoutButton
@@ -58,6 +62,7 @@ export function ExpressCheckout({
         price={price}
         productName={productName}
         singleCheckout={singleCheckout}
+        onComplete={onComplete}
       />
     </Elements>
   );

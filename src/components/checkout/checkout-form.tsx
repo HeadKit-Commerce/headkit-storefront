@@ -16,13 +16,18 @@ import {
 import { Elements } from "@stripe/react-stripe-js";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../../contexts/app-context";
-import { checkout, getCustomer, getPickupLocations } from "@/lib/headkit/actions";
-import { setCheckoutData } from "@/lib/headkit/actions/cookies";
+import {
+  checkout,
+  getCustomer,
+  getPickupLocations,
+} from "@/lib/headkit/actions";
 import { v7 as uuidv7 } from "uuid";
-import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpressCheckout } from "../stripe/express-checkout";
 import { useStripe } from "@/contexts/stripe-context";
+import { useRouter } from "next/navigation";
+import { setCheckoutData } from "@/lib/headkit/actions/cookies";
+import { updatePaymentIntentDescription } from "@/lib/stripe/actions";
 
 interface FormData {
   email?: string;
@@ -60,7 +65,7 @@ interface FormData {
 
 const CheckoutForm = () => {
   const router = useRouter();
-  const { cartData } = useAppContext();
+  const { cartData, isLiveMode } = useAppContext();
   const [currentStep, setCurrentStep] = useState<CheckoutFormStepEnum>(
     CheckoutFormStepEnum.CONTACT
   );
@@ -122,12 +127,13 @@ const CheckoutForm = () => {
           withOrders: false
         });
 
-        console.log("data", data);
+        if (process.env.NODE_ENV === "development") {
+          console.log("fetchCustomer data", data);
+          console.log("fetchCustomer customer", data?.customer);
+          console.log("fetchCustomer cartData", cartData);
+        }
 
         const customer = data?.customer;
-
-        console.log("customer", customer);
-        console.log("cartData", cartData);
 
         // if cartData?.chosenShippingMethods?.[0] starts with "pickup_location" then set deliveryMethod to DeliveryStepEnum.CLICK_AND_COLLECT, and set location to the pickup location
         const isPickupLocation = cartData?.chosenShippingMethods?.[0]?.startsWith("pickup_location");
@@ -320,64 +326,51 @@ const CheckoutForm = () => {
     stripePaymentMethod?: string;
     paymentStatus?: "failed" | "processing" | "pending";
   }) => {
-    const checkoutData: {
-      input: CheckoutInput;
-    } = {
+    console.log("handlePaymentSubmit data", data);
+
+    const checkoutData: { input: CheckoutInput } = {
       input: {
         clientMutationId: uuidv7(),
         paymentMethod: data.paymentMethod,
-        isPaid: data.paymentMethod === "headkit-payments",
-        transactionId: data.transactionId ?? "",
-        customerNote: formData.customerNote,
-        billing: {
-          firstName: formData.billingAddress?.firstName,
-          lastName: formData.billingAddress?.lastName,
-          address1: formData.billingAddress?.line1,
-          address2: formData.billingAddress?.line2,
-          city: formData.billingAddress?.city,
-          state: formData.billingAddress?.state,
-          postcode: formData.billingAddress?.postalCode,
-          country: (formData.billingAddress?.country || "US") as CountriesEnum,
-          email: formData.email,
-          phone: formData.billingAddress?.phone,
-        },
+        transactionId: data?.transactionId,
+        isPaid: data.paymentStatus === "processing",
+        billing: formData.billingAddress?.line1
+          ? {
+              firstName: formData.billingAddress.firstName,
+              lastName: formData.billingAddress.lastName,
+              address1: formData.billingAddress.line1,
+              address2: formData.billingAddress.line2,
+              city: formData.billingAddress.city,
+              state: formData.billingAddress.state,
+              postcode: formData.billingAddress.postalCode,
+              country: formData.billingAddress.country as CountriesEnum,
+              email: formData.email,
+              phone: formData.billingAddress.phone,
+            }
+          : {
+              firstName: formData.shippingAddress?.firstName || "",
+              lastName: formData.shippingAddress?.lastName || "",
+              address1: formData.shippingAddress?.line1 || "",
+              address2: formData.shippingAddress?.line2,
+              city: formData.shippingAddress?.city || "",
+              state: formData.shippingAddress?.state || "",
+              postcode: formData.shippingAddress?.postalCode || "",
+              country:
+                (formData.shippingAddress?.country as CountriesEnum) || "",
+              email: formData.email,
+              phone: formData.shippingAddress?.phone || "",
+            },
         shipping: {
-          firstName:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.firstName,
-          lastName:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.lastName,
-          address1:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.line1,
-          address2:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.line2,
-          city:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.city,
-          state:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.state,
-          postcode:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.postalCode,
-          country:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? (undefined as unknown as CountriesEnum)
-              : (formData.shippingAddress?.country || "US") as CountriesEnum,
-          phone:
-            formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
-              ? ""
-              : formData.shippingAddress?.phone,
+          firstName: formData.shippingAddress?.firstName,
+          lastName: formData.shippingAddress?.lastName,
+          address1: formData.shippingAddress?.line1,
+          address2: formData.shippingAddress?.line2,
+          city: formData.shippingAddress?.city,
+          state: formData.shippingAddress?.state,
+          postcode: formData.shippingAddress?.postalCode,
+          country: formData.shippingAddress?.country as CountriesEnum,
+          email: formData.email,
+          phone: formData.shippingAddress?.phone,
         },
         metaData:
           data.paymentMethod === "headkit-payments"
@@ -398,55 +391,66 @@ const CheckoutForm = () => {
                   key: "_headkit_payments_status",
                   value: data?.paymentStatus ?? "pending",
                 },
+                {
+                  key: "_headkit_payment_mode",
+                  value: isLiveMode ? "live" : "test",
+                },
               ]
             : [],
       },
     };
 
     // save in cookies
+    await setCheckoutData(checkoutData.input);
+
+    console.log("checkoutData", checkoutData);
+
     try {
-      await setCheckoutData(checkoutData.input);
-      
-      console.log("checkoutData", checkoutData);
       const response = await checkout(checkoutData);
       console.log("checkout response data", response.data);
       console.log("checkout response errors", response.errors);
 
-      if (response.errors) {
-        console.error("Checkout errors:", response.errors);
-        router.push(
-          `/checkout/error?reason=checkout_execution_error&error=${encodeURIComponent(
-            JSON.stringify(response.errors)
-          )}`
-        );
+      const orderId = response.data?.checkout?.order?.databaseId;
+
+      if (!orderId) {
+        console.error("No order ID received from checkout");
         return;
       }
 
-      if (
-        data.paymentStatus === "processing" &&
-        response.data?.checkout?.order?.databaseId
-      ) {
-        router.replace(
-          `/checkout/success/${response.data.checkout?.order?.databaseId}`
-        );
-      } else if (response.data?.checkout?.order?.databaseId) {
-        router.replace(
-          `/checkout/success/${response.data.checkout?.order?.databaseId}`
-        );
-      } else if (response.data?.checkout?.redirect) {
-        // Handle external payment gateway redirect
-        window.location.href = response.data.checkout.redirect;
+      // Update payment intent description and redirect to success page
+      const shouldProcessPayment =
+        (data.paymentStatus === "processing" &&
+          data.paymentMethod === "headkit-payments") ||
+        data.paymentMethod !== "headkit-payments";
+
+      console.log("shouldProcessPayment", shouldProcessPayment);
+      console.log("data.paymentIntentId", data.paymentIntentId);
+      console.log("orderId", orderId);
+
+      if (shouldProcessPayment && data.paymentIntentId) {
+        console.log("updating payment intent description");
+        await updatePaymentIntentDescription({
+          paymentIntent: data.paymentIntentId,
+          orderId: orderId.toString(),
+        });
+        console.log("payment intent description updated");
+      }
+
+      // Only redirect to success page when payment is completed or for non-stripe payments
+      const shouldRedirect =
+        (data.paymentStatus === "processing" &&
+          data.paymentMethod === "headkit-payments") ||
+        data.paymentMethod !== "headkit-payments";
+
+      if (shouldRedirect) {
+        console.log("redirecting to success page with orderId", orderId);
+        router.replace(`/checkout/success/${orderId}`);
       } else {
-        console.error("No order ID returned from checkout:", response);
-        router.push("/checkout/error?reason=order_creation_failed");
+        console.log("not redirecting - payment status is pending");
       }
     } catch (error) {
-      console.error("Error during checkout:", error);
-      router.push(
-        `/checkout/error?reason=checkout_execution_error&error=${encodeURIComponent(
-          JSON.stringify(error)
-        )}`
-      );
+      console.error("Checkout failed:", error);
+      // TODO: Handle checkout error (show error message to user)
     }
   };
 

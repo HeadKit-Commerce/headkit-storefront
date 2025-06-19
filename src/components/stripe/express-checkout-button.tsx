@@ -9,8 +9,9 @@ import { AlertBox } from "@/components/alert-box/alert-box";
 import { getFloatVal } from "@/lib/utils";
 import { addToCart, createPaymentIntent, updateCustomer, updateShippingMethod, checkout } from "@/lib/headkit/actions";
 import { CheckoutInput, CountriesEnum } from "@/lib/headkit/generated";
-import { removeSingleCheckoutSession, setSingleCheckoutSession } from "@/lib/headkit/actions/auth";
+import { removeSingleCheckoutSession } from "@/lib/headkit/actions/auth";
 import { v7 as uuidv7 } from "uuid";
+import Cookies from 'js-cookie';
 
 interface ExpressCheckoutButtonProps {
   productId?: number;
@@ -18,6 +19,7 @@ interface ExpressCheckoutButtonProps {
   price?: number;
   productName?: string;
   singleCheckout: boolean;
+  onComplete?: () => void;
 }
 
 interface CartNode {
@@ -44,6 +46,7 @@ export function ExpressCheckoutButton({
   price,
   productName,
   singleCheckout,
+  onComplete,
 }: ExpressCheckoutButtonProps) {
   const router = useRouter();
   const { initCurrency, cartData: cartDataContext, isGlobalDisabled, setIsGlobalDisabled } = useAppContext();
@@ -82,7 +85,7 @@ export function ExpressCheckoutButton({
         clientSecret: paymentIntent.createPaymentIntent.clientSecret,
         elements,
         confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/checkout/success`,
+          return_url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/checkout/confirm`,
           expand: ["payment_method"],
         },
         redirect: "if_required",
@@ -101,7 +104,7 @@ export function ExpressCheckoutButton({
         singleCheckout,
         input: {
           clientMutationId: uuidv7(),
-          paymentMethod: "stripe",
+          paymentMethod: "headkit-payments",
           isPaid: true,
           transactionId: result.paymentIntent.id,
           billing: {
@@ -139,6 +142,10 @@ export function ExpressCheckoutButton({
               key: "_stripe_payment_method",
               value: JSON.stringify(result.paymentIntent.payment_method),
             },
+            {
+              key: "_headkit_payment_mode",
+              value: process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true' ? "live" : "test",
+            },
             ...(singleCheckout ? [{
               key: "_single_checkout",
               value: "true"
@@ -149,16 +156,49 @@ export function ExpressCheckoutButton({
 
       console.log("checkoutData", checkoutData);
 
+      // For redirect payment methods, store checkout data in cookie
+      const cookieData = {
+        singleCheckout,
+        billing: checkoutData.input.billing,
+        shipping: checkoutData.input.shipping,
+        metaData: checkoutData.input.metaData,
+      };
+      
+      console.log("Setting checkout_data cookie:", cookieData);
+      
+      try {
+        Cookies.set('checkout_data', JSON.stringify(cookieData), { 
+          expires: 1/24, // Expires in 1 hour
+          sameSite: 'Lax',
+          secure: window.location.protocol === 'https:',
+          path: '/'
+        });
+        console.log("Checkout cookie set successfully");
+      } catch (cookieError) {
+        console.error("Error setting checkout cookie:", cookieError);
+      }
+
       const checkoutResult = await checkout(checkoutData);
       console.log("checkoutResult", checkoutResult);
 
+      if (checkoutResult.errors || !checkoutResult.data.checkout) {
+        console.error("Checkout failed:", checkoutResult.errors);
+        throw new Error(checkoutResult.errors?.[0]?.message || "Checkout failed. Please try again.");
+      }
 
       // Handle successful payment
       setIsLoading(false);
       setIsGlobalDisabled(false);
       setIsOpen(false);
+      
+      // Call onComplete if provided
+      if (onComplete) {
+        onComplete();
+      }
+      
       router.push(`/checkout/success/${checkoutResult.data.checkout?.order?.databaseId}`);
     } catch (error) {
+      console.error("Express checkout error:", error);
       setErrorMessage(error instanceof Error ? error.message : "An error occurred");
       setIsLoading(false);
       setIsGlobalDisabled(false);
@@ -182,8 +222,8 @@ export function ExpressCheckoutButton({
             googlePay: "pay",
           },
           layout: {
-            maxRows: 0,
-            overflow: "never",
+            maxRows: 1,
+            overflow: "auto",
           },
           buttonHeight: 40,
           paymentMethods: {
@@ -206,6 +246,7 @@ export function ExpressCheckoutButton({
               },
               withCustomer: false,
               withCart: true,
+              singleCheckout,
             });
 
             console.log("customerData", customerData);
@@ -245,6 +286,7 @@ export function ExpressCheckoutButton({
           try {
             const { data: updateCartResult } = await updateShippingMethod({
               shippingMethod: e.shippingRate.id,
+              singleCheckout,
             });
 
             elements?.update({
@@ -309,15 +351,19 @@ export function ExpressCheckoutButton({
 
               //add single item to new cart
               if (singleCheckout) {
-                // Set single checkout session cookie before adding to cart
-                await setSingleCheckoutSession();
-                
+                console.log("singleCheckout", {
+                  productId,
+                  variationId,
+                  price,
+                  productName,
+                });
                 await addToCart({
                   input: {
                     quantity: 1,
                     productId: productId!,
                     variationId: variationId!,
                   },
+                  singleCheckout,
                 });
               }
 
