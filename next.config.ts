@@ -6,21 +6,18 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: process.env.IMAGE_DOMAIN
-          ? process.env.IMAGE_DOMAIN
-          : "**.kinsta.cloud",
+        hostname: process.env.IMAGE_DOMAIN!,
       },
       {
         protocol: "http",
-        hostname: process.env.IMAGE_DOMAIN
-          ? process.env.IMAGE_DOMAIN
-          : "**.kinsta.cloud",
+        hostname: process.env.IMAGE_DOMAIN!,
       },
       {
         protocol: "https",
         hostname: "storage.googleapis.com",
       },
     ],
+    contentDispositionType: "inline",
   },
   logging: {
     fetches: {

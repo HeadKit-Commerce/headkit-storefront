@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, ReactNode, useContext, useReducer, useEffect } from "react";
-import { Branding, Cart, StripeConfig } from "@/lib/headkit/generated";
+import { Branding, Cart, StripeConfig, StoreSettings } from "@/lib/headkit/generated";
 import { getStripeConfig } from "@/lib/headkit/actions";
 
 interface AppContextState {
@@ -16,8 +16,10 @@ interface AppContextState {
     accountId: string;
   } | null;
   stripeFullConfig: StripeConfig | null;
+  storeSettings: StoreSettings | null;
   isLiveMode: boolean;
   brandingData: Branding | null;
+  isLoading: boolean;
 }
 
 interface AppContextActions {
@@ -26,7 +28,9 @@ interface AppContextActions {
   setIsGlobalDisabled: (isGlobalDisabled: boolean) => void;
   setWishlists: (wishlists: number[]) => void;
   setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => void;
+  setStoreSettings: (storeSettings: StoreSettings | null) => void;
   setIsLiveMode: (isLiveMode: boolean) => void;
+  setIsLoading: (isLoading: boolean) => void;
 }
 
 type AppContextValue = AppContextState & AppContextActions;
@@ -40,6 +44,7 @@ interface AppContextProviderProps {
   initialLang?: string;
   initialCurrency?: string;
   stripeFullConfig?: StripeConfig | null;
+  storeSettings?: StoreSettings | null;
   brandingData?: Branding | null;
 }
 
@@ -52,8 +57,12 @@ const initialState: AppContextState = {
   initCurrency: "AUD",
   stripeConfig: null,
   stripeFullConfig: null,
-  isLiveMode: process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true',
+  storeSettings: null,
+  isLiveMode: process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE !== undefined 
+    ? process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true' 
+    : false,
   brandingData: null,
+  isLoading: true,
 };
 
 type AppContextAction =
@@ -65,7 +74,9 @@ type AppContextAction =
   | { type: "SET_STRIPE_CONFIG"; payload: { publishableKey: string; accountId: string } | null }
   | { type: "SET_IS_LIVE_MODE"; payload: boolean }
   | { type: "SET_STRIPE_FULL_CONFIG"; payload: StripeConfig | null }
-  | { type: "SET_BRANDING_DATA"; payload: Branding | null };
+  | { type: "SET_STORE_SETTINGS"; payload: StoreSettings | null }
+  | { type: "SET_BRANDING_DATA"; payload: Branding | null }
+  | { type: "SET_IS_LOADING"; payload: boolean };
 
 const reducer = (
   state: AppContextState,
@@ -90,8 +101,12 @@ const reducer = (
       return { ...state, isLiveMode: action.payload };
     case "SET_STRIPE_FULL_CONFIG":
       return { ...state, stripeFullConfig: action.payload };
+    case "SET_STORE_SETTINGS":
+      return { ...state, storeSettings: action.payload };
     case "SET_BRANDING_DATA":
       return { ...state, brandingData: action.payload };
+    case "SET_IS_LOADING":
+      return { ...state, isLoading: action.payload };
     default:
       return state;
   }
@@ -103,6 +118,7 @@ export const AppContextProvider = ({
   initialLang = "en-AU",
   initialCurrency = "AUD",
   stripeFullConfig = null,
+  storeSettings = null,
   brandingData = null,
 }: AppContextProviderProps) => {
   const [state, dispatch] = useReducer(reducer, {
@@ -111,6 +127,7 @@ export const AppContextProvider = ({
     initLang: initialLang,
     initCurrency: initialCurrency,
     stripeFullConfig,
+    storeSettings,
     brandingData,
   });
 
@@ -144,22 +161,12 @@ export const AppContextProvider = ({
     }
   }, [state.isLiveMode, state.stripeFullConfig]);
 
-  // useEffect(() => {
-  //   const fetchBranding = async () => {
-  //     try {
-  //       const response = await getBranding();
-  //       if (response?.data?.branding) {
-  //         dispatch({
-  //           type: "SET_BRANDING_DATA",
-  //           payload: response.data.branding
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error('Error fetching branding:', error);
-  //     }
-  //   };
-  //   fetchBranding();
-  // }, []);
+  // Set loading to false after initial setup
+  useEffect(() => {
+    if (state.isLoading && (state.storeSettings || state.stripeFullConfig)) {
+      dispatch({ type: "SET_IS_LOADING", payload: false });
+    }
+  }, [state.isLoading, state.storeSettings, state.stripeFullConfig]);
 
   const actions: AppContextActions = {
     toggleCartDrawer: (enable?: boolean) => {
@@ -177,8 +184,14 @@ export const AppContextProvider = ({
     setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => {
       dispatch({ type: "SET_STRIPE_CONFIG", payload: config });
     },
+    setStoreSettings: (storeSettings: StoreSettings | null) => {
+      dispatch({ type: "SET_STORE_SETTINGS", payload: storeSettings });
+    },
     setIsLiveMode: (isLiveMode: boolean) => {
       dispatch({ type: "SET_IS_LIVE_MODE", payload: isLiveMode });
+    },
+    setIsLoading: (isLoading: boolean) => {
+      dispatch({ type: "SET_IS_LOADING", payload: isLoading });
     },
   };
 

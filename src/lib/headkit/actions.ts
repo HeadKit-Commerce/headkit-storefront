@@ -6,119 +6,134 @@ import {
   AddToCartInput,
   CheckoutInput,
   GetBrandsQueryVariables,
+  GetCarouselQueryVariables,
   GetCustomerQueryVariables,
+  GetFaQsQueryVariables,
+  GetGeneralSettingsQueryVariables,
   GetPostCategoriesQueryVariables,
   GetPostsQueryVariables,
+  GetProductCategoriesQueryVariables,
   GetProductFiltersQueryVariables,
   GetProductListQueryVariables,
-  Order,
+  GetProductsQueryVariables,
+  GetProductSlugsQueryVariables,
   PageIdType,
+  PostIdType,
   ProductCategoryIdType,
+  ProductIdTypeEnum,
   RemoveItemsFromCartInput,
   SubmitGfFormInput,
   UpdateCustomerInput,
   UpdateItemQuantitiesInput,
+  UpdatePaymentIntentInput,
 } from "./generated";
+import { cookies } from "next/headers";
 import { v7 as uuidv7 } from "uuid";
 import { getWoocommerceAuthToken } from "./actions/auth";
-import { cookies } from "next/headers";
+import { COOKIE_NAMES } from "./constants";
+import {
+  parseCookies,
+  getSessionKeyFromCookies,
+  encodeSessionCookie,
+} from "./utils/cookies";
 
-// Type for response with headers that might have getSetCookie
-interface ResponseWithHeaders {
-  headers?: {
-    getSetCookie?: () => string[];
-  };
-}
+const getClientConfig = async (singleCheckout?: boolean) => {
+  const config: {
+    authToken?: string;
+    woocommerceSession?: string;
+    mailchimpUserEmail?: string;
+    mailchimpUserPreviousEmail?: string;
+  } = {};
 
-// Helper function for actions that need cookie handling (user-specific, stateful)
-const withCookieHandling = async <T>(
-  operation: (client: Awaited<ReturnType<typeof headkit>>) => Promise<T>,
-  options?: {
-    debug?: boolean;
-    forceNoCache?: boolean;
-    revalidateTime?: number;
-    revalidateTags?: string[];
+  const authToken = await getWoocommerceAuthToken();
+  if (authToken) {
+    config.authToken = authToken;
   }
-): Promise<T> => {
-  const cookieStore = await cookies();
-  const client = await headkit({
-    cookies: Object.fromEntries(cookieStore.getAll().map((cookie) => [cookie.name, cookie.value])),
-    debug: options?.debug,
-    forceNoCache: options?.forceNoCache,
-    revalidateTime: options?.revalidateTime,
-    revalidateTags: options?.revalidateTags,
-  });
 
-  const response = await operation(client);
-  
-  // Handle setting cookies from response if present
-  if (response && typeof response === 'object' && 'headers' in response) {
-    const responseWithHeaders = response as ResponseWithHeaders;
-    if (responseWithHeaders.headers?.getSetCookie) {
-      const setCookieHeader = responseWithHeaders.headers.getSetCookie();
-      if (setCookieHeader) {
-        for (const cookie of setCookieHeader) {
-          const [name, value] = cookie.split("=");
-          cookieStore.set(name, value);
-        }
-      }
+  if (singleCheckout) {
+    const singleCheckoutToken = (await cookies()).get(
+      COOKIE_NAMES.SINGLE_CHECKOUT
+    )?.value;
+    if (singleCheckoutToken) {
+      config.woocommerceSession = singleCheckoutToken;
+    }
+  } else {
+    const sessionToken = (await cookies()).get(COOKIE_NAMES.SESSION)?.value;
+    if (sessionToken) {
+      config.woocommerceSession = sessionToken;
     }
   }
 
+  const mailchimpUserEmail = (await cookies()).get(
+    "mailchimp_user_email"
+  )?.value;
+  if (mailchimpUserEmail) {
+    config.mailchimpUserEmail = mailchimpUserEmail;
+  }
+
+  const mailchimpUserPreviousEmail = (await cookies()).get(
+    "mailchimp_user_previous_email"
+  )?.value;
+  if (mailchimpUserPreviousEmail) {
+    config.mailchimpUserPreviousEmail = mailchimpUserPreviousEmail;
+  }
+
+  return config;
+};
+
+const handleSessionResponse = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  response: any,
+  singleCheckout?: boolean
+) => {
+  const setCookieHeader = response.headers.get("set-cookie");
+  if (!setCookieHeader) {
+    return;
+  }
+
+  const cookiesObj = parseCookies(setCookieHeader);
+  const cookieStore = await cookies();
+
+  const sessionKey = getSessionKeyFromCookies(cookiesObj);
+
+  if (sessionKey) {
+    const sessionValue = cookiesObj[sessionKey];
+    const encodedSession = encodeSessionCookie(sessionKey, sessionValue);
+
+    if (singleCheckout) {
+      cookieStore.set(COOKIE_NAMES.SINGLE_CHECKOUT, encodedSession);
+    } else {
+      cookieStore.set(COOKIE_NAMES.SESSION, encodedSession);
+    }
+  }
+
+  Object.entries(cookiesObj).forEach(([name, value]) => {
+    if (!name.startsWith("wp_woocommerce_session_")) {
+      cookieStore.set(name, value);
+    }
+  });
+};
+
+const getCart = async () => {
+  const config = await getClientConfig();
+
+  const response = await headkit(config).getCart();
+  await handleSessionResponse(response);
   return response;
 };
 
-// Helper function for actions that don't need cookies (public/static content)
-const withoutCookies = async <T>(
-  operation: (client: Awaited<ReturnType<typeof headkit>>) => Promise<T>,
-  options?: {
-    debug?: boolean;
-    forceNoCache?: boolean;
-    revalidateTime?: number;
-    revalidateTags?: string[];
-  }
-): Promise<T> => {
-  const client = await headkit({
-    debug: options?.debug,
-    forceNoCache: options?.forceNoCache,
-    revalidateTime: options?.revalidateTime,
-    revalidateTags: options?.revalidateTags,
-  });
+const addToCart = async ({
+  input,
+  singleCheckout,
+}: {
+  input: AddToCartInput;
+  singleCheckout?: boolean;
+}) => {
+  const config = await getClientConfig(singleCheckout);
 
-  return operation(client);
-};
-
-// =============================================================================
-// COOKIE-DEPENDENT ACTIONS (User-specific, stateful)
-// =============================================================================
-
-// Cart Actions
-const getCart = async () => {
-  return withCookieHandling(
-    async (client) => {
-      const response = await client.getCart();
-      console.log(
-        "getCart response with cookies:",
-        JSON.stringify(response, null, 2)
-      );
-      return response;
-    },
-    { debug: true, forceNoCache: true }
-  );
-};
-
-const addToCart = async ({ input }: { input: AddToCartInput }) => {
-  return withCookieHandling(
-    async (client) => {
-      const response = await client.addToCart({ input });
-      console.log(
-        "addToCart response with cookies:",
-        JSON.stringify(response, null, 2)
-      );
-      return response;
-    },
-    { debug: true, forceNoCache: true }
-  );
+  const response = await headkit(config).addToCart({ input });
+  await handleSessionResponse(response, singleCheckout);
+  return response;
 };
 
 const removeCartItem = async ({
@@ -126,82 +141,164 @@ const removeCartItem = async ({
 }: {
   cartInput: RemoveItemsFromCartInput;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.removeItemsFromCart({ cartInput });
+  const response = await headkit(await getClientConfig()).removeItemsFromCart({
+    cartInput,
   });
+  await handleSessionResponse(response);
+  return response;
 };
 
 const applyCoupon = async ({ code }: { code: string }) => {
-  return withCookieHandling(async (client) => {
-    return client.applyCoupon({ code });
-  });
+  const response = await headkit(await getClientConfig()).applyCoupon({ code });
+  await handleSessionResponse(response);
+  return response;
 };
 
 const removeCoupons = async ({ code }: { code: string }) => {
-  return withCookieHandling(async (client) => {
-    return client.removeCoupons({ code });
+  const response = await headkit(await getClientConfig()).removeCoupons({
+    code,
   });
+  await handleSessionResponse(response);
+  return response;
+};
+
+const checkout = async ({
+  input,
+  singleCheckout,
+}: {
+  input: CheckoutInput;
+  singleCheckout?: boolean;
+}) => {
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).checkout({ input });
+
+  if (
+    response.data?.checkout &&
+    response.data?.checkout?.result === "success"
+  ) {
+    console.log("checkout success");
+    await handleSessionResponse(response, singleCheckout);
+  }
+  return response;
+};
+
+const getCustomer = async (variables: GetCustomerQueryVariables) => {
+  const config = await getClientConfig();
+  const response = await headkit(config).getCustomer(variables);
+
+  return response;
 };
 
 const emptyCart = async () => {
-  return withCookieHandling(async (client) => {
-    return client.emptyCart({ input: {} });
+  const response = await headkit(await getClientConfig()).emptyCart({
+    input: {},
   });
+
+  return response;
 };
 
 const updateShippingMethod = async ({
   shippingMethod,
+  singleCheckout,
 }: {
   shippingMethod: string;
+  singleCheckout?: boolean;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.updateShippingMethod({ shippingMethod });
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).updateShippingMethod({
+    shippingMethod,
   });
+  await handleSessionResponse(response, singleCheckout);
+  return response;
 };
 
-const updateItemQuantities = async ({
+const getPaymentGateways = async () => {
+  const response = await headkit().getPaymentGateways();
+  return response;
+};
+
+const createPaymentIntent = async ({
+  amount,
+  currency,
+}: {
+  amount: number;
+  currency: string;
+}) => {
+  const response = await headkit(await getClientConfig()).createPaymentIntent({
+    input: {
+      amount,
+      currency,
+    },
+  });
+  return response;
+};
+
+const updatePaymentIntent = async ({
   input,
 }: {
-  input: UpdateItemQuantitiesInput;
+  input: UpdatePaymentIntentInput;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.updateItemQuantities({ input });
+  const response = await headkit(await getClientConfig()).updatePaymentIntent({
+    input,
   });
-};
-
-const updateCartItemQuantity = async ({
-  input,
-}: {
-  input: UpdateItemQuantitiesInput;
-}) => {
-  return withCookieHandling(async (client) => {
-    return client.updateItemQuantities({ input });
-  });
-};
-
-// Customer/Auth Actions
-const getCustomer = async (variables: GetCustomerQueryVariables) => {
-  return withCookieHandling(async (client) => {
-    return client.getCustomer(variables);
-  });
+  return response;
 };
 
 const updateCustomer = async ({
   input,
   withCustomer = true,
   withCart = false,
+  singleCheckout = false,
 }: {
   input: UpdateCustomerInput;
   withCustomer?: boolean;
   withCart?: boolean;
+  singleCheckout?: boolean;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.updateCustomer({
-      input,
-      withCustomer,
-      withCart,
-    });
+  const config = await getClientConfig(singleCheckout);
+  const response = await headkit(config).updateCustomer({
+    input,
+    withCustomer,
+    withCart,
   });
+  await handleSessionResponse(response, singleCheckout);
+  return response;
+};
+
+const getGravityFormById = async ({ id }: { id: string }) => {
+  const response = await headkit().getGravityFormById({ id });
+  return response;
+};
+
+const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
+  const response = await headkit().submitGravityForm({ input });
+  return response;
+};
+
+const sendPasswordResetEmail = async ({ email }: { email: string }) => {
+  const response = await headkit().sendPasswordResetEmail({
+    input: {
+      clientMutationId: uuidv7(),
+      username: email,
+    },
+  });
+  return response;
+};
+
+const resetUserPassword = async ({
+  input,
+}: {
+  input: { key: string; login: string; password: string };
+}) => {
+  const response = await headkit().resetUserPassword({
+    input: {
+      clientMutationId: uuidv7(),
+      ...input,
+    },
+  });
+  return response;
 };
 
 const login = async ({
@@ -211,15 +308,14 @@ const login = async ({
   email: string;
   password: string;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.login({
-      input: {
-        clientMutationId: uuidv7(),
-        username: email,
-        password,
-      },
-    });
+  const response = await headkit().login({
+    input: {
+      clientMutationId: uuidv7(),
+      username: email,
+      password,
+    },
   });
+  return response;
 };
 
 const registerUser = async ({
@@ -233,299 +329,162 @@ const registerUser = async ({
   email: string;
   password: string;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.registerUser({
-      input: {
-        clientMutationId: uuidv7(),
-        username: email,
-        email,
-        password,
-        firstName,
-        lastName,
-        nicename: `${firstName} ${lastName}`,
-      },
-    });
+  const response = await headkit().registerUser({
+    input: {
+      clientMutationId: uuidv7(),
+      username: email,
+      email,
+      password,
+      firstName,
+      lastName,
+      nicename: `${firstName} ${lastName}`,
+    },
   });
+  return response;
 };
 
-const sendPasswordResetEmail = async ({ email }: { email: string }) => {
-  return withCookieHandling(async (client) => {
-    return client.sendPasswordResetEmail({
-      input: {
-        clientMutationId: uuidv7(),
-        username: email,
-      },
-    });
-  });
-};
-
-const resetUserPassword = async ({
+const updateItemQuantities = async ({
   input,
 }: {
-  input: { key: string; login: string; password: string };
+  input: UpdateItemQuantitiesInput;
 }) => {
-  return withCookieHandling(async (client) => {
-    return client.resetUserPassword({
-      input: {
-        clientMutationId: uuidv7(),
-        ...input,
-      },
-    });
+  const response = await headkit(await getClientConfig()).updateItemQuantities({
+    input,
   });
+  await handleSessionResponse(response);
+  return response;
 };
 
-// Order Actions
-const getOrders = async () => {
-  return withCookieHandling(async (client) => {
-    return client.getOrders({ first: 20 });
-  });
+const getAvailablePaymentMethods = async () => {
+  const response = await headkit(
+    await getClientConfig()
+  ).getAvailablePaymentMethods();
+  return response;
 };
 
 const getOrder = async ({ id }: { id: string }) => {
-  // Guest user - try to get order through customer query
-  const guestOrder = await getGuestOrder({ orderId: id });
-  
+  const singleCheckoutToken = (await cookies()).get(
+    COOKIE_NAMES.SINGLE_CHECKOUT
+  )?.value;
+  const config = await getClientConfig(!!singleCheckoutToken);
+
+  if (config.authToken) {
+    // Logged in user - use getOrder
+    const order = await headkit(config).getOrder({ orderId: id });
+    return {
+      data: {
+        order: order.data?.order,
+      },
+    };
+  }
+
+  // Guest user - try both session tokens
+  const guestOrder = await getGuestOrder({
+    orderId: id,
+    sessionToken: singleCheckoutToken || config.woocommerceSession,
+  });
+
   return {
     data: {
-      order: guestOrder.data?.customer?.orders?.nodes?.[0] as Order | undefined,
+      order: guestOrder.data?.customer?.orders?.nodes?.[0],
     },
   };
 };
 
-const getGuestOrder = async ({ orderId }: { orderId: string }) => {
-  return withCookieHandling(async (client) => {
-    const response = await client.getCustomer({
-      withAddress: true,
-      withOrders: true,
-    });
-
-    const order = response.data?.customer?.orders?.nodes?.find(
-      (order) => order?.databaseId === Number(orderId)
-    );
-
-    return {
-      data: {
-        customer: {
-          ...response.data?.customer,
-          orders: {
-            nodes: order ? [order] : [],
-          },
-        },
-      },
-    };
-  });
-};
-
-// Payment Actions
-const checkout = async ({ input }: { input: CheckoutInput }) => {
-  return withCookieHandling(async (client) => {
-    return client.checkout({ input });
-  });
-};
-
-const getPaymentGateways = async () => {
-  return withCookieHandling(async (client) => {
-    return client.getPaymentGateways();
-  });
-};
-
-const createPaymentIntent = async ({
-  amount,
-  currency,
-}: {
-  amount: number;
-  currency: string;
-}) => {
-  return withCookieHandling(async (client) => {
-    return client.createPaymentIntent({
-      input: { amount, currency },
-    });
-  });
-};
-
-const getAvailablePaymentMethods = async () => {
-  return withCookieHandling(async (client) => {
-    return client.getAvailablePaymentMethods();
-  });
-};
-
-// Form Actions (that modify state)
-const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
-  return withCookieHandling(async (client) => {
-    return client.submitGravityForm({ input });
-  });
-};
-
-// Wishlist Actions
-const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
-  return withCookieHandling(
-    async (client) => {
-      return client.actionWishlist({ input });
-    },
-    { forceNoCache: true }
-  );
-};
-
-// =============================================================================
-// NON-COOKIE ACTIONS (Public/static content)
-// =============================================================================
-
-// Product Actions
 const getProductList = async ({
   input,
 }: {
   input: GetProductListQueryVariables;
 }) => {
-  return withoutCookies(async (client) => {
-    return client.getProductList(input);
-  });
+  const response = await headkit().getProductList(input);
+  return response;
 };
 
-const getProductFilters = async ({
-  input,
-}: {
-  input: GetProductFiltersQueryVariables;
-}) => {
-  return withoutCookies(async (client) => {
-    return client.getProductFilters(input);
-  });
-};
-
-const getProductCategory = async ({
-  id,
-  type,
-}: {
-  id: string;
-  type?: ProductCategoryIdType;
-}) => {
-  return withoutCookies(async (client) => {
-    return client.getProductCategory({ id, type });
-  });
-};
-
-// NEW: Product Actions
-const getProduct = async ({
-  id,
-  type,
-}: {
-  id: string;
-  type?: import("./generated").ProductIdTypeEnum;
-}) => {
-  return withoutCookies(async (client) => {
-    return client.getProduct({ id, type });
-  });
-};
-
-const getProducts = async ({
-  first,
-  where,
-}: {
-  first?: number;
-  where?: Record<string, unknown>;
-}) => {
-  return withoutCookies(async (client) => {
-    return client.getProducts({ first, where });
-  });
-};
-
-const getProductCategories = async ({
-  where,
-}: {
-  where?: Record<string, unknown>;
-} = {}) => {
-  return withoutCookies(async (client) => {
-    return client.getProductCategories({ where });
-  });
-};
-
-const getProductSlugs = async ({
-  after,
-  first = 100,
-}: {
-  after?: string | null;
-  first?: number;
-} = {}) => {
-  return withoutCookies(async (client) => {
-    return client.getProducts({ 
-      first, 
-      after,
-      where: {} 
-    });
-  });
-};
-
-// NEW: Carousel Actions
-const getCarousel = async ({
-  where,
-}: {
-  where?: Record<string, unknown>;
-} = {}) => {
-  return withoutCookies(async (client) => {
-    return client.getCarousel({ where });
-  });
-};
-
-// Store Settings Actions
-const getStoreSettings = async () => {
-  return withoutCookies(async (client) => {
-    return client.getStoreSettings();
-  });
+const getProductFilters = async (
+  productFiltersQuery?: GetProductFiltersQueryVariables
+) => {
+  const response = await headkit().getProductFilters(productFiltersQuery);
+  return response;
 };
 
 const getStripeConfig = async () => {
-  return withoutCookies(async (client) => {
-    return client.getStripeConfig();
-  });
+  const response = await headkit().getStripeConfig();
+  return response;
+};
+
+const getStoreSettings = async () => {
+  const response = await headkit().getStoreSettings();
+  return response;
 };
 
 const getPickupLocations = async () => {
-  return withoutCookies(async (client) => {
-    return client.getPickupLocations();
-  });
+  const response = await headkit().getPickupLocations();
+  return response;
 };
 
-// NEW: General Settings Actions
-const getGeneralSettings = async () => {
-  return withoutCookies(async (client) => {
-    return client.getGeneralSettings();
+const updateCartItem = async ({
+  input,
+}: {
+  input: UpdateItemQuantitiesInput;
+}) => {
+  const response = await headkit(await getClientConfig()).updateItemQuantities({
+    input,
   });
+
+  return response;
 };
 
-// Content Actions
-export async function getMenu() {
-  return withoutCookies(async (client) => {
-    return client.getMenu();
+const getProductCategory = async ({ slug }: { slug: string }) => {
+  const response = await headkit().getProductCategory({
+    id: slug,
+    type: ProductCategoryIdType.Slug,
   });
-}
+  return response;
+};
 
-export async function getBranding() {
-  return withoutCookies(
-    async (client) => {
-      return client.getBranding();
-    },
-    {
-      revalidateTime: 86400,
-      revalidateTags: ["headkit:branding"],
-    }
+const getOrders = async () => {
+  const response = await headkit(await getClientConfig()).getOrders();
+  return response;
+};
+
+// For guest users in checkout success
+const getGuestOrder = async ({
+  orderId,
+  sessionToken,
+}: {
+  orderId: string;
+  sessionToken?: string;
+}) => {
+  const config = sessionToken
+    ? { woocommerceSession: sessionToken }
+    : await getClientConfig();
+
+  const response = await headkit(config).getCustomer({
+    withAddress: true,
+    withOrders: true,
+  });
+
+  const order = response.data?.customer?.orders?.nodes?.find(
+    (order) => order?.databaseId === Number(orderId)
   );
-}
 
-export async function getSEOSettings() {
-  const client = await headkit();
-  return client.getSEOSettings();
-}
+  return {
+    data: {
+      customer: {
+        ...response.data?.customer,
+        orders: {
+          nodes: order ? [order] : [],
+        },
+      },
+    },
+  };
+};
 
-export async function getPage({ id, type }: { id: string; type: PageIdType }) {
-  return withoutCookies(async (client) => {
-    return client.getPage({ id, type });
+const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
+  const response = await headkit(await getClientConfig()).actionWishlist({
+    input,
   });
-}
-
-// Form Actions (read-only)
-const getGravityFormById = async ({ id }: { id: string }) => {
-  return withoutCookies(async (client) => {
-    return client.getGravityFormById({ id });
-  });
+  return response;
 };
 
 // Post Actions
@@ -534,9 +493,8 @@ export async function getPostFilters({
 }: {
   input: GetPostCategoriesQueryVariables;
 }) {
-  return withoutCookies(async (client) => {
-    return client.getPostCategories(input);
-  });
+  const response = await headkit().getPostCategories(input);
+  return response;
 }
 
 export async function getPostList({
@@ -544,48 +502,9 @@ export async function getPostList({
 }: {
   input: GetPostsQueryVariables;
 }) {
-  return withoutCookies(async (client) => {
-    return client.getPosts(input);
-  });
+  const response = await headkit().getPosts(input);
+  return response;
 }
-
-// NEW: Post Actions
-const getPost = async ({
-  id,
-  type,
-}: {
-  id: string;
-  type?: import("./generated").PostIdType;
-}) => {
-  return withoutCookies(async (client) => {
-    return client.getPost({ id, type });
-  });
-};
-
-const getPosts = async ({
-  first,
-  last,
-  where,
-}: {
-  first?: number;
-  last?: number;
-  where?: Record<string, unknown>;
-} = {}) => {
-  return withoutCookies(async (client) => {
-    return client.getPosts({ first, last, where });
-  });
-};
-
-// NEW: FAQ Actions
-const getFAQs = async ({
-  where,
-}: {
-  where?: Record<string, unknown>;
-} = {}) => {
-  return withoutCookies(async (client) => {
-    return client.getFAQs({ where });
-  });
-};
 
 // Brand Actions
 export async function getBrandList({
@@ -593,71 +512,92 @@ export async function getBrandList({
 }: {
   input: GetBrandsQueryVariables;
 }) {
-  return withoutCookies(async (client) => {
-    return client.getBrands(input);
-  });
+  const response = await headkit().getBrands(input);
+  return response;
 }
 
 export async function getBrand({ slug }: { slug: string }) {
-  return withoutCookies(async (client) => {
-    return client.getBrand({ slug });
-  });
+  const response = await headkit().getBrand({ slug });
+  return response;
 }
 
-// =============================================================================
-// STATIC-SAFE VERSIONS (for build/static generation)
-// =============================================================================
+export async function getBranding() {
+  const response = await headkit({
+    revalidateTime: 24 * 60 * 60,
+    revalidateTags: ["headkit:branding"],
+  }).getBranding();
+  return response;
+}
 
-const getCartStatic = async () => {
-  // Return null during static generation - cart is user-specific
-  return { data: { cart: null } };
-};
+export async function getCarousel(
+  variables?: GetCarouselQueryVariables
+) {
+  const response = await headkit().getCarousel(variables);
+  return response;
+}
 
-const getMenuStatic = async () => {
-  return withoutCookies(async (client) => {
-    return client.getMenu();
-  });
-};
+export async function getProductCategories(
+  variables?: GetProductCategoriesQueryVariables
+) {
+  const response = await headkit().getProductCategories(variables);
+  return response;
+}
 
-const getBrandingStatic = async () => {
-  return withoutCookies(async (client) => {
-    return client.getBranding();
-  });
-};
+export async function getSEOSettings() {
+  const response = await headkit().getSEOSettings();
+  return response;
+}
 
-const getStoreSettingsStatic = async () => {
-  return withoutCookies(async (client) => {
-    return client.getStoreSettings();
-  });
-};
+export async function getPage({ id, type }: { id: string; type: PageIdType }) {
+  const response = await headkit({
+    revalidateTime: 24 * 60 * 60,
+    revalidateTags: ["headkit:page", `headkit:page:${id}`],
+  }).getPage({ id, type });
+  return response;
+}
 
-const getStripeConfigStatic = async () => {
-  return withoutCookies(async (client) => {
-    return client.getStripeConfig();
-  });
-};
+// FAQ Actions
+export async function getFAQs(variables?: GetFaQsQueryVariables) {
+  const response = await headkit().getFAQs(variables);
+  return response;
+}
 
-const getGeneralSettingsStatic = async () => {
-  return withoutCookies(async (client) => {
-    return client.getGeneralSettings();
-  });
-};
+// Post Actions
+export async function getPost({ id, type }: { id: string; type: PostIdType }) {
+  const response = await headkit().getPost({ id, type });
+  return response;
+}
 
-// =============================================================================
-// UTILITY FUNCTIONS
-// =============================================================================
+export async function getPosts(variables: GetPostsQueryVariables) {
+  const response = await headkit().getPosts(variables);
+  return response;
+}
 
-const updateCartItemMeta = async (order: Record<string, unknown>) => {
-  return Promise.resolve(order);
-};
+// Product Actions
+export async function getProduct({ id, type }: { id: string; type: ProductIdTypeEnum }) {
+  const response = await headkit().getProduct({ id, type });
+  return response;
+}
 
-// =============================================================================
-// EXPORTS
-// =============================================================================
+export async function getProducts(variables?: GetProductsQueryVariables) {
+  const response = await headkit().getProducts(variables);
+  return response;
+}
 
-// Cookie-dependent exports (user-specific, stateful)
+export async function getProductSlugs(variables?: GetProductSlugsQueryVariables) {
+  const response = await headkit().getProductSlugs(variables);
+  return response;
+}
+
+// General Settings Actions
+export async function getGeneralSettings(variables?: GetGeneralSettingsQueryVariables) {
+  const response = await headkit().getGeneralSettings(variables);
+  return response;
+}
+
 export {
-  // Cart
+  getCustomer,
+  updateCustomer,
   getCart,
   addToCart,
   removeCartItem,
@@ -665,70 +605,28 @@ export {
   removeCoupons,
   emptyCart,
   updateShippingMethod,
-  updateItemQuantities,
-  updateCartItemQuantity,
-  
-  // Customer/Auth
-  getCustomer,
-  updateCustomer,
-  login,
-  registerUser,
-  sendPasswordResetEmail,
-  resetUserPassword,
-  
-  // Orders
-  getOrders,
-  getOrder,
-  getGuestOrder,
-  
-  // Payment
-  checkout,
   getPaymentGateways,
   createPaymentIntent,
-  getAvailablePaymentMethods,
-  
-  // Forms (state-changing)
+  updatePaymentIntent,
+  checkout,
+  getGravityFormById,
   submitGravityForm,
-  
-  // Wishlist
-  actionWishlist,
-  
-  // Legacy/Utils
-  getWoocommerceAuthToken,
-  updateCartItemMeta,
-};
-
-// Non-cookie exports (public/static content)
-export {
-  // Products
+  sendPasswordResetEmail,
+  resetUserPassword,
+  login,
+  registerUser,
+  updateItemQuantities,
+  getAvailablePaymentMethods,
+  getOrder,
   getProductList,
   getProductFilters,
-  getProductCategory,
-  getProduct,
-  getProducts,
-  getProductCategories,
-  getProductSlugs,
-  getCarousel,
-  
-  // Store Settings
-  getStoreSettings,
   getStripeConfig,
   getPickupLocations,
-  getGeneralSettings,
-  
-  // Forms (read-only)
-  getGravityFormById,
-  
-  // Posts
-  getPost,
-  getPosts,
-  getFAQs,
-  
-  // Static-safe versions
-  getMenuStatic,
-  getBrandingStatic,
-  getStoreSettingsStatic,
-  getStripeConfigStatic,
-  getCartStatic,
-  getGeneralSettingsStatic,
+  updateCartItem,
+  getProductCategory,
+  getWoocommerceAuthToken,
+  getOrders,
+  getGuestOrder,
+  actionWishlist,
+  getStoreSettings,
 };

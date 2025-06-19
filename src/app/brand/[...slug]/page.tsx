@@ -67,9 +67,7 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
     const [brand, productFilter, productsData] = await Promise.all([
       getBrand({ slug: brandSlug }),
       getProductFilters({
-        input: {
-          brands: [brandSlug],
-        }
+        brands: [brandSlug],
       }),
       getProductList({
         input: {

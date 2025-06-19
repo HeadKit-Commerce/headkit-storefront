@@ -19,19 +19,18 @@ import {
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { 
-  getPage, 
-  getCarousel, 
-  getProductCategories, 
-  getBrandList, 
-  getProducts, 
-  getPosts 
-} from "@/lib/headkit/actions";
+import { getPage, getSEOSettings, getBranding } from "@/lib/headkit/actions";
+import { headkit } from "@/lib/headkit/client";
 
 export async function generateMetadata() {
-  const { data } = await getPage({ id: "/", type: PageIdType.Uri });
+  const [{ data }, headkitSEOSettings, headkitBranding] = await Promise.all([
+    getPage({ id: "/", type: PageIdType.Uri }),
+    getSEOSettings(),
+    getBranding(),
+  ]);
+  
   const seo = data?.page?.seo;
-  return await makeSEOMetadata(seo, {
+  return makeSEOMetadata(seo, {
     override: {
       alternates: {
         canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}`,
@@ -42,6 +41,8 @@ export async function generateMetadata() {
         canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}`,
       },
     },
+    headkitSEOSettings,
+    headkitBranding,
   });
 }
 
@@ -55,15 +56,15 @@ export default async function Home() {
     featuredProducts,
     posts,
   ] = await Promise.all([
-    getPage({ id: "/", type: PageIdType.Uri }),
-    getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
-    getProductCategories({ where: { featured: true } }),
-    getBrandList({ input: { where: { featured: true } } }),
-    getProducts({
+    headkit().getPage({ id: "/", type: PageIdType.Uri }),
+    headkit().getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
+    headkit().getProductCategories({ where: { featured: true } }),
+    headkit().getBrands({ where: { featured: true } }),
+    headkit().getProducts({
       first: 10,
       where: makeWhereProductQuery("featured"),
     }),
-    getPosts({ first: 10 }),
+    headkit().getPosts({ first: 10 }),
   ]);
 
   const editorBlocks = processBlockEditor(
@@ -124,7 +125,7 @@ export default async function Home() {
           <div className="mt-5 lg:mt-[30px]">
             <CategoryCarousel
               categories={
-                productCategories?.data?.productCategories?.nodes.map(
+                productCategories?.data?.productCategories?.nodes?.map(
                   (category) => ({
                     name: category?.name || "",
                     thumbnail: category?.thumbnail || "",
@@ -152,7 +153,7 @@ export default async function Home() {
           <div className="mt-7">
             <BrandCarousel
               brands={
-                brands?.data.brands?.nodes.map((brand) => ({
+                brands?.data.brands?.nodes?.map((brand) => ({
                   name: brand?.name || "",
                   thumbnail: brand?.thumbnail || "",
                   slug: brand?.slug || "",
@@ -175,11 +176,11 @@ export default async function Home() {
           <div className="mt-5 lg:mt-[30px]">
             <PostCarousel
               posts={
-                posts?.data?.posts?.nodes.map((post) => ({
+                posts?.data?.posts?.nodes?.map((post) => ({
                   title: post?.title || "",
                   slug: post?.slug || "",
                   featuredImage: {
-                    src: post?.featuredImage?.node.sourceUrl || "",
+                    src: post?.featuredImage?.node?.sourceUrl || "",
                     alt: post?.title || "",
                   },
                 })) ?? []

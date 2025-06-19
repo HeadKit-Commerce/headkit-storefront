@@ -1,0 +1,7 @@
+mutation updatePaymentIntent ($input: UpdatePaymentIntentInput!) {
+  updatePaymentIntent(input: $input) {
+    id
+    clientSecret
+    customerId
+  }
+} 

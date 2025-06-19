@@ -1,11 +1,19 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductCategory, getProductFilters, getProductList } from "@/lib/headkit/actions";
+import {
+  getProductCategory,
+  getProductFilters,
+  getProductList,
+} from "@/lib/headkit/actions";
 import { CollectionPage } from "@/components/collection/collection-page";
-import { makeWhereProductQuery, SortKeyType, makeBreadcrumbFromProductCategoryData, makeSubcategorySwiperFromProductCategoryData } from "@/components/collection/utils";
+import {
+  makeWhereProductQuery,
+  SortKeyType,
+  makeBreadcrumbFromProductCategoryData,
+  makeSubcategorySwiperFromProductCategoryData,
+} from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { ProductCategoryIdType } from "@/lib/headkit/generated";
 
 interface CollectionPageProps {
   params: Promise<{
@@ -29,18 +37,51 @@ export async function generateMetadata({
 
   if (!categorySlug) return notFound();
 
-  const { data } = await getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug });
+  const { data } = await getProductCategory({ slug: categorySlug });
   if (!data?.productCategory) return notFound();
 
-  return await makeSEOMetadata(data.productCategory.seo, {
+  return makeSEOMetadata(data.productCategory.seo, {
+    override: {
+      openGraph: {
+        url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/collections/${slug.join(
+          "/"
+        )}`,
+        images: [
+          {
+            url:
+              data.productCategory.seo?.opengraphImage?.sourceUrl ||
+              data.productCategory.thumbnail ||
+              "",
+          },
+        ],
+      },
+      twitter: {
+        images: [
+          {
+            url:
+              data.productCategory.seo?.opengraphImage?.sourceUrl ||
+              data.productCategory.thumbnail ||
+              "",
+          },
+        ],
+      },
+    },
     fallback: {
       title: data.productCategory.name,
       description: data.productCategory.description,
+      alternates: {
+        canonical: `${
+          process.env.NEXT_PUBLIC_FRONTEND_URL
+        }/collections/${slug.join("/")}`,
+      },
     },
   });
 }
 
-export default async function Page({ params, searchParams }: CollectionPageProps) {
+export default async function Page({
+  params,
+  searchParams,
+}: CollectionPageProps) {
   const { slug } = await params;
   const categorySlug = slug.pop();
   const parsedSearchParams = await searchParams;
@@ -53,8 +94,14 @@ export default async function Page({ params, searchParams }: CollectionPageProps
     // Parse attributes from search params
     const attributes: Record<string, string[]> = {};
     Object.entries(parsedSearchParams).forEach(([key, value]) => {
-      if (key !== 'page' && key !== 'sort' && key !== 'categories' && key !== 'brands' && key !== 'instock') {
-        attributes[key] = value?.split(',') || [];
+      if (
+        key !== "page" &&
+        key !== "sort" &&
+        key !== "categories" &&
+        key !== "brands" &&
+        key !== "instock"
+      ) {
+        attributes[key] = value?.split(",") || [];
       }
     });
 
@@ -69,12 +116,8 @@ export default async function Page({ params, searchParams }: CollectionPageProps
     };
 
     const [productCategory, productFilter, productsData] = await Promise.all([
-      getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug }),
-      getProductFilters({ 
-        input: {
-          mainCategory: categorySlug 
-        }
-      }),
+      getProductCategory({ slug: categorySlug }),
+      getProductFilters({ mainCategory: categorySlug }),
       getProductList({
         input: {
           where: makeWhereProductQuery({
@@ -95,7 +138,9 @@ export default async function Page({ params, searchParams }: CollectionPageProps
         <CollectionHeader
           name={productCategory.data.productCategory?.name || ""}
           description={productCategory.data.productCategory?.description || ""}
-          breadcrumbData={makeBreadcrumbFromProductCategoryData(productCategory.data)}
+          breadcrumbData={makeBreadcrumbFromProductCategoryData(
+            productCategory.data
+          )}
           categories={makeSubcategorySwiperFromProductCategoryData(
             productCategory.data
           )}
@@ -112,4 +157,4 @@ export default async function Page({ params, searchParams }: CollectionPageProps
     console.error("Error fetching collection data:", error);
     return notFound();
   }
-} 
+}

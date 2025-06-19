@@ -33,7 +33,12 @@ type SEOContentFragment = TaxonomySeoContentFragment | PostTypeSeoContentFragmen
 
 const makeSEOMetadata = async (
   seo?: SEOContentFragment,
-  options?: { fallback?: Metadata; override?: Metadata }
+  options?: { 
+    fallback?: Metadata; 
+    override?: Metadata;
+    headkitSEOSettings?: Awaited<ReturnType<typeof import('../actions').getSEOSettings>> | null;
+    headkitBranding?: Awaited<ReturnType<typeof import('../actions').getBranding>> | null;
+  }
 ): Promise<Metadata> => {
   const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || "";
 

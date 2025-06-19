@@ -38,7 +38,7 @@ export async function generateSocialImage(alt: string = 'Site logo') {
             }} 
           />
         ) : (
-          <div style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: '#FFFFFF' }}>
+          <div style={{ width: `${iconSize}px`, height: `${iconSize}px`, color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Icon.monoLogo />
           </div>
         )}

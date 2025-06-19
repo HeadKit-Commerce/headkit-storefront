@@ -1,8 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Branding } from '@/lib/headkit/generated';
-import { useAppContext } from './app-context';
+import React, { createContext, useContext, useState } from "react";
+import { Branding } from "@/lib/headkit/generated";
 
 interface ThemeContextType {
   primaryColor: string;
@@ -13,21 +12,21 @@ interface ThemeContextType {
 }
 
 const defaultTheme: ThemeContextType = {
-  primaryColor: '#000000',
-  secondaryColor: '#000000',
-  primaryTextColor: '#ffffff',
+  primaryColor: "#000000",
+  secondaryColor: "#000000",
+  primaryTextColor: "#ffffff",
   branding: null,
-  isLoading: true,
+  isLoading: false,
 };
 
 // Function to determine if a color is dark or light
 const isColorDark = (hexColor: string): boolean => {
   // Handle colors with transparency or without # prefix
-  const color = hexColor.charAt(0) === '#' ? hexColor.substring(1) : hexColor;
-  
+  const color = hexColor.charAt(0) === "#" ? hexColor.substring(1) : hexColor;
+
   // Convert hex to RGB
   let r: number, g: number, b: number;
-  
+
   // Handle different hex formats (3 digits, 6 digits)
   if (color.length === 3) {
     r = parseInt(color.charAt(0) + color.charAt(0), 16);
@@ -41,52 +40,53 @@ const isColorDark = (hexColor: string): boolean => {
     // If invalid format, default to considering it as light color
     return false;
   }
-  
+
   // Calculate perceived brightness using YIQ formula
   // This gives better results for human perception than simple average
-  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq < 128; // < 128 is considered dark
 };
 
 // Function to get appropriate text color based on background
 const getTextColorForBackground = (bgColor: string): string => {
-  return isColorDark(bgColor) ? '#ffffff' : '#000000';
+  return isColorDark(bgColor) ? "#ffffff" : "#000000";
 };
 
 const ThemeContext = createContext<ThemeContextType>(defaultTheme);
 
 export const useTheme = () => useContext(ThemeContext);
 
-export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<ThemeContextType>(defaultTheme);
-  const { brandingData } = useAppContext();
-
-  useEffect(() => {
-    if (brandingData) {
-      const primaryColor = brandingData.primaryColor || defaultTheme.primaryColor;
-      const secondaryColor = brandingData.secondaryColor || defaultTheme.secondaryColor;
+// Accept branding data from server components instead of fetching it
+export const ThemeProvider = ({
+  children,
+  initialBranding = null,
+}: {
+  children: React.ReactNode;
+  initialBranding?: Branding | null;
+}) => {
+  const [theme] = useState<ThemeContextType>(() => {
+    if (initialBranding) {
+      const primaryColor =
+        initialBranding.primaryColor || defaultTheme.primaryColor;
+      const secondaryColor =
+        initialBranding.secondaryColor || defaultTheme.secondaryColor;
       const primaryTextColor = getTextColorForBackground(primaryColor);
-      
-      setTheme({
+
+      return {
         primaryColor,
         secondaryColor,
         primaryTextColor,
-        branding: brandingData,
+        branding: initialBranding,
         isLoading: false,
-      });
-      
-      // Apply CSS variables to :root
-      document.documentElement.style.setProperty('--color-primary', primaryColor);
-      document.documentElement.style.setProperty('--color-secondary', secondaryColor);
-      document.documentElement.style.setProperty('--color-primary-text', primaryTextColor);
-    } else {
-      setTheme({ ...defaultTheme, isLoading: false });
+      };
     }
-  }, [brandingData]);
+    return defaultTheme;
+  });
+
+  // CSS variables are now injected server-side via ThemeCSS component
+  // No need for client-side useEffect to prevent color flashing
 
   return (
-    <ThemeContext.Provider value={theme}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>
   );
-}; 
+};

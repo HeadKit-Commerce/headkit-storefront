@@ -17,7 +17,11 @@ import { BreadcrumbJsonLD } from "@/components/seo/breadcrumb-json-ld";
 import { ProductDetail } from "@/components/product/product-detail";
 import { ProductCarousel } from "@/components/carousel/product-carousel";
 import { SectionHeader } from "@/components/common/section-header";
-import { getProduct, getGeneralSettings, getProducts } from "@/lib/headkit/actions";
+import {
+  getProduct,
+  getGeneralSettings,
+  getProducts,
+} from "@/lib/headkit/actions";
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -47,11 +51,32 @@ export async function generateMetadata(
         },
       };
     }
-
-    return await makeSEOMetadata(seo, {
+    return makeSEOMetadata(seo, {
       fallback: {
         title: product?.data?.product?.name,
         description: product?.data?.product?.shortDescription,
+        openGraph: {
+          url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/shop/${slug.join("/")}`,
+          images: [
+            {
+              url: product?.data?.product?.image?.sourceUrl || "",
+              alt: product?.data?.product?.image?.altText || "",
+            },
+          ],
+        },
+        twitter: {
+          images: [
+            {
+              url: product?.data?.product?.image?.sourceUrl || "",
+              alt: product?.data?.product?.image?.altText || "",
+            },
+          ],
+        },
+        alternates: {
+          canonical: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/shop/${slug.join(
+            "/"
+          )}`,
+        },
       },
     });
   } catch (error) {
@@ -105,7 +130,8 @@ export default async function Product({ params }: Props) {
           <div className="mt-5 lg:mt-[30px]">
             <ProductCarousel
               products={
-                (product?.data.product.upsell?.nodes || []) as ProductContentFullWithGroupFragment[]
+                (product?.data.product.upsell?.nodes ||
+                  []) as ProductContentFullWithGroupFragment[]
               }
             />
           </div>
@@ -123,7 +149,8 @@ export default async function Product({ params }: Props) {
           <div className="mt-5 lg:mt-[30px]">
             <ProductCarousel
               products={
-                (product?.data.product.related?.nodes || []) as ProductContentFullWithGroupFragment[]
+                (product?.data.product.related?.nodes ||
+                  []) as ProductContentFullWithGroupFragment[]
               }
               carouselItemClassName="basis-10/12 sm:basis-1/3 lg:basis-1/4 pl-[30px]"
             />
@@ -140,13 +167,22 @@ export async function generateStaticParams() {
     first: 1000, // Get a large number of products to ensure we get all slugs
   });
 
-  return products?.data.products?.nodes?.map(
-    (item) => {
+  return (
+    products?.data.products?.nodes?.map((item) => {
       return {
         slug:
-          (item as SimpleProduct | VariableProduct | GroupProduct | ExternalProduct | null | undefined)
-            ?.uri?.split("/").filter((e) => e !== "" && e !== "shop") || [],
+          (
+            item as
+              | SimpleProduct
+              | VariableProduct
+              | GroupProduct
+              | ExternalProduct
+              | null
+              | undefined
+          )?.uri
+            ?.split("/")
+            .filter((e) => e !== "" && e !== "shop") || [],
       };
-    }
-  ) || [];
+    }) || []
+  );
 }

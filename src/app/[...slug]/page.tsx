@@ -35,7 +35,7 @@ export async function generateMetadata(
       throw new Error("Not Found");
     }
 
-    return await makeSEOMetadata(seo, { fallback: { title: page?.page?.title } });
+    return makeSEOMetadata(seo, { fallback: { title: page?.page?.title } });
   } catch {
     const parentMetadata = await parent;
     return {

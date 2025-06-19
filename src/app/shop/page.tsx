@@ -41,7 +41,7 @@ export default async function Page({ searchParams }: Props) {
           first: itemsPerPage,
         },
       }),
-      getProductFilters({ input: {} }),
+      getProductFilters(),
     ]);
 
   // Parse attribute filters after getting the product filter data
