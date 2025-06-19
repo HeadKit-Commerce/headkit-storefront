@@ -43,18 +43,29 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL('/checkout?error=stripe_configuration', request.url));
     }
     
-    // Check if we should use live mode
-    const isLiveMode = process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true';
+    // Determine which mode to use - if NEXT_PUBLIC_STRIPE_LIVE_MODE is set, use that, otherwise use publishable key to infer
+    let shouldUseLiveMode = false;
     
-    // Use live key when in live mode and live key is available
-    const publishableKey = isLiveMode && stripeFullConfig.publishableKeyLive
-      ? stripeFullConfig.publishableKeyLive
-      : stripeFullConfig.publishableKeyTest;
+    if (process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE !== undefined) {
+      // Environment variable override
+      shouldUseLiveMode = process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true';
+    } else {
+      // Infer from whether live publishable key is being used
+      shouldUseLiveMode = !!(stripeFullConfig.publishableKeyLive && stripeFullConfig.publishableKeyLive.length > 0);
+    }
     
-    console.log('Using Stripe mode:', isLiveMode ? 'LIVE' : 'TEST');
+    // Use environment variables for secret keys
+    const secretKey = shouldUseLiveMode 
+      ? process.env.STRIPE_SECRET_KEY_LIVE 
+      : process.env.STRIPE_SECRET_KEY_TEST;
 
-    // Create Stripe instance
-    const stripeInstanceServer = new Stripe(publishableKey, {
+    if (!secretKey) {
+      console.error('Stripe secret key not found for mode:', shouldUseLiveMode ? 'live' : 'test');
+      return NextResponse.redirect(new URL('/checkout?error=stripe_configuration', request.url));
+    }
+
+    // Create Stripe instance with secret key
+    const stripeInstanceServer = new Stripe(secretKey, {
       stripeAccount: stripeFullConfig.accountId || undefined,
     });
 
@@ -85,6 +96,10 @@ export async function GET(request: Request) {
               value: "processing",
             },
             {
+              key: "_headkit_payment_mode",
+              value: shouldUseLiveMode ? "live" : "test",
+            },
+            {
               key: "_stripe_intent_id",
               value: paymentIntent,
             },
@@ -112,8 +127,21 @@ export async function GET(request: Request) {
           return NextResponse.redirect(new URL('/checkout?error=checkout_failed', request.url));
         }
 
-        // Redirect to success page
+        // Get the order ID for updating payment intent description
         const orderId = checkoutResponse.data.checkout.order.databaseId;
+        
+        // Update payment intent description with order ID
+        try {
+          await stripeInstanceServer.paymentIntents.update(paymentIntent, {
+            description: `Order ID: ${orderId}`
+          });
+          console.log('Payment intent description updated with order ID:', orderId);
+        } catch (updateError) {
+          console.error('Error updating payment intent description:', updateError);
+          // Don't fail the checkout if description update fails
+        }
+
+        // Redirect to success page
         console.log('Payment successful, redirecting to success page with order ID:', orderId);
         return NextResponse.redirect(new URL(`/checkout/success/${orderId}`, request.url));
       } else {
@@ -130,6 +158,10 @@ export async function GET(request: Request) {
             {
               key: "_headkit_payments_status",
               value: "failed",
+            },
+            {
+              key: "_headkit_payment_mode",
+              value: shouldUseLiveMode ? "live" : "test",
             },
           ],
         };
