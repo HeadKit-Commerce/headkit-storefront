@@ -12,6 +12,7 @@ import { CheckoutInput, CountriesEnum } from "@/lib/headkit/generated";
 import { removeSingleCheckoutSession } from "@/lib/headkit/actions/auth";
 import { v7 as uuidv7 } from "uuid";
 import Cookies from 'js-cookie';
+import { updatePaymentIntentDescription } from "@/lib/stripe/actions";
 
 interface ExpressCheckoutButtonProps {
   productId?: number;
@@ -184,6 +185,31 @@ export function ExpressCheckoutButton({
       if (checkoutResult.errors || !checkoutResult.data.checkout) {
         console.error("Checkout failed:", checkoutResult.errors);
         throw new Error(checkoutResult.errors?.[0]?.message || "Checkout failed. Please try again.");
+      }
+
+      // Update payment intent description with Order ID
+      const orderId = checkoutResult.data.checkout?.order?.databaseId;
+      if (orderId && result.paymentIntent.id) {
+        console.log("=== EXPRESS CHECKOUT: UPDATING PAYMENT INTENT DESCRIPTION ===");
+        try {
+          await updatePaymentIntentDescription({
+            paymentIntent: result.paymentIntent.id,
+            orderId: orderId.toString(),
+          });
+          console.log("=== EXPRESS CHECKOUT: PAYMENT INTENT DESCRIPTION UPDATE COMPLETED ===");
+        } catch (updateError) {
+          console.error("=== EXPRESS CHECKOUT: PAYMENT INTENT DESCRIPTION UPDATE FAILED ===");
+          console.error("Express checkout update error:", updateError);
+          // Don't throw here, allow checkout to continue
+        }
+      } else {
+        console.log("=== EXPRESS CHECKOUT: SKIPPING PAYMENT INTENT UPDATE ===");
+        console.log("Reason:", {
+          hasOrderId: !!orderId,
+          orderId,
+          hasPaymentIntentId: !!result.paymentIntent.id,
+          paymentIntentId: result.paymentIntent.id
+        });
       }
 
       // Handle successful payment

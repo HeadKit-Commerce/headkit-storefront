@@ -423,17 +423,38 @@ const CheckoutForm = () => {
           data.paymentMethod === "headkit-payments") ||
         data.paymentMethod !== "headkit-payments";
 
-      console.log("shouldProcessPayment", shouldProcessPayment);
-      console.log("data.paymentIntentId", data.paymentIntentId);
-      console.log("orderId", orderId);
+      console.log("=== PAYMENT INTENT UPDATE DEBUG ===");
+      console.log("shouldProcessPayment calculation:", {
+        paymentStatus: data.paymentStatus,
+        paymentMethod: data.paymentMethod,
+        isProcessingAndHeadkit: data.paymentStatus === "processing" && data.paymentMethod === "headkit-payments",
+        isNotHeadkitPayments: data.paymentMethod !== "headkit-payments",
+        finalShouldProcessPayment: shouldProcessPayment
+      });
+      console.log("data.paymentIntentId:", data.paymentIntentId);
+      console.log("orderId:", orderId);
+      console.log("Will attempt update:", shouldProcessPayment && data.paymentIntentId);
 
       if (shouldProcessPayment && data.paymentIntentId) {
-        console.log("updating payment intent description");
-        await updatePaymentIntentDescription({
-          paymentIntent: data.paymentIntentId,
-          orderId: orderId.toString(),
+        console.log("=== STARTING PAYMENT INTENT DESCRIPTION UPDATE ===");
+        try {
+          await updatePaymentIntentDescription({
+            paymentIntent: data.paymentIntentId,
+            orderId: orderId.toString(),
+          });
+          console.log("=== PAYMENT INTENT DESCRIPTION UPDATE COMPLETED ===");
+        } catch (updateError) {
+          console.error("=== PAYMENT INTENT DESCRIPTION UPDATE FAILED ===");
+          console.error("Update error:", updateError);
+          // Don't throw here, allow checkout to continue
+        }
+      } else {
+        console.log("=== SKIPPING PAYMENT INTENT UPDATE ===");
+        console.log("Reason:", {
+          shouldProcessPayment,
+          hasPaymentIntentId: !!data.paymentIntentId,
+          paymentIntentId: data.paymentIntentId
         });
-        console.log("payment intent description updated");
       }
 
       // Only redirect to success page when payment is completed or for non-stripe payments
