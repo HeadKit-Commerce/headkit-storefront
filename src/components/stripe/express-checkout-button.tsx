@@ -7,7 +7,7 @@ import { useAppContext } from "@/contexts/app-context";
 import { useState } from "react";
 import { AlertBox } from "@/components/alert-box/alert-box";
 import { getFloatVal } from "@/lib/utils";
-import { addToCart, createPaymentIntent, updateCustomer, updateShippingMethod, checkout } from "@/lib/headkit/actions";
+import { addToCart, createPaymentIntent, updateCustomer, updateShippingMethod, checkout, getCart } from "@/lib/headkit/actions";
 import { CheckoutInput, CountriesEnum } from "@/lib/headkit/generated";
 import { removeSingleCheckoutSession } from "@/lib/headkit/actions/auth";
 import { v7 as uuidv7 } from "uuid";
@@ -74,10 +74,14 @@ export function ExpressCheckoutButton({
         throw new Error(submitError.message);
       }
 
+      // Get fresh cart data before creating payment intent to ensure accurate amount
+      let freshCartData = cartData;
+      const { data: freshCart } = await getCart(singleCheckout);
+      freshCartData = freshCart?.cart as CartType;
+      console.log("Fresh cart data before payment intent:", freshCartData);
+
       const { data: paymentIntent } = await createPaymentIntent({
-        amount: singleCheckout
-          ? Math.round((price ?? 0) * 100)
-          : Math.round(getFloatVal(cartData?.total ?? "0") * 100),
+        amount: Math.round(getFloatVal(freshCartData?.total ?? "0") * 100),
         currency: initCurrency.toLowerCase(),
       });
       console.log("paymentIntent", paymentIntent);
@@ -377,12 +381,6 @@ export function ExpressCheckoutButton({
 
               //add single item to new cart
               if (singleCheckout) {
-                console.log("singleCheckout", {
-                  productId,
-                  variationId,
-                  price,
-                  productName,
-                });
                 await addToCart({
                   input: {
                     quantity: 1,

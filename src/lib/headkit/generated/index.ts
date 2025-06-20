@@ -52660,7 +52660,7 @@ export type GetSeoSettingsQuery = { __typename?: 'Query', seoSettings: { __typen
 export type GetStoreSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetStoreSettingsQuery = { __typename?: 'Query', storeSettings: { __typename?: 'StoreSettings', gtmId?: string | null } };
+export type GetStoreSettingsQuery = { __typename?: 'Query', storeSettings: { __typename?: 'StoreSettings', id: string, slug: string, name: string, gtmId?: string | null, domain?: string | null, webhookUrl?: string | null, paymentMode: PaymentMode, planType: PlanType, createdAt: string, updatedAt: string } };
 
 export type GetStripeConfigQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -54531,7 +54531,16 @@ export const GetSeoSettingsDocument = gql`
 export const GetStoreSettingsDocument = gql`
     query getStoreSettings {
   storeSettings {
+    id
+    slug
+    name
     gtmId
+    domain
+    webhookUrl
+    paymentMode
+    planType
+    createdAt
+    updatedAt
   }
 }
     `;

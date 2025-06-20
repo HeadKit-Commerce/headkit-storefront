@@ -114,11 +114,11 @@ const handleSessionResponse = async (
   });
 };
 
-const getCart = async () => {
-  const config = await getClientConfig();
+const getCart = async (singleCheckout?: boolean) => {
+  const config = await getClientConfig(singleCheckout);
 
   const response = await headkit(config).getCart();
-  await handleSessionResponse(response);
+  await handleSessionResponse(response, singleCheckout);
   return response;
 };
 

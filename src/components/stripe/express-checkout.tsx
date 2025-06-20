@@ -52,7 +52,6 @@ export function ExpressCheckout({
     return null;
   }
 
-  console.log("singleCheckout", singleCheckout, JSON.stringify(options, null, 2));
 
   return (
     <Elements options={options} stripe={stripe}>

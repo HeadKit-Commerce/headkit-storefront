@@ -30,17 +30,27 @@ const urbanist = Urbanist({
 });
 
 export const generateMetadata = async (): Promise<Metadata> => {
-  const {
-    data: { generalSettings },
-  } = await headkit({
-    revalidateTime: 24 * 60 * 60,
-    revalidateTags: ["headkit:general-settings"],
-  }).getGeneralSettings();
+  try {
+    const {
+      data: { generalSettings },
+    } = await headkit({
+      revalidateTime: 24 * 60 * 60,
+      revalidateTags: ["headkit:general-settings"],
+    }).getGeneralSettings();
 
-  return makeRootMetadata({
-    title: generalSettings?.title,
-    description: generalSettings?.description,
-  });
+    return makeRootMetadata({
+      title: generalSettings?.title,
+      description: generalSettings?.description,
+    });
+  } catch (error) {
+    console.error("Error fetching general settings for metadata:", error);
+    
+    // Return fallback metadata if the query fails
+    return makeRootMetadata({
+      title: "Your Store",
+      description: "Welcome to our online store",
+    });
+  }
 };
 
 export default async function RootLayout({
@@ -48,17 +58,43 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [
-    { data: branding },
-    { data: menu },
-    { data: stripeConfigData },
-    { data: storeSettings },
-  ] = await Promise.all([
-    getBranding(),
-    headkit().getMenu(),
-    getStripeConfig(),
-    getStoreSettings(),
-  ]);
+  let branding = null;
+  let menu = null;
+  let stripeConfigData = null;
+  let storeSettings = null;
+
+  try {
+    const results = await Promise.all([
+      getBranding().catch((error) => {
+        console.error("Error fetching branding:", error);
+        return { data: { branding: null } };
+      }),
+      headkit().getMenu().catch((error) => {
+        console.error("Error fetching menu:", error);
+        return { data: { menus: { nodes: [] } } };
+      }),
+      getStripeConfig().catch((error) => {
+        console.error("Error fetching stripe config:", error);
+        return { data: { stripeConfig: null } };
+      }),
+      getStoreSettings().catch((error) => {
+        console.error("Error fetching store settings:", error);
+        return { data: { storeSettings: null } };
+      }),
+    ]);
+
+    branding = results[0].data;
+    menu = results[1].data;
+    stripeConfigData = results[2].data;
+    storeSettings = results[3].data;
+  } catch (error) {
+    console.error("Error in RootLayout queries:", error);
+    // Fallback to empty/null values if the entire Promise.all fails
+    branding = { branding: null };
+    menu = { menus: { nodes: [] } };
+    stripeConfigData = { stripeConfig: null };
+    storeSettings = { storeSettings: null };
+  }
 
   // Use the enum to fetch menus by location
   const headerMenuLocations = [

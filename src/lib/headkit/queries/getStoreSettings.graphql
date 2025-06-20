@@ -1,5 +1,14 @@
 query getStoreSettings {
   storeSettings {
+    id
+    slug
+    name
     gtmId
+    domain
+    webhookUrl
+    paymentMode
+    planType
+    createdAt
+    updatedAt
   }
 }
