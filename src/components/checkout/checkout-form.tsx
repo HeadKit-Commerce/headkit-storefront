@@ -26,8 +26,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ExpressCheckout } from "../stripe/express-checkout";
 import { useStripe } from "@/contexts/stripe-context";
 import { useRouter } from "next/navigation";
-import { setCheckoutData } from "@/lib/headkit/actions/cookies";
 import { updatePaymentIntentDescription } from "@/lib/stripe/actions";
+import Cookies from "js-cookie";
 
 interface FormData {
   email?: string;
@@ -401,7 +401,7 @@ const CheckoutForm = () => {
     };
 
     // save in cookies
-    await setCheckoutData(checkoutData.input);
+    Cookies.set('checkoutData', JSON.stringify(checkoutData.input), { expires: 1 });
 
     console.log("checkoutData", checkoutData);
 
