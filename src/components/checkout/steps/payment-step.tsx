@@ -134,7 +134,11 @@ const StripePaymentStep = React.forwardRef<
     <div className={`space-y-6`}>
       <PaymentElement
         options={{
-          layout: "accordion",
+          layout: {
+            type: "accordion",
+            defaultCollapsed: false,
+            radios: true,
+          },
         }}
         onFocus={() => {
           if (onClick) {
@@ -178,7 +182,7 @@ const StandardPaymentStep: React.FC<{
   };
 
   return (
-    <div onClick={onClick} className={`${!isActive ? 'cursor-pointer' : ''}`}>
+    <div onClick={onClick} className={`${!isActive ? "cursor-pointer" : ""}`}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
@@ -204,7 +208,9 @@ const StandardPaymentStep: React.FC<{
                           </FormControl>
                           <FormLabel className="font-normal cursor-pointer">
                             <div className="ml-2">
-                              <div className="font-semibold mb-1 text-primary">{gateway.title}</div>
+                              <div className="font-semibold mb-1 text-primary">
+                                {gateway.title}
+                              </div>
                               <div className="text-sm text-gray-600 leading-tight">
                                 {gateway.description}
                               </div>
@@ -242,7 +248,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
       paymentGatewayId: "",
     },
   });
-  
+
   const stripeRef = useRef<{ handleSubmit: () => Promise<void> }>(null);
 
   const handlePayment = async () => {
@@ -269,7 +275,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
       {enableStripe && (
         <div
           className={`${
-            activePaymentMethod === "stripe" ? "border-primary" : "border-gray-200"
+            activePaymentMethod === "stripe"
+              ? "border-primary"
+              : "border-gray-200"
           } border rounded-md p-4 cursor-pointer`}
           onClick={() => setActivePaymentMethod("stripe")}
         >
@@ -286,7 +294,9 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
 
       <div
         className={`${
-          activePaymentMethod === "standard" ? "border-primary" : "border-gray-200"
+          activePaymentMethod === "standard"
+            ? "border-primary"
+            : "border-gray-200"
         } border rounded-md p-4`}
       >
         <h3 className="font-semibold text-lg mb-4">Other Payment Methods</h3>
