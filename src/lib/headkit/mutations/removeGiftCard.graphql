@@ -1,0 +1,6 @@
+mutation removeGiftCard($id: String!) {
+  removeGiftCard(input: { id: $id }) {
+    message
+    result
+  }
+} 

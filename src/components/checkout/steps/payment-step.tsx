@@ -41,7 +41,7 @@ interface PaymentStepProps {
     paymentIntentId?: string;
     stripePaymentMethod?: string;
     paymentStatus?: "failed" | "processing" | "pending";
-  }) => Promise<void>;
+  }) => Promise<{ success: boolean; error?: string }>;
   buttonLabel?: string;
 }
 
@@ -72,11 +72,15 @@ const StripePaymentStep = React.forwardRef<
         console.log("paymentIntentData", paymentIntentData);
 
         // Submit the pending status and wait for it to complete
-        await onSubmit({
+        const pendingResult = await onSubmit({
           paymentMethod: "headkit-payments",
           paymentIntentId: paymentIntentData.createPaymentIntent.id,
           paymentStatus: "pending",
         });
+
+        if (!pendingResult.success) {
+          throw new Error(pendingResult.error || "Failed to create pending payment");
+        }
 
         const result = await stripe.confirmPayment({
           clientSecret: paymentIntentData.createPaymentIntent.clientSecret,
@@ -102,23 +106,28 @@ const StripePaymentStep = React.forwardRef<
             transactionId:
               result.error.payment_intent?.id || result.error.charge,
           });
-          return;
+          throw new Error(result.error.message || "Payment failed");
         }
 
-        if ("paymentIntent" in result && result.paymentIntent) {
+        if (result.paymentIntent?.status === "succeeded") {
           console.log("successpaymentIntent", result.paymentIntent);
           const paymentIntent = result.paymentIntent as PaymentIntent;
-          await onSubmit({
+          const successResult = await onSubmit({
             paymentMethod: "headkit-payments",
             transactionId: paymentIntent.id,
             paymentIntentId: paymentIntentData.createPaymentIntent.id,
             stripePaymentMethod: JSON.stringify(paymentIntent.payment_method),
             paymentStatus: "processing",
           });
+          
+          if (!successResult.success) {
+            throw new Error(successResult.error || "Failed to complete payment");
+          }
         }
       }
     } catch (error) {
       console.error("Payment error:", error);
+      throw error; // Re-throw so parent can handle
     }
   };
 
@@ -176,9 +185,13 @@ const StandardPaymentStep: React.FC<{
   }, [form.formState.isValid]);
 
   const handleSubmit = async (data: z.infer<typeof paymentSchema>) => {
-    await onSubmit({
+    const result = await onSubmit({
       paymentMethod: data.paymentGatewayId ?? "",
     });
+    
+    if (!result.success) {
+      throw new Error(result.error || "Payment failed");
+    }
   };
 
   return (
@@ -258,14 +271,17 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
         await stripeRef.current?.handleSubmit();
       } else if (form.formState.isValid && activePaymentMethod === "standard") {
         await form.handleSubmit(async (data) => {
-          await onSubmit({
+          const result = await onSubmit({
             paymentMethod: data.paymentGatewayId ?? "",
           });
+          
+          if (!result.success) {
+            throw new Error(result.error || "Payment failed");
+          }
         })();
       }
     } catch (error) {
       console.error("Payment submission error:", error);
-    } finally {
       setLoading(false);
     }
   };

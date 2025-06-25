@@ -1,0 +1,6 @@
+mutation applyGiftCardToCart($code: String!) {
+  applyGiftCard(input: {code: $code}) {
+    message
+    result
+  }
+} 

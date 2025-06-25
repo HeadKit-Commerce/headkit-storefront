@@ -70,19 +70,18 @@ export const formatShippingPrice = (
     ? getFloatVal(shippingTotal) + getFloatVal(shippingTax) === 0
       ? "Free"
       : currencyFormatter({
-        price: getFloatVal(shippingTotal) + getFloatVal(shippingTax),
-        currency,
-        lang,
-      })
+          price: getFloatVal(shippingTotal) + getFloatVal(shippingTax),
+          currency,
+          lang,
+        })
     : getFloatVal(shippingTotal) === 0
-      ? "Free"
-      : currencyFormatter({
+    ? "Free"
+    : currencyFormatter({
         price: getFloatVal(shippingTotal),
         currency,
         lang,
       });
 };
-
 
 export const processText = (
   inputText: string
@@ -112,14 +111,18 @@ interface PaymentMethodDisplay {
   text: string;
 }
 
-export const getPaymentMethodDisplay = (metaData?: Array<{ key: string; value: string }>): PaymentMethodDisplay => {
+export const getPaymentMethodDisplay = (
+  metaData?: Array<{ key: string; value: string }>
+): PaymentMethodDisplay => {
   try {
-    const paymentMethodData = metaData?.find(item => item.key === '_stripe_payment_method')?.value;
+    const paymentMethodData = metaData?.find(
+      (item) => item.key === "_stripe_payment_method"
+    )?.value;
 
     if (!paymentMethodData) {
       return {
         icon: <></>,
-        text: "Unknown payment method"
+        text: "Unknown payment method",
       };
     }
 
@@ -127,48 +130,57 @@ export const getPaymentMethodDisplay = (metaData?: Array<{ key: string; value: s
 
     // Handle different payment method types
     switch (paymentMethod.type) {
-      case 'link':
+      case "link":
         return {
           icon: <Icon.stripe className="h-auto w-6 shrink-0" />,
-          text: `Stripe Link (${paymentMethod.link.email})`
+          text: `Stripe Link (${paymentMethod.link.email})`,
         };
 
-      case 'card': {
+      case "card": {
         // Handle different card brands
-        const brand = paymentMethod.card?.brand || 'unknown';
-        const last4 = paymentMethod.card?.last4 ?? '****';
-        
+        const brand = paymentMethod.card?.brand || "unknown";
+        const last4 = paymentMethod.card?.last4 ?? "****";
+
         // Handle different card brands
         const cardIcons = {
           visa: <Icon.visa className="h-auto w-6 shrink-0" />,
           mastercard: <Icon.mastercard className="h-auto w-6 shrink-0" />,
           amex: <Icon.amex className="h-auto w-6 shrink-0" />,
-          default: <Icon.stripe className="h-auto w-6 shrink-0" />
+          default: <Icon.stripe className="h-auto w-6 shrink-0" />,
         };
 
         // Check if it's Apple Pay
-        if (paymentMethod.card?.wallet?.type === 'apple_pay') {
+        if (paymentMethod.card?.wallet?.type === "apple_pay") {
           return {
             icon: (
               <div className="flex gap-2">
                 <Icon.applePay className="h-auto w-6 shrink-0" />
-                {cardIcons[brand as keyof typeof cardIcons] || cardIcons.default}
+                {cardIcons[brand as keyof typeof cardIcons] ||
+                  cardIcons.default}
               </div>
             ),
-            text: `Apple Pay (${brand} ending in ${last4})`
+            text: `Apple Pay (${brand} ending in ${last4})`,
           };
         }
 
         return {
           icon: cardIcons[brand as keyof typeof cardIcons] || cardIcons.default,
-          text: `${brand.charAt(0).toUpperCase() + brand.slice(1)} ending in ${last4}`
+          text: `${
+            brand.charAt(0).toUpperCase() + brand.slice(1)
+          } ending in ${last4}`,
         };
       }
+
+      case "afterpay_clearpay":
+        return {
+          icon: <></>,
+          text: "Afterpay Clearpay",
+        };
 
       default:
         return {
           icon: <></>,
-          text: `Payment method: ${paymentMethod.type}`
+          text: `Payment method: ${paymentMethod.type}`,
         };
     }
   } catch (error) {
@@ -176,7 +188,7 @@ export const getPaymentMethodDisplay = (metaData?: Array<{ key: string; value: s
     console.error("Error parsing payment method data:", error);
     return {
       icon: <></>,
-      text: "Invalid payment method data"
+      text: "Invalid payment method data",
     };
   }
 };
@@ -212,11 +224,11 @@ export function debounce<T extends (...args: any[]) => void>(
 export function snakeCase(str: string): string {
   return str
     .trim()
-    .replace(/([a-z])([A-Z])/g, '$1_$2') // Convert camelCase to snake_case
-    .replace(/[\s-]+/g, '_') // Replace spaces and hyphens with underscores
+    .replace(/([a-z])([A-Z])/g, "$1_$2") // Convert camelCase to snake_case
+    .replace(/[\s-]+/g, "_") // Replace spaces and hyphens with underscores
     .toLowerCase();
-} 
+}
 
 export const removeTrailingSlash = (str: string) => {
-  return str.replace(/\/$/, '');
-}
+  return str.replace(/\/$/, "");
+};

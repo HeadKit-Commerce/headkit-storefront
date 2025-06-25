@@ -162,6 +162,22 @@ const removeCoupons = async ({ code }: { code: string }) => {
   return response;
 };
 
+const applyGiftCard = async ({ code }: { code: string }) => {
+  const response = await headkit(await getClientConfig()).applyGiftCardToCart({
+    code,
+  });
+  await handleSessionResponse(response);
+  return response;
+};
+
+const removeGiftCard = async ({ id }: { id: string }) => {
+  const response = await headkit(await getClientConfig()).removeGiftCard({
+    id,
+  });
+  await handleSessionResponse(response);
+  return response;
+};
+
 const checkout = async ({
   input,
   singleCheckout,
@@ -603,6 +619,8 @@ export {
   removeCartItem,
   applyCoupon,
   removeCoupons,
+  applyGiftCard,
+  removeGiftCard,
   emptyCart,
   updateShippingMethod,
   getPaymentGateways,

@@ -66,6 +66,16 @@ interface FormData {
 const CheckoutForm = () => {
   const router = useRouter();
   const { cartData, isLiveMode } = useAppContext();
+  
+  // Determine if payment is needed based on cart total
+  const cartTotal = getFloatVal(cartData?.total ?? "0");
+  const needsPayment = cartTotal > 0;
+  
+  // Get available steps based on whether payment is needed
+  const availableSteps = needsPayment 
+    ? Object.values(CheckoutFormStepEnum)
+    : Object.values(CheckoutFormStepEnum).filter(step => step !== CheckoutFormStepEnum.PAYMENT);
+  
   const [currentStep, setCurrentStep] = useState<CheckoutFormStepEnum>(
     CheckoutFormStepEnum.CONTACT
   );
@@ -221,7 +231,7 @@ const CheckoutForm = () => {
         return !!formData.email;
       case CheckoutFormStepEnum.DELIVERY_METHOD:
         return !!formData.deliveryMethod;
-      case CheckoutFormStepEnum.ADDRESS:
+              case CheckoutFormStepEnum.ADDRESS:
         return formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT
           ? !!formData.billingAddress?.line1
           : !!formData.shippingAddress?.line1;
@@ -233,23 +243,27 @@ const CheckoutForm = () => {
   };
 
   const handleStepNavigation = (step: CheckoutFormStepEnum) => {
-    const stepIndex = Object.values(CheckoutFormStepEnum).indexOf(step);
-    const currentStepIndex = Object.values(CheckoutFormStepEnum).indexOf(currentStep);
+    const stepIndex = availableSteps.indexOf(step);
+    const currentStepIndex = availableSteps.indexOf(currentStep);
 
     if (isStepCompleted(step) || stepIndex === currentStepIndex + 1) {
       setCurrentStep(step);
     }
   };
 
-  const handleNextStep = (
+  const handleNextStep = async (
     step: CheckoutFormStepEnum,
     data: Partial<FormData>
   ) => {
-    setFormData((prev) => ({ ...prev, ...data }));
-    const steps = Object.values(CheckoutFormStepEnum);
-    const nextStepIndex = steps.indexOf(step) + 1;
-    if (nextStepIndex < steps.length) {
-      setCurrentStep(steps[nextStepIndex]);
+    const updatedFormData = { ...formData, ...data };
+    setFormData(updatedFormData);
+    
+    const nextStepIndex = availableSteps.indexOf(step) + 1;
+    if (nextStepIndex < availableSteps.length) {
+      setCurrentStep(availableSteps[nextStepIndex]);
+    } else if (!needsPayment && step === CheckoutFormStepEnum.ADDRESS) {
+      // If no payment is needed and we're on the last step (ADDRESS), auto-submit the order
+      await handleFreeOrderSubmit(updatedFormData);
     }
   };
 
@@ -259,7 +273,7 @@ const CheckoutForm = () => {
     } else if (step === CheckoutFormStepEnum.DELIVERY_METHOD) {
       // if formData.deliveryMethod is click and collect, show formData.deliveryMethod and formData.location
       if (formData.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT) {
-        const address = pickupLocations.find(location => location.name === formData.location);
+        const address = pickupLocations.find(location => location.shippingMethodId === formData.location);
         return `
           <span>
             <span>${formData.deliveryMethod}</span>
@@ -319,58 +333,67 @@ const CheckoutForm = () => {
     return undefined;
   };
 
+  const handleFreeOrderSubmit = async (updatedFormData: FormData) => {
+    // Submit order without payment for free orders
+    return await handlePaymentSubmit({
+      paymentMethod: "free_order",
+      paymentStatus: "processing"
+    }, updatedFormData);
+  };
+
   const handlePaymentSubmit = async (data: {
     paymentMethod: string;
     transactionId?: string;
     paymentIntentId?: string;
     stripePaymentMethod?: string;
     paymentStatus?: "failed" | "processing" | "pending";
-  }) => {
+  }, overrideFormData?: FormData): Promise<{ success: boolean; error?: string }> => {
     console.log("handlePaymentSubmit data", data);
 
+    const currentFormData = overrideFormData || formData;
     const checkoutData: { input: CheckoutInput } = {
       input: {
         clientMutationId: uuidv7(),
         paymentMethod: data.paymentMethod,
         transactionId: data?.transactionId,
         isPaid: data.paymentStatus === "processing",
-        billing: formData.billingAddress?.line1
+        billing: currentFormData.billingAddress?.line1
           ? {
-              firstName: formData.billingAddress.firstName,
-              lastName: formData.billingAddress.lastName,
-              address1: formData.billingAddress.line1,
-              address2: formData.billingAddress.line2,
-              city: formData.billingAddress.city,
-              state: formData.billingAddress.state,
-              postcode: formData.billingAddress.postalCode,
-              country: formData.billingAddress.country as CountriesEnum,
-              email: formData.email,
-              phone: formData.billingAddress.phone,
+              firstName: currentFormData.billingAddress.firstName,
+              lastName: currentFormData.billingAddress.lastName,
+              address1: currentFormData.billingAddress.line1,
+              address2: currentFormData.billingAddress.line2,
+              city: currentFormData.billingAddress.city,
+              state: currentFormData.billingAddress.state,
+              postcode: currentFormData.billingAddress.postalCode,
+              country: currentFormData.billingAddress.country as CountriesEnum,
+              email: currentFormData.email,
+              phone: currentFormData.billingAddress.phone,
             }
           : {
-              firstName: formData.shippingAddress?.firstName || "",
-              lastName: formData.shippingAddress?.lastName || "",
-              address1: formData.shippingAddress?.line1 || "",
-              address2: formData.shippingAddress?.line2,
-              city: formData.shippingAddress?.city || "",
-              state: formData.shippingAddress?.state || "",
-              postcode: formData.shippingAddress?.postalCode || "",
+              firstName: currentFormData.shippingAddress?.firstName || "",
+              lastName: currentFormData.shippingAddress?.lastName || "",
+              address1: currentFormData.shippingAddress?.line1 || "",
+              address2: currentFormData.shippingAddress?.line2,
+              city: currentFormData.shippingAddress?.city || "",
+              state: currentFormData.shippingAddress?.state || "",
+              postcode: currentFormData.shippingAddress?.postalCode || "",
               country:
-                (formData.shippingAddress?.country as CountriesEnum) || "",
-              email: formData.email,
-              phone: formData.shippingAddress?.phone || "",
+                (currentFormData.shippingAddress?.country as CountriesEnum) || "",
+              email: currentFormData.email,
+              phone: currentFormData.shippingAddress?.phone || "",
             },
         shipping: {
-          firstName: formData.shippingAddress?.firstName,
-          lastName: formData.shippingAddress?.lastName,
-          address1: formData.shippingAddress?.line1,
-          address2: formData.shippingAddress?.line2,
-          city: formData.shippingAddress?.city,
-          state: formData.shippingAddress?.state,
-          postcode: formData.shippingAddress?.postalCode,
-          country: formData.shippingAddress?.country as CountriesEnum,
-          email: formData.email,
-          phone: formData.shippingAddress?.phone,
+          firstName: currentFormData.shippingAddress?.firstName,
+          lastName: currentFormData.shippingAddress?.lastName,
+          address1: currentFormData.shippingAddress?.line1,
+          address2: currentFormData.shippingAddress?.line2,
+          city: currentFormData.shippingAddress?.city,
+          state: currentFormData.shippingAddress?.state,
+          postcode: currentFormData.shippingAddress?.postalCode,
+          country: currentFormData.shippingAddress?.country as CountriesEnum,
+          email: currentFormData.email,
+          phone: currentFormData.shippingAddress?.phone,
         },
         metaData:
           data.paymentMethod === "headkit-payments"
@@ -414,7 +437,7 @@ const CheckoutForm = () => {
 
       if (!orderId) {
         console.error("No order ID received from checkout");
-        return;
+        return { success: false, error: "No order ID received from checkout" };
       }
 
       // Update payment intent description and redirect to success page
@@ -469,9 +492,11 @@ const CheckoutForm = () => {
       } else {
         console.log("not redirecting - payment status is pending");
       }
+
+      return { success: true };
     } catch (error) {
       console.error("Checkout failed:", error);
-      // TODO: Handle checkout error (show error message to user)
+      return { success: false, error: error instanceof Error ? error.message : "Checkout failed" };
     }
   };
 
@@ -506,7 +531,7 @@ const CheckoutForm = () => {
 
   const FormContent = () => (
     <div>
-      {Object.values(CheckoutFormStepEnum).map((step, index) => (
+      {availableSteps.map((step, index) => (
         <AccordionWrapper
           key={step}
           order={index + 1}
@@ -518,8 +543,8 @@ const CheckoutForm = () => {
           isActive={currentStep === step}
           isCompleted={isStepCompleted(step)}
           clickable={isStepCompleted(step) ||
-            Object.values(CheckoutFormStepEnum).indexOf(step) <=
-            Object.values(CheckoutFormStepEnum).indexOf(currentStep)}
+            availableSteps.indexOf(step) <=
+            availableSteps.indexOf(currentStep)}
           handleAccordionClick={() => handleStepNavigation(step)}
           briefValue={getBriefValue(step)}
         >
@@ -574,14 +599,14 @@ const CheckoutForm = () => {
                       phone: "",
                     },
                   }}
-                  buttonLabel="Continue To Payment"
+                  buttonLabel={needsPayment ? "Continue To Payment" : "Complete Order"}
                 />
               ) : (
                 <ShippingOptionsStep
                   onNext={(data) =>
                     handleNextStep(CheckoutFormStepEnum.ADDRESS, data)
                   }
-                  buttonLabel="Continue To Payment"
+                  buttonLabel={needsPayment ? "Continue To Payment" : "Complete Order"}
                 />
               )}
             </>

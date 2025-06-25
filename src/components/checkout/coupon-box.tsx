@@ -9,7 +9,13 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { AlertBox } from "@/components/alert-box/alert-box";
-import { applyCoupon, removeCoupons } from "@/lib/headkit/actions";
+import {
+  applyCoupon,
+  removeCoupons,
+  applyGiftCard,
+  removeGiftCard,
+  getCart,
+} from "@/lib/headkit/actions";
 
 const isValidGiftCardFormat = (code: string) => {
   const regex = /^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/;
@@ -50,17 +56,19 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
       try {
         if (isValidGiftCardFormat(code)) {
           // Apply Gift Card Logic
-          /*
-          const giftCardResult = await headkit().applyGiftCard({ code });
+          const { data: giftCardResult } = await applyGiftCard({ code });
           if (giftCardResult?.applyGiftCard?.result === "success") {
+            // Manually fetch cart after successful gift card application
             const updatedCart = await getCart();
-            if (updatedCart) {
-              setCartData(updatedCart.data.cart);
+            if (updatedCart?.data?.cart) {
+              setCartData(updatedCart.data.cart as Cart);
             }
           } else {
-            throw new Error(giftCardResult?.applyGiftCard?.message || "Failed to apply gift card");
+            throw new Error(
+              giftCardResult?.applyGiftCard?.message ||
+                "Failed to apply gift card"
+            );
           }
-          */
         } else {
           // Apply Coupon Logic
           const { data: couponResult } = await applyCoupon({ code });
@@ -102,21 +110,27 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
     [setCartData]
   );
 
-  /*
-  const removeGiftCard = useCallback(
+  const removeGiftCardHandler = useCallback(
     async (id: string) => {
       try {
-        const result = await headkit().removeGiftCard({ id });
-        if (result?.removeGiftCard?.cart) {
-          setCartData(result.removeGiftCard.cart);
+        // Call the remove gift card API
+        await removeGiftCard({ id });
+        // Manually fetch cart after removal
+        const updatedCart = await getCart();
+        if (updatedCart?.data?.cart) {
+          setCartData(updatedCart.data.cart as Cart);
         }
-      } catch (error: any) {
-        setErrorMessage(error.response?.errors?.[0]?.message || "An error occurred");
+      } catch (error: unknown) {
+        const err = error as ApiError;
+        setErrorMessage(
+          err.response?.errors?.[0]?.message ||
+            err.message ||
+            "An error occurred"
+        );
       }
     },
     [setCartData]
   );
-  */
 
   return (
     <div>
@@ -148,23 +162,24 @@ export const CouponBox = ({ cart }: { cart: Cart }) => {
           ))}
         </div>
       )}
-      {/* Uncomment for Gift Card logic */}
-      {/* cart?.appliedGiftCards?.length > 0 && (
+      {(cart?.appliedGiftCards?.length ?? 0) > 0 && (
         <div>
-          {cart.appliedGiftCards.map((giftCard) => (
-            <div key={giftCard.code} className="flex text-lg font-medium  py-2">
-              <p className="flex-1">Gift Card: {giftCard.code}</p>
-              <p>-${getFloatVal(giftCard.amount).toFixed(2)}</p>
-              <p
-                className="underline font-medium ml-1 cursor-pointer"
-                onClick={() => removeGiftCard(giftCard.id)}
-              >
-                [remove]
-              </p>
-            </div>
-          ))}
+          {cart?.appliedGiftCards?.map((giftCard) => 
+            giftCard ? (
+              <div key={giftCard.code} className="flex text-lg font-medium  py-2">
+                <p className="flex-1">Gift Card: {giftCard.code}</p>
+                <p>-${getFloatVal(giftCard?.amount ?? "0").toFixed(2)}</p>
+                <p
+                  className="underline font-medium ml-1 cursor-pointer"
+                  onClick={() => removeGiftCardHandler(giftCard?.id ?? "")}
+                >
+                  [remove]
+                </p>
+              </div>
+            ) : null
+          )}
         </div>
-      ) */}
+      )}
       <form onSubmit={handleSubmit(applyCouponOrGiftCard)}>
         <div className="flex gap-3 items-start">
           <div className="flex-1">
