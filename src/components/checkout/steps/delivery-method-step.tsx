@@ -14,52 +14,61 @@ import { Button } from "@/components/ui/button";
 import { DeliveryStepEnum } from "../utils";
 import { AddressElement } from "@stripe/react-stripe-js";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  updateShippingMethod,
-  updateCustomer,
-} from "@/lib/headkit/actions";
+import { updateShippingMethod, updateCustomer } from "@/lib/headkit/actions";
 import { CountriesEnum } from "@/lib/headkit/generated";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
-const deliverySchema = z.object({
-  deliveryMethod: z.enum([
-    DeliveryStepEnum.CLICK_AND_COLLECT,
-    DeliveryStepEnum.SHIPPING_TO_HOME,
-  ]).optional(),
-  location: z.string().optional(),
-  shippingAddress: z.object({
-    firstName: z.string().min(1, "First Name is required"),
-    lastName: z.string().min(1, "Last Name is required"),
-    line1: z.string().min(1, "Address Line 1 is required"),
-    line2: z.string().optional(),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    country: z.string().min(1, "Country is required"),
-    postalCode: z.string().min(1, "Postal Code is required"),
-    phone: z.string().min(1, "Phone is required"),
-  }).optional(),
-}).superRefine((data, ctx) => {
-  if (!data.deliveryMethod) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Please select a delivery method",
-    });
-  }
-  if (data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT && !data.location) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Pickup location is required for Click & Collect",
-    });
-  }
-  // make sure shippingAddress is required if deliveryMethod is SHIPPING_TO_HOME
-  if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && !data.shippingAddress) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Shipping address is required for Ship to Home",
-    });
-  }
-});
+const deliverySchema = z
+  .object({
+    deliveryMethod: z
+      .enum([
+        DeliveryStepEnum.CLICK_AND_COLLECT,
+        DeliveryStepEnum.SHIPPING_TO_HOME,
+      ])
+      .optional(),
+    location: z.string().optional(),
+    shippingAddress: z
+      .object({
+        firstName: z.string().min(1, "First Name is required"),
+        lastName: z.string().min(1, "Last Name is required"),
+        line1: z.string().min(1, "Address Line 1 is required"),
+        line2: z.string().optional(),
+        city: z.string().min(1, "City is required"),
+        state: z.string().min(1, "State is required"),
+        country: z.string().min(1, "Country is required"),
+        postalCode: z.string().min(1, "Postal Code is required"),
+        phone: z.string().min(1, "Phone is required"),
+      })
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.deliveryMethod) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please select a delivery method",
+      });
+    }
+    if (
+      data.deliveryMethod === DeliveryStepEnum.CLICK_AND_COLLECT &&
+      !data.location
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Pickup location is required for Click & Collect",
+      });
+    }
+    // make sure shippingAddress is required if deliveryMethod is SHIPPING_TO_HOME
+    if (
+      data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME &&
+      !data.shippingAddress
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Shipping address is required for Ship to Home",
+      });
+    }
+  });
 
 interface DeliveryMethodStepProps {
   onChange: (data: z.infer<typeof deliverySchema>) => void;
@@ -137,7 +146,10 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
       }
 
       // Update customer shipping address if shipping to home
-      if (data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME && data.shippingAddress) {
+      if (
+        data.deliveryMethod === DeliveryStepEnum.SHIPPING_TO_HOME &&
+        data.shippingAddress
+      ) {
         const customerResult = await updateCustomer({
           input: {
             shipping: {
@@ -150,9 +162,9 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               postcode: data.shippingAddress.postalCode,
               country: data.shippingAddress.country as CountriesEnum,
               phone: data.shippingAddress.phone,
-            }
+            },
           },
-          withCart: true
+          withCart: true,
         });
 
         if (customerResult?.errors) {
@@ -167,18 +179,13 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
     }
   };
 
-  // useEffect(() => {
-  //   // If no pickup locations, force shipping to home and set initial location
-  //   if (pickupLocations.length === 0) {
-  //     form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: false });
-  //   } else if (pickupLocations.length === 1) {
-  //     // If only one location, automatically select it
-  //     form.setValue("location", pickupLocations[0].shippingMethodId, { shouldValidate: false });
-  //   }
-  // }, [pickupLocations]);
-
   if (isLoading) {
-    return <div className="text-center min-h-[200px] flex items-center justify-center bg-white/50"> <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+    return (
+      <div className="text-center min-h-[200px] flex items-center justify-center bg-white/50">
+        {" "}
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
@@ -198,21 +205,31 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                     className="grid md:grid-cols-2 gap-4"
                   >
                     {pickupLocations.length > 0 && (
-                      <FormLabel htmlFor="click-collect" className={cn(
-                        "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
-                        field.value === DeliveryStepEnum.CLICK_AND_COLLECT && "border-purple-500"
-                      )}>
+                      <FormLabel
+                        htmlFor="click-collect"
+                        className={cn(
+                          "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
+                          field.value === DeliveryStepEnum.CLICK_AND_COLLECT &&
+                            "border-purple-500"
+                        )}
+                      >
                         <RadioGroupItem
                           value={DeliveryStepEnum.CLICK_AND_COLLECT}
                           id="click-collect"
                         />
-                        <span className="font-normal">Free Click & Collect</span>
+                        <span className="font-normal">
+                          Free Click & Collect
+                        </span>
                       </FormLabel>
                     )}
-                    <FormLabel htmlFor="ship-home" className={cn(
-                      "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
-                      field.value === DeliveryStepEnum.SHIPPING_TO_HOME && "border-purple-500"
-                    )}>
+                    <FormLabel
+                      htmlFor="ship-home"
+                      className={cn(
+                        "flex items-center space-x-2 cursor-pointer h-[40px] px-[16px] border rounded-[6px]",
+                        field.value === DeliveryStepEnum.SHIPPING_TO_HOME &&
+                          "border-purple-500"
+                      )}
+                    >
                       <RadioGroupItem
                         value={DeliveryStepEnum.SHIPPING_TO_HOME}
                         id="ship-home"
@@ -227,7 +244,8 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
           />
         )}
 
-        {form.watch("deliveryMethod") === DeliveryStepEnum.CLICK_AND_COLLECT && (
+        {form.watch("deliveryMethod") ===
+          DeliveryStepEnum.CLICK_AND_COLLECT && (
           <FormField
             name="location"
             control={form.control}
@@ -249,9 +267,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                           value={location.shippingMethodId}
                           id={location.shippingMethodId}
                         />
-                        <FormLabel
-                          htmlFor={location.shippingMethodId}
-                        >
+                        <FormLabel htmlFor={location.shippingMethodId}>
                           <div className="flex flex-col gap-1">
                             <div className="font-medium">{location.name}</div>
                             <div className="text-gray-500">
@@ -270,8 +286,8 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
           />
         )}
 
-        {form.watch("deliveryMethod") === DeliveryStepEnum.SHIPPING_TO_HOME && (
-          enableStripe ? (
+        {form.watch("deliveryMethod") === DeliveryStepEnum.SHIPPING_TO_HOME &&
+          (enableStripe ? (
             <AddressElement
               key={form.watch("deliveryMethod")}
               options={{
@@ -291,30 +307,60 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                 defaultValues: {
                   firstName: form.getValues("shippingAddress.firstName") || "",
                   lastName: form.getValues("shippingAddress.lastName") || "",
-                  address: {
-                    line1: form.getValues("shippingAddress.line1") || "",
-                    line2: form.getValues("shippingAddress.line2") || "",
-                    city: form.getValues("shippingAddress.city") || "",
-                    state: form.getValues("shippingAddress.state") || "",
-                    country: form.getValues("shippingAddress.country") || "",
-                    postal_code: form.getValues("shippingAddress.postalCode") || "",
-                  },
-                  phone: form.getValues("shippingAddress.phone") || "",
+                  ...(form.getValues("shippingAddress.line1") && {
+                    address: {
+                      line1: form.getValues("shippingAddress.line1") || "",
+                      line2: form.getValues("shippingAddress.line2") || "",
+                      city: form.getValues("shippingAddress.city") || "",
+                      state: form.getValues("shippingAddress.state") || "",
+                      country: form.getValues("shippingAddress.country") || "",
+                      postal_code:
+                        form.getValues("shippingAddress.postalCode") || "",
+                    },
+                    phone: form.getValues("shippingAddress.phone") || "",
+                  }),
                 },
               }}
               onChange={(event) => {
                 if (event.complete) {
-                  const { address, phone, firstName, lastName, name } = event.value;
+                  const { address, phone, firstName, lastName, name } =
+                    event.value;
                   // Set and validate each field individually
-                  form.setValue("shippingAddress.firstName", name?.split(" ")?.[0] || firstName || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.lastName", name?.split(" ")?.[1] || lastName || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.line1", address.line1 || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.line2", address.line2 || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.city", address.city || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.postalCode", address.postal_code || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.state", address.state || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.country", address.country || "", { shouldValidate: true });
-                  form.setValue("shippingAddress.phone", phone || "", { shouldValidate: true });
+                  form.setValue(
+                    "shippingAddress.firstName",
+                    name?.split(" ")?.[0] || firstName || "",
+                    { shouldValidate: true }
+                  );
+                  form.setValue(
+                    "shippingAddress.lastName",
+                    name?.split(" ")?.[1] || lastName || "",
+                    { shouldValidate: true }
+                  );
+                  form.setValue("shippingAddress.line1", address.line1 || "", {
+                    shouldValidate: true,
+                  });
+                  form.setValue("shippingAddress.line2", address.line2 || "", {
+                    shouldValidate: true,
+                  });
+                  form.setValue("shippingAddress.city", address.city || "", {
+                    shouldValidate: true,
+                  });
+                  form.setValue(
+                    "shippingAddress.postalCode",
+                    address.postal_code || "",
+                    { shouldValidate: true }
+                  );
+                  form.setValue("shippingAddress.state", address.state || "", {
+                    shouldValidate: true,
+                  });
+                  form.setValue(
+                    "shippingAddress.country",
+                    address.country || "",
+                    { shouldValidate: true }
+                  );
+                  form.setValue("shippingAddress.phone", phone || "", {
+                    shouldValidate: true,
+                  });
                 }
               }}
             />
@@ -328,7 +374,12 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
-                      <input type="text" placeholder="First Name" className="border rounded-md p-2 w-full" {...field} />
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -342,7 +393,12 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
-                      <input type="text" placeholder="Last Name" className="border rounded-md p-2 w-full" {...field} />
+                      <input
+                        type="text"
+                        placeholder="Last Name"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -464,15 +520,19 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <input type="text" placeholder="Phone" className="border rounded-md p-2 w-full" {...field} />
+                      <input
+                        type="text"
+                        placeholder="Phone"
+                        className="border rounded-md p-2 w-full"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </>
-          )
-        )}
+          ))}
 
         <Button
           type="submit"
@@ -488,4 +548,4 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
   );
 };
 
-export { DeliveryMethodStep }; 
+export { DeliveryMethodStep };

@@ -79,7 +79,9 @@ const StripePaymentStep = React.forwardRef<
         });
 
         if (!pendingResult.success) {
-          throw new Error(pendingResult.error || "Failed to create pending payment");
+          throw new Error(
+            pendingResult.error || "Failed to create pending payment"
+          );
         }
 
         const result = await stripe.confirmPayment({
@@ -119,9 +121,11 @@ const StripePaymentStep = React.forwardRef<
             stripePaymentMethod: JSON.stringify(paymentIntent.payment_method),
             paymentStatus: "processing",
           });
-          
+
           if (!successResult.success) {
-            throw new Error(successResult.error || "Failed to complete payment");
+            throw new Error(
+              successResult.error || "Failed to complete payment"
+            );
           }
         }
       }
@@ -188,7 +192,7 @@ const StandardPaymentStep: React.FC<{
     const result = await onSubmit({
       paymentMethod: data.paymentGatewayId ?? "",
     });
-    
+
     if (!result.success) {
       throw new Error(result.error || "Payment failed");
     }
@@ -274,7 +278,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
           const result = await onSubmit({
             paymentMethod: data.paymentGatewayId ?? "",
           });
-          
+
           if (!result.success) {
             throw new Error(result.error || "Payment failed");
           }
@@ -289,15 +293,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
   return (
     <div className="space-y-6">
       {enableStripe && (
-        <div
-          className={`${
-            activePaymentMethod === "stripe"
-              ? "border-primary"
-              : "border-gray-200"
-          } border rounded-md p-4 cursor-pointer`}
-          onClick={() => setActivePaymentMethod("stripe")}
-        >
-          <h3 className="font-semibold text-lg mb-4">Card Payment</h3>
+        <div onClick={() => setActivePaymentMethod("stripe")}>
           <StripePaymentStep
             ref={stripeRef}
             enableStripe={enableStripe}
@@ -308,14 +304,7 @@ const PaymentStep: React.FC<PaymentStepProps> = ({
         </div>
       )}
 
-      <div
-        className={`${
-          activePaymentMethod === "standard"
-            ? "border-primary"
-            : "border-gray-200"
-        } border rounded-md p-4`}
-      >
-        <h3 className="font-semibold text-lg mb-4">Other Payment Methods</h3>
+      <div>
         <StandardPaymentStep
           onSubmit={onSubmit}
           onStandardReady={setIsStandardReady}
