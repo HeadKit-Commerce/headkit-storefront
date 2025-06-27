@@ -67,13 +67,13 @@ interface PostCategoryData {
 export function makeBreadcrumbFromPostCategoryData(data: PostCategoryData) {
   const breadcrumb = [
     { name: "Home", href: "/" },
-    { name: "Posts", href: "/posts" },
+    { name: "News & Tips", href: "/news" },
   ];
 
   if (data?.postCategory) {
     breadcrumb.push({
       name: data.postCategory.name || "",
-      href: `/posts/${data.postCategory.slug}`,
+      href: `/news/${data.postCategory.slug}`,
     });
   }
 

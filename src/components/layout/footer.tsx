@@ -27,22 +27,14 @@ interface FooterProps {
 const SubscriptionBox = () => {
   return (
     <div className="flex flex-col gap-2">
-      <Label className="text-purple-800 font-semibold text-lg">
-        Subscribe
-      </Label>
+      <Label className="text-purple-800 font-semibold text-lg">Subscribe</Label>
       <form className="flex gap-2 relative">
-        <Input
-          type="email"
-          placeholder="Enter your email"
-          required
-        />
-        <Button
-          type="submit"
-          className="absolute right-0"
-        >
+        <Input type="email" placeholder="Enter your email" required />
+        <Button type="submit" className="absolute right-0">
           Subscribe
         </Button>
-      </form></div>
+      </form>
+    </div>
   );
 };
 
@@ -60,15 +52,24 @@ const Footer = ({ menus, iconUrl }: FooterProps) => {
             <div className="shrink-0 pr-4">
               <Link href="/" className="mr-4" aria-label="home">
                 <div className="relative h-auto w-full max-w-[60px] hover:opacity-70">
-                  {iconUrl ? <Image src={iconUrl} alt="Logo" sizes="20vw" width={0} height={0} className="h-9 w-auto" /> : <Icon.monoLogo />}
+                  {iconUrl ? (
+                    <Image
+                      src={iconUrl}
+                      alt="Logo"
+                      sizes="20vw"
+                      width={0}
+                      height={0}
+                      className="h-9 w-auto"
+                    />
+                  ) : (
+                    <Icon.monoLogo />
+                  )}
                 </div>
               </Link>
             </div>
             <div className="leading-5 text-purple-800">
-              HeadKit is the Headless eCommerce Starter Kit for WooCommerce.
-              Reduce your time to market building a Headless eCommerce site
-              and launch or re-launch with a high-performance modernized
-              solution.
+              HeadKit is the cloud platform making it easy to build headless
+              commerce stores.
             </div>
           </div>
           <div className="mt-4 flex gap-5">
@@ -76,12 +77,7 @@ const Footer = ({ menus, iconUrl }: FooterProps) => {
               (platform, i) => {
                 const IconPlatform = Icon[platform as keyof typeof Icon];
                 return (
-                  <a
-                    key={i}
-                    href="#"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a key={i} href="#" target="_blank" rel="noopener noreferrer">
                     <IconPlatform
                       size={24}
                       className="fill-purple-800 hover:opacity-70"
@@ -109,15 +105,17 @@ const Footer = ({ menus, iconUrl }: FooterProps) => {
         <div className="flex flex-col justify-between">
           <SubscriptionBox />
           <div className="mt-4 flex flex-wrap gap-3 md:justify-end">
-            {["visa", "mastercard", "amex", "applePay", "googlePay", "paypal"].map((icon, i) => {
-              const IconPayment = Icon[icon as keyof typeof Icon];
-              return (
-                <IconPayment
-                  key={i}
-                  className="h-8! w-auto hover:opacity-70"
-                />
-              );
-            })}
+            {["visa", "mastercard", "amex", "applePay", "googlePay"].map(
+              (icon, i) => {
+                const IconPayment = Icon[icon as keyof typeof Icon];
+                return (
+                  <IconPayment
+                    key={i}
+                    className="h-8! w-auto hover:opacity-70"
+                  />
+                );
+              }
+            )}
           </div>
         </div>
       </div>

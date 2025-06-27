@@ -24,11 +24,13 @@ fragment CartData on Cart {
     discountAmount
     discountTax
   }
-  appliedGiftCards {
-    id
-    code
-    amount
-  }
+  ## Uncomment this and run `pnpm generate` to use gift cards (you need WooCommerce Gift Cards plugin installed and activated)
+  # appliedGiftCards {
+  #   id
+  #   code
+  #   amount
+  # }
+  ##
   fees {
     id
     name

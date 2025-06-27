@@ -110,7 +110,7 @@ export const processBlockEditor = (
         }
         // Handle product blocks
         else if (
-          ["WoocommerceProductOnSale", "WoocommerceProductNew"].includes(
+          ["WoocommerceProductOnSale", "WoocommerceProductNew", "WoocommerceHandpickedProducts"].includes(
             block.__typename!
           ) &&
           (

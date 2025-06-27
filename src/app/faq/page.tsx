@@ -99,7 +99,7 @@ export default async function FAQPage() {
                   value={faq.id || index.toString()}
                   className="rounded-lg border border-purple-200 px-4"
                 >
-                  <AccordionTrigger className="text-left font-medium">
+                  <AccordionTrigger className="text-left font-medium cursor-pointer">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent>

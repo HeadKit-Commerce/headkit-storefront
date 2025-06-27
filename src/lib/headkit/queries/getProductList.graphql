@@ -41,6 +41,7 @@ query getProductList(
                 value
               }
             }
+            date
           }
         }
         attributes(first: 100) {

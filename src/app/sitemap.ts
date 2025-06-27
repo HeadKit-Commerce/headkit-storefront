@@ -115,7 +115,7 @@ const makePostSitemap = async (): Promise<MetadataRoute.Sitemap> => {
   const posts = response.data?.posts?.nodes || [];
 
   return posts.map((node: PostNode) => ({
-    url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/posts/${node?.slug}`,
+    url: `${process.env.NEXT_PUBLIC_FRONTEND_URL}/news/${node?.slug}`,
     lastModified: node?.modified ? new Date(node.modified) : new Date(),
     changeFrequency: "weekly",
     priority: 0.8,

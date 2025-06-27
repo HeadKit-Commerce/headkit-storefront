@@ -3,6 +3,7 @@ import { getPostList, getPostFilters } from "@/lib/headkit/actions";
 import { PostPage } from "@/components/post/post-page";
 import { makeWherePostQuery, SortKeyType } from "@/components/post/utils";
 import { PostHeader } from "@/components/post/post-header";
+import headkitConfig from "@/headkit.config";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Posts",
+  title: headkitConfig.article.name,
   description: "Browse our collection of posts",
 };
 
@@ -50,7 +51,7 @@ export default async function Page({ searchParams }: PageProps) {
 
     return <>
       <PostHeader
-        name="Posts"
+        name={headkitConfig.article.name}
         breadcrumbData={[
           {
             name: "Home",
@@ -58,8 +59,8 @@ export default async function Page({ searchParams }: PageProps) {
             current: false,
           },
           {
-            name: "Posts",
-            uri: "/posts",
+            name: "News & Tips",
+            uri: "/news",
             current: true,
           },
         ]}

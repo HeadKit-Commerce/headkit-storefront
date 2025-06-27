@@ -28,7 +28,7 @@ export async function generateMetadata() {
     getSEOSettings(),
     getBranding(),
   ]);
-  
+
   const seo = data?.page?.seo;
   return makeSEOMetadata(seo, {
     override: {
@@ -47,7 +47,6 @@ export async function generateMetadata() {
 }
 
 export default async function Home() {
-
   const [
     page,
     mainCarousel,
@@ -78,6 +77,7 @@ export default async function Home() {
       | WoocommerceProductNew
     )[]
   );
+
   return (
     <>
       {(mainCarousel?.data?.carousels?.nodes?.length ?? 0) > 0 && (
@@ -171,7 +171,7 @@ export default async function Home() {
             title="Latest News"
             description="Get the latest news and updates from our blog."
             allButton="View All"
-            allButtonPath="/posts"
+            allButtonPath="/news"
           />
           <div className="mt-5 lg:mt-[30px]">
             <PostCarousel

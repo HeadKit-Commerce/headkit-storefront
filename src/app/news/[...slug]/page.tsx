@@ -62,7 +62,7 @@ export default async function Page({ params }: Props) {
               title="Latest News"
               description="Get the latest news and updates from our blog."
               allButton="View All"
-              allButtonPath="/posts"
+              allButtonPath="/news"
             />
             <div className="mt-5">
               <PostCarousel

@@ -47,10 +47,10 @@ export const MainCarousel = ({ carouselData }: Props) => {
                   <div className="z-999 h-full w-full md:absolute">
                     <div className="mx-auto flex h-full items-center">
                       <div className="py-[20px] md:w-[400px] md:pl-[20px] lg:w-[600px] lg:pl-[100px]">
-                        <HeaderTag className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-3xl font-semibold leading-[1.3]! text-transparent md:from-purple-500 md:to-pink-500 md:text-5xl">
+                        <HeaderTag className="text-primary text-3xl font-semibold leading-[1.3]! md:text-5xl">
                           {carousel?.header}
                         </HeaderTag>
-                        <p className="bg-linear-to-r from-purple-500 to-pink-500 bg-clip-text text-3xl font-semibold leading-[1.3]! text-transparent md:from-purple-500 md:to-pink-500 md:text-5xl">
+                        <p className="mt-8 text-3xl font-semibold text-black md:text-white">
                           {carousel?.description}
                         </p>
                         <div className="mt-8">

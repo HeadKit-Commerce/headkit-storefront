@@ -6,7 +6,7 @@ interface ThemeCSSProps {
 
 // Default theme colors
 const defaultTheme = {
-  primaryColor: '#000000',
+  primaryColor: '#7f54b3',
   secondaryColor: '#000000',
   primaryTextColor: '#ffffff',
 };

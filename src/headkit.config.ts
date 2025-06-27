@@ -62,8 +62,8 @@ const config: HeadKitConfig = {
   },
   article: {
     name: "News & Tips",
-    slug: "posts",
-    link: "/posts",
+    slug: "news",
+    link: "/news",
   },
   sale: {
     name: "Sale",
