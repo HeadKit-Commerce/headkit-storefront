@@ -225,6 +225,22 @@ const CheckoutForm = () => {
     loadPickupLocations();
   }, []);
 
+  useEffect(() => {
+    // If no pickup locations, force shipping to home and set initial location
+    if (pickupLocations.length === 0) {
+      setFormData(prev => ({
+        ...prev,
+        deliveryMethod: DeliveryStepEnum.SHIPPING_TO_HOME
+      }));
+    } else if (pickupLocations.length === 1) {
+      // If only one location, automatically select it
+      setFormData(prev => ({
+        ...prev,
+        location: pickupLocations[0].shippingMethodId
+      }));
+    }
+  }, [pickupLocations]);
+
   const isStepCompleted = (step: CheckoutFormStepEnum) => {
     switch (step) {
       case CheckoutFormStepEnum.CONTACT:

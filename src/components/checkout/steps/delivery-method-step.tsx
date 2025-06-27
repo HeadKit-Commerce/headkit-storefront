@@ -117,7 +117,8 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
       }
     });
     return () => subscription.unsubscribe();
-  }, [form, onChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
 
   const onSubmit = async (data: z.infer<typeof deliverySchema>) => {
     try {
@@ -166,15 +167,15 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
     }
   };
 
-  useEffect(() => {
-    // If no pickup locations, force shipping to home and set initial location
-    if (pickupLocations.length === 0) {
-      form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: true });
-    } else if (pickupLocations.length === 1) {
-      // If only one location, automatically select it
-      form.setValue("location", pickupLocations[0].shippingMethodId, { shouldValidate: true });
-    }
-  }, [pickupLocations, form]);
+  // useEffect(() => {
+  //   // If no pickup locations, force shipping to home and set initial location
+  //   if (pickupLocations.length === 0) {
+  //     form.setValue("deliveryMethod", DeliveryStepEnum.SHIPPING_TO_HOME, { shouldValidate: false });
+  //   } else if (pickupLocations.length === 1) {
+  //     // If only one location, automatically select it
+  //     form.setValue("location", pickupLocations[0].shippingMethodId, { shouldValidate: false });
+  //   }
+  // }, [pickupLocations]);
 
   if (isLoading) {
     return <div className="text-center min-h-[200px] flex items-center justify-center bg-white/50"> <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
