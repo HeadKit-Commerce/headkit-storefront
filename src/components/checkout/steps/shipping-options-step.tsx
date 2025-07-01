@@ -62,13 +62,11 @@ export const ShippingOptionsStep = ({ onNext, buttonLabel }: Props) => {
   }, [cartData?.chosenShippingMethods]);
 
   const handleUpdateShippingMethod = useCallback(async (id: string) => {
-    console.log("handleUpdateShippingMethod: id", id);
     setIsLoading(true);
     setActiveMethod(id);
     const cartData = await updateShippingMethod({
       shippingMethod: id,
     });
-    console.log("cartData", cartData);
     setCartData(cartData?.data.updateShippingMethod?.cart as Cart);
     setIsLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps

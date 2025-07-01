@@ -137,11 +137,7 @@ const CheckoutForm = () => {
           withOrders: false
         });
 
-        if (process.env.NODE_ENV === "development") {
-          console.log("fetchCustomer data", data);
-          console.log("fetchCustomer customer", data?.customer);
-          console.log("fetchCustomer cartData", cartData);
-        }
+        
 
         const customer = data?.customer;
 
@@ -364,7 +360,7 @@ const CheckoutForm = () => {
     stripePaymentMethod?: string;
     paymentStatus?: "failed" | "processing" | "pending";
   }, overrideFormData?: FormData): Promise<{ success: boolean; error?: string }> => {
-    console.log("handlePaymentSubmit data", data);
+
 
     const currentFormData = overrideFormData || formData;
     const checkoutData: { input: CheckoutInput } = {
@@ -442,12 +438,8 @@ const CheckoutForm = () => {
     // save in cookies
     Cookies.set('checkoutData', JSON.stringify(checkoutData.input), { expires: 1 });
 
-    console.log("checkoutData", checkoutData);
-
     try {
       const response = await checkout(checkoutData);
-      console.log("checkout response data", response.data);
-      console.log("checkout response errors", response.errors);
 
       const orderId = response.data?.checkout?.order?.databaseId;
 
@@ -462,38 +454,16 @@ const CheckoutForm = () => {
           data.paymentMethod === "headkit-payments") ||
         data.paymentMethod !== "headkit-payments";
 
-      console.log("=== PAYMENT INTENT UPDATE DEBUG ===");
-      console.log("shouldProcessPayment calculation:", {
-        paymentStatus: data.paymentStatus,
-        paymentMethod: data.paymentMethod,
-        isProcessingAndHeadkit: data.paymentStatus === "processing" && data.paymentMethod === "headkit-payments",
-        isNotHeadkitPayments: data.paymentMethod !== "headkit-payments",
-        finalShouldProcessPayment: shouldProcessPayment
-      });
-      console.log("data.paymentIntentId:", data.paymentIntentId);
-      console.log("orderId:", orderId);
-      console.log("Will attempt update:", shouldProcessPayment && data.paymentIntentId);
-
       if (shouldProcessPayment && data.paymentIntentId) {
-        console.log("=== STARTING PAYMENT INTENT DESCRIPTION UPDATE ===");
         try {
           await updatePaymentIntentDescription({
             paymentIntent: data.paymentIntentId,
             orderId: orderId.toString(),
           });
-          console.log("=== PAYMENT INTENT DESCRIPTION UPDATE COMPLETED ===");
         } catch (updateError) {
-          console.error("=== PAYMENT INTENT DESCRIPTION UPDATE FAILED ===");
           console.error("Update error:", updateError);
           // Don't throw here, allow checkout to continue
         }
-      } else {
-        console.log("=== SKIPPING PAYMENT INTENT UPDATE ===");
-        console.log("Reason:", {
-          shouldProcessPayment,
-          hasPaymentIntentId: !!data.paymentIntentId,
-          paymentIntentId: data.paymentIntentId
-        });
       }
 
       // Only redirect to success page when payment is completed or for non-stripe payments
@@ -503,10 +473,7 @@ const CheckoutForm = () => {
         data.paymentMethod !== "headkit-payments";
 
       if (shouldRedirect) {
-        console.log("redirecting to success page with orderId", orderId);
         router.replace(`/checkout/success/${orderId}`);
-      } else {
-        console.log("not redirecting - payment status is pending");
       }
 
       return { success: true };

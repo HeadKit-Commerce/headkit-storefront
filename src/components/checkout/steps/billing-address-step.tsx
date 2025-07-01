@@ -58,7 +58,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
   });
 
   const onSubmit = (data: z.infer<typeof addressSchema>) => {
-    console.log("data", data);
+    
     onNext(data);
   };
 
@@ -96,7 +96,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
           }}
           onChange={(event) => {
             if (event.complete && event.value) {
-              console.log("event", event);
+        
               form.setValue("billingAddress.firstName", event.value.firstName ?? "");
               form.setValue("billingAddress.lastName", event.value.lastName ?? "");
               form.setValue("billingAddress.line1", event.value.address.line1);

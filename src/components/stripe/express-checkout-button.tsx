@@ -68,7 +68,6 @@ export function ExpressCheckoutButton({
 
     try {
       const { error: submitError } = await elements.submit();
-      console.log("submitError", submitError);
 
       if (submitError) {
         throw new Error(submitError.message);
@@ -78,13 +77,11 @@ export function ExpressCheckoutButton({
       let freshCartData = cartData;
       const { data: freshCart } = await getCart(singleCheckout);
       freshCartData = freshCart?.cart as CartType;
-      console.log("Fresh cart data before payment intent:", freshCartData);
 
       const { data: paymentIntent } = await createPaymentIntent({
         amount: Math.round(getFloatVal(freshCartData?.total ?? "0") * 100),
         currency: initCurrency.toLowerCase(),
       });
-      console.log("paymentIntent", paymentIntent);
 
       const result = await stripe.confirmPayment({
         clientSecret: paymentIntent.createPaymentIntent.clientSecret,
@@ -95,8 +92,6 @@ export function ExpressCheckoutButton({
         },
         redirect: "if_required",
       });
-
-      console.log("result", result);
 
       if (result?.error) {
         throw new Error(result.error.message);
@@ -159,8 +154,6 @@ export function ExpressCheckoutButton({
         },
       };
 
-      console.log("checkoutData", checkoutData);
-
       // For redirect payment methods, store checkout data in cookie
       const cookieData = {
         singleCheckout,
@@ -169,8 +162,6 @@ export function ExpressCheckoutButton({
         metaData: checkoutData.input.metaData,
       };
       
-      console.log("Setting checkout_data cookie:", cookieData);
-      
       try {
         Cookies.set('checkout_data', JSON.stringify(cookieData), { 
           expires: 1/24, // Expires in 1 hour
@@ -178,13 +169,11 @@ export function ExpressCheckoutButton({
           secure: window.location.protocol === 'https:',
           path: '/'
         });
-        console.log("Checkout cookie set successfully");
       } catch (cookieError) {
         console.error("Error setting checkout cookie:", cookieError);
       }
 
       const checkoutResult = await checkout(checkoutData);
-      console.log("checkoutResult", checkoutResult);
 
       if (checkoutResult.errors || !checkoutResult.data.checkout) {
         console.error("Checkout failed:", checkoutResult.errors);
@@ -194,26 +183,15 @@ export function ExpressCheckoutButton({
       // Update payment intent description with Order ID
       const orderId = checkoutResult.data.checkout?.order?.databaseId;
       if (orderId && result.paymentIntent.id) {
-        console.log("=== EXPRESS CHECKOUT: UPDATING PAYMENT INTENT DESCRIPTION ===");
         try {
           await updatePaymentIntentDescription({
             paymentIntent: result.paymentIntent.id,
             orderId: orderId.toString(),
           });
-          console.log("=== EXPRESS CHECKOUT: PAYMENT INTENT DESCRIPTION UPDATE COMPLETED ===");
         } catch (updateError) {
-          console.error("=== EXPRESS CHECKOUT: PAYMENT INTENT DESCRIPTION UPDATE FAILED ===");
           console.error("Express checkout update error:", updateError);
           // Don't throw here, allow checkout to continue
         }
-      } else {
-        console.log("=== EXPRESS CHECKOUT: SKIPPING PAYMENT INTENT UPDATE ===");
-        console.log("Reason:", {
-          hasOrderId: !!orderId,
-          orderId,
-          hasPaymentIntentId: !!result.paymentIntent.id,
-          paymentIntentId: result.paymentIntent.id
-        });
       }
 
       // Handle successful payment
@@ -262,7 +240,6 @@ export function ExpressCheckoutButton({
           },
         }}
         onShippingAddressChange={async (e) => {
-          console.log("onShippingAddressChange", singleCheckout, e);
           try {
 
             const { data: customerData } = await updateCustomer({
@@ -279,7 +256,7 @@ export function ExpressCheckoutButton({
               singleCheckout,
             });
 
-            console.log("customerData", customerData);
+
             const newCartData = customerData?.updateCustomer?.cart;
 
             const shippingRates =
@@ -306,13 +283,11 @@ export function ExpressCheckoutButton({
                 ),
               })) : undefined,
             });
-          } catch (error) {
-            console.log("errror", error);
+          } catch {
             e.reject();
           }
         }}
         onShippingRateChange={async (e) => {
-          console.log("onShippingRateChange", e);
           try {
             const { data: updateCartResult } = await updateShippingMethod({
               shippingMethod: e.shippingRate.id,
@@ -348,8 +323,7 @@ export function ExpressCheckoutButton({
                 ),
               })) : undefined,
             });
-          } catch (error) {
-            console.log("errror", error);
+          } catch {
             e.reject();
           }
         }}
@@ -399,7 +373,6 @@ export function ExpressCheckoutButton({
           }
         }}
         onCancel={async () => {
-          console.log("onCancel");
           // clear cookies
           if (singleCheckout) {
             await removeSingleCheckoutSession()

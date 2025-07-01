@@ -43,6 +43,16 @@ const Footer = ({ menus, iconUrl }: FooterProps) => {
   const footer2Menu = menus[MenuLocationEnum.Footer_2];
   const footerPolicyMenu = menus[MenuLocationEnum.FooterPolicy];
 
+  // Social media links mapping
+  const socialLinks = {
+    facebook: "",
+    instagram: "https://www.instagram.com/headkitcommerce",
+    discord: "https://discord.gg/bSNe29JtsX",
+    github: "https://github.com/headkit-commerce",
+    linkedin: "https://www.linkedin.com/company/headkit-commerce/",
+    youtube: "https://www.youtube.com/@headkit-commerce"
+  };
+
   return (
     <footer className="mt-8 border-t-2 border-t-[#E2E2DF] px-5 md:px-10">
       <div className="grid gap-x-24 gap-y-8 py-10 md:grid-cols-3 md:py-14">
@@ -73,19 +83,26 @@ const Footer = ({ menus, iconUrl }: FooterProps) => {
             </div>
           </div>
           <div className="mt-4 flex gap-5">
-            {["facebook", "instagram", "discord", "linkedin", "youtube"].map(
-              (platform, i) => {
-                const IconPlatform = Icon[platform as keyof typeof Icon];
-                return (
-                  <a key={i} href="#" target="_blank" rel="noopener noreferrer">
-                    <IconPlatform
-                      size={24}
-                      className="fill-purple-800 hover:opacity-70"
-                    />
-                  </a>
-                );
-              }
-            )}
+            {Object.entries(socialLinks).map(([platform, url]) => {
+              const IconPlatform = Icon[platform as keyof typeof Icon];
+              // Skip Facebook if no URL is provided
+              if (!url && platform === 'facebook') return null;
+              
+              return (
+                <a 
+                  key={platform} 
+                  href={url || "#"} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  aria-label={platform}
+                >
+                  <IconPlatform
+                    size={24}
+                    className="fill-purple-800 hover:opacity-70"
+                  />
+                </a>
+              );
+            })}
           </div>
         </div>
 

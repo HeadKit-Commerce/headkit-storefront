@@ -31,6 +31,7 @@ import {
   FaApplePay,
   FaPaypal,
   FaCcAmex,
+  FaGithub,
 } from "react-icons/fa";
 import { BrandmarkSvg } from "./svg/brandmark-svg";
 import { HeadkitMonoSvg } from "./svg/headkit-mono-svg";
@@ -49,6 +50,7 @@ const Icon = {
   discord: (props: IconProps) => <FaDiscord {...props} />,
   linkedin: (props: IconProps) => <FaLinkedin {...props} />,
   youtube: (props: IconProps) => <FaYoutube {...props} />,
+  github: (props: IconProps) => <FaGithub {...props} />,
 
   // payment
   visa: (props: IconProps) => <FaCcVisa {...props} />,

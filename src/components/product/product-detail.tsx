@@ -96,12 +96,11 @@ export const ProductDetail = ({ product }: Props) => {
     }
 
     const jsonData = JSON.stringify(newGiftCardData);
-    console.log('Setting productExtraData:', jsonData);
     setProductExtraData(jsonData);
   };
 
   useEffect(() => {
-    console.log('productExtraData updated:', productExtraData);
+    // productExtraData updated
   }, [productExtraData]);
 
   return (
@@ -176,7 +175,7 @@ export const ProductDetail = ({ product }: Props) => {
               <GiftCardForm
                 emitClickEvent={handleGiftCardEvent}
                 onFormValid={(isValid) => {
-                  console.log('Form validity changed:', isValid);
+            
                   setGiftCardFormValid(isValid);
                 }}
               />

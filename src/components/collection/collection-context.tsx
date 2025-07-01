@@ -153,7 +153,7 @@ export function CollectionProvider({
       // For brand pages, always ensure the correct brand is set
       if (pathname.startsWith('/brand/')) {
         const brandSlug = pathname.split('/').pop();
-        console.log("Brand slug:", brandSlug);
+  
         queryFilters.brands = brandSlug ? [brandSlug] : [];
       }
 

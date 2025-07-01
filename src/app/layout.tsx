@@ -33,10 +33,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
   try {
     const {
       data: { generalSettings },
-    } = await headkit({
-      revalidateTime: 24 * 60 * 60,
-      revalidateTags: ["headkit:general-settings"],
-    }).getGeneralSettings();
+    } = await headkit().getGeneralSettings();
 
     return makeRootMetadata({
       title: generalSettings?.title,

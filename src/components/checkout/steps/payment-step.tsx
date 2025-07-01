@@ -69,7 +69,7 @@ const StripePaymentStep = React.forwardRef<
           currency: "aud",
         });
 
-        console.log("paymentIntentData", paymentIntentData);
+  
 
         // Submit the pending status and wait for it to complete
         const pendingResult = await onSubmit({
@@ -94,8 +94,6 @@ const StripePaymentStep = React.forwardRef<
           redirect: "if_required",
         });
 
-        console.log("confirmPayment result", result);
-
         if (result?.error) {
           console.error("Payment failed", result?.error.message);
           await onSubmit({
@@ -112,7 +110,7 @@ const StripePaymentStep = React.forwardRef<
         }
 
         if (result.paymentIntent?.status === "succeeded") {
-          console.log("successpaymentIntent", result.paymentIntent);
+  
           const paymentIntent = result.paymentIntent as PaymentIntent;
           const successResult = await onSubmit({
             paymentMethod: "headkit-payments",

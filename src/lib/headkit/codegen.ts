@@ -27,7 +27,6 @@ const config: CodegenConfig = {
       },
       hooks: {
         beforeOneFileWrite: async (_file, content) => {
-          console.log("Hook is being executed!");
           const ignoreComments = [
             "/* eslint-disable @typescript-eslint/no-explicit-any */",
             "/* eslint-disable @typescript-eslint/no-unused-vars */",

@@ -193,7 +193,6 @@ const checkout = async ({
     response.data?.checkout &&
     response.data?.checkout?.result === "success"
   ) {
-    console.log("checkout success");
     await handleSessionResponse(response, singleCheckout);
   }
   return response;
@@ -538,10 +537,7 @@ export async function getBrand({ slug }: { slug: string }) {
 }
 
 export async function getBranding() {
-  const response = await headkit({
-    revalidateTime: 24 * 60 * 60,
-    revalidateTags: ["headkit:branding"],
-  }).getBranding();
+  const response = await headkit().getBranding();
   return response;
 }
 
@@ -565,10 +561,7 @@ export async function getSEOSettings() {
 }
 
 export async function getPage({ id, type }: { id: string; type: PageIdType }) {
-  const response = await headkit({
-    revalidateTime: 24 * 60 * 60,
-    revalidateTags: ["headkit:page", `headkit:page:${id}`],
-  }).getPage({ id, type });
+  const response = await headkit().getPage({ id, type });
   return response;
 }
 

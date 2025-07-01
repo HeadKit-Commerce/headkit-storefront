@@ -97,7 +97,7 @@ export default function Page() {
         password: data.password,
       });
 
-      console.log(response);
+
 
       if (response.data?.registerUser?.user?.jwtAuthToken) {
         setAuthToken(response.data.registerUser.user.jwtAuthToken);

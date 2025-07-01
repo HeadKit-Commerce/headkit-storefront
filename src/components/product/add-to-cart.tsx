@@ -29,6 +29,8 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
     const [buttonLoading, setButtonLoading] = useState<boolean>(false);
     const [error, setError] = useState("");
 
+
+
     return (
       <>
         <Button
@@ -41,8 +43,6 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
               setError("");
               setButtonLoading(true);
               
-              console.log("🛍️ Adding to cart with server action...");
-              
               // Use server action instead of client-side mutation
               const response = await addToCart({
                 input: {
@@ -51,8 +51,6 @@ const AddToCart = forwardRef<HTMLButtonElement, AddToCartProps>(
                   extraData: productExtraData ?? "",
                 },
               });
-              
-              console.log("✅ Add to cart successful:", response);
               
               setCartData(response?.data?.addToCart?.cart as Cart);
               toggleCartDrawer();
