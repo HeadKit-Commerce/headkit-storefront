@@ -1,0 +1,11 @@
+mutation rebuildCartFromKlaviyo($input: RebuildCartFromKlaviyoInput!) {
+  rebuildCartFromKlaviyo(input: $input) {
+    success
+    message
+    itemsAdded
+    itemsFailed
+    cart {
+      ...CartData
+    }
+  }
+} 

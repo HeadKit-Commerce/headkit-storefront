@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, useRef } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CheckoutForm } from "@/components/checkout/checkout-form";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
@@ -9,7 +10,8 @@ import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal, cn } from "@/lib/utils";
 import { Cart } from "@/components/checkout/cart";
 import { currencyFormatter } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { rebuildCartFromKlaviyo, getCart } from "@/lib/headkit/actions";
+import { Cart as CartType } from "@/lib/headkit/generated";
 
 // Separate component for handling search params
 function CheckoutErrorHandler({
@@ -45,16 +47,109 @@ function CheckoutErrorHandler({
   return null;
 }
 
-export default function Page() {
-  const { cartData, toggleCartDrawer } = useAppContext();
+function CheckoutContent() {
+  const { cartData, toggleCartDrawer, setCartData } = useAppContext();
   const [showCart, setShowCart] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isRebuildingCart, setIsRebuildingCart] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const hasProcessedRebuild = useRef(false);
+
+  useEffect(() => {
+    const handleCartRebuild = async () => {
+      const rebuildCartData = searchParams.get("wck_rebuild_cart");
+
+      if (rebuildCartData && !hasProcessedRebuild.current) {
+        hasProcessedRebuild.current = true;
+        setIsRebuildingCart(true);
+        
+        try {
+          // Call the rebuild cart action
+          const response = await rebuildCartFromKlaviyo({
+            input: {
+              cartData: rebuildCartData,
+            },
+          });
+          
+          if (response.data?.rebuildCartFromKlaviyo?.success) {
+            // Wait a moment to let any background processes complete
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // PRIORITY 1: Use cart data from rebuild response (direct cart object)
+            if (response.data.rebuildCartFromKlaviyo.cart && (response.data.rebuildCartFromKlaviyo.cart.contents?.nodes?.length ?? 0) > 0) {
+              setCartData(response.data.rebuildCartFromKlaviyo.cart as CartType);
+            } 
+            // PRIORITY 2: If rebuild response has cart but no items, still use it (might be empty cart)
+            else if (response.data.rebuildCartFromKlaviyo.cart) {
+              setCartData(response.data.rebuildCartFromKlaviyo.cart as CartType);
+            } 
+            // PRIORITY 3: Fallback to getCart only if no cart object in response
+            else {
+              // Fallback: manually refresh cart data with getCart
+              const cartResponse = await getCart();
+              
+              if (cartResponse.data?.cart) {
+                setCartData(cartResponse.data.cart as CartType);
+              } else {
+                setErrorMessage("Cart was rebuilt but couldn't be retrieved. Please refresh the page.");
+              }
+            }
+            
+            // Remove query parameters from URL
+            router.replace('/checkout', { scroll: false });
+          } else {
+            setErrorMessage("Failed to rebuild cart from Klaviyo data.");
+          }
+        } catch {
+          setErrorMessage("An error occurred while rebuilding your cart.");
+        } finally {
+          setIsRebuildingCart(false);
+        }
+      }
+    };
+
+    handleCartRebuild();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // Load cart data on initial mount if not already available
+  useEffect(() => {
+    const loadCartData = async () => {
+      if (!cartData) {
+        try {
+          const cartResponse = await getCart();
+          
+          if (cartResponse.data?.cart) {
+            setCartData(cartResponse.data.cart as CartType);
+          }
+        } catch {
+          // Handle error silently
+        }
+      }
+    };
+
+    loadCartData();
+  }, [cartData, setCartData]);
 
   useEffect(() => {
     toggleCartDrawer(false);
     window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Show loading while rebuilding cart
+  if (isRebuildingCart) {
+    return (
+      <div className="min-h-[700px] py-10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Restoring your cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[700px] py-10">
@@ -128,6 +223,21 @@ export default function Page() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[700px] py-10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }
 

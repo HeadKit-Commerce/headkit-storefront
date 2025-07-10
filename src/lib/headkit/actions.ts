@@ -21,6 +21,7 @@ import {
   PostIdType,
   ProductCategoryIdType,
   ProductIdTypeEnum,
+  RebuildCartFromKlaviyoInput,
   RemoveItemsFromCartInput,
   SubmitGfFormInput,
   UpdateCustomerInput,
@@ -370,6 +371,19 @@ const updateItemQuantities = async ({
   return response;
 };
 
+const rebuildCartFromKlaviyo = async ({
+  input,
+}: {
+  input: RebuildCartFromKlaviyoInput;
+}) => {
+  const response = await headkit(await getClientConfig()).rebuildCartFromKlaviyo({
+    input,
+  });
+  
+  await handleSessionResponse(response);
+  return response;
+};
+
 const getAvailablePaymentMethods = async () => {
   const response = await headkit(
     await getClientConfig()
@@ -636,6 +650,7 @@ export {
   updateCartItem,
   getProductCategory,
   getWoocommerceAuthToken,
+  rebuildCartFromKlaviyo,
   getOrders,
   getGuestOrder,
   actionWishlist,
