@@ -1,10 +1,5 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  getProductCategory,
-  getProductFilters,
-  getProductList,
-} from "@/lib/headkit/actions";
 import { CollectionPage } from "@/components/collection/collection-page";
 import {
   makeWhereProductQuery,
@@ -14,6 +9,8 @@ import {
 } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
+import { headkit } from "@/lib/headkit/client";
+import { ProductCategoryIdType } from "@/lib/headkit/generated";
 
 interface CollectionPageProps {
   params: Promise<{
@@ -33,11 +30,11 @@ export async function generateMetadata({
   params,
 }: CollectionPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const categorySlug = slug.pop();
+  const categorySlug = slug[slug.length - 1];
 
   if (!categorySlug) return notFound();
 
-  const { data } = await getProductCategory({ slug: categorySlug });
+  const { data } = await headkit().getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug });
   if (!data?.productCategory) return notFound();
 
   return makeSEOMetadata(data.productCategory.seo, {
@@ -83,7 +80,7 @@ export default async function Page({
   searchParams,
 }: CollectionPageProps) {
   const { slug } = await params;
-  const categorySlug = slug.pop();
+  const categorySlug = slug[slug.length - 1];
   const parsedSearchParams = await searchParams;
   const page = parsedSearchParams.page ? parseInt(parsedSearchParams.page) : 0;
   const itemsPerPage = 24;
@@ -116,10 +113,9 @@ export default async function Page({
     };
 
     const [productCategory, productFilter, productsData] = await Promise.all([
-      getProductCategory({ slug: categorySlug }),
-      getProductFilters({ mainCategory: categorySlug }),
-      getProductList({
-        input: {
+      headkit().getProductCategory({ id: categorySlug }),
+      headkit().getProductFilters({ mainCategory: categorySlug }),
+      headkit().getProductList({
           where: makeWhereProductQuery({
             filterQuery,
             categorySlug,
@@ -127,7 +123,6 @@ export default async function Page({
             perPage: itemsPerPage,
           }),
           first: itemsPerPage,
-        },
       }),
     ]);
 

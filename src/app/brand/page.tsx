@@ -1,8 +1,8 @@
 import { Metadata } from "next";
-import { getBrandList } from "@/lib/headkit/actions";
 import { BrandPage } from "@/components/brand/brand-page";
 import { makeWhereBrandQuery, SortKeyType } from "@/components/brand/utils";
 import { BrandHeader } from "@/components/brand/brand-header";
+import { headkit } from "@/lib/headkit/client";
 
 export const dynamic = "force-dynamic";
 
@@ -29,13 +29,11 @@ export default async function Page({ searchParams }: PageProps) {
       sort: parsedSearchParams.sort as SortKeyType | undefined,
     };
 
-    const brandsData = await getBrandList({
-      input: {
-        first: perPage,
-        where: makeWhereBrandQuery({
+    const brandsData = await headkit().getBrands({
+      first: perPage,
+      where: makeWhereBrandQuery({
           filterQuery,
         }),
-      },
     });
 
     return (

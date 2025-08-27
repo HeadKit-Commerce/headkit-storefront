@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { getPostList, getPostFilters } from "@/lib/headkit/actions";
 import { PostPage } from "@/components/post/post-page";
 import { makeWherePostQuery, SortKeyType } from "@/components/post/utils";
 import { PostHeader } from "@/components/post/post-header";
 import headkitConfig from "@/headkit.config";
+import { headkit } from "@/lib/headkit/client";
 
 export const dynamic = "force-dynamic";
 
@@ -24,9 +24,12 @@ export const metadata: Metadata = {
 export default async function Page({ searchParams }: PageProps) {
   try {
     const parsedSearchParams = await searchParams;
-    const page = parsedSearchParams.page ? parseInt(parsedSearchParams.page) : 0;
+    const page = parsedSearchParams.page
+      ? parseInt(parsedSearchParams.page)
+      : 0;
     const perPage = 12;
-    const categories = parsedSearchParams.categories?.split(",").filter(Boolean) || [];
+    const categories =
+      parsedSearchParams.categories?.split(",").filter(Boolean) || [];
 
     const filterQuery = {
       sort: parsedSearchParams.sort as SortKeyType | undefined,
@@ -34,44 +37,41 @@ export default async function Page({ searchParams }: PageProps) {
     };
 
     const [postsData, filtersData] = await Promise.all([
-      getPostList({
-        input: {
-          first: perPage,
-          where: makeWherePostQuery({
-            filterQuery,
-          }),
-        },
+      headkit().getPosts({
+        first: perPage,
+        where: makeWherePostQuery({
+          filterQuery,
+        }),
       }),
-      getPostFilters({
-        input: {
-          where: {},
-        },
-      }),
+      headkit().getPostCategories(),
     ]);
 
-    return <>
-      <PostHeader
-        name={headkitConfig.article.name}
-        breadcrumbData={[
-          {
-            name: "Home",
-            uri: "/",
-            current: false,
-          },
-          {
-            name: "News & Tips",
-            uri: "/news",
-            current: true,
-          },
-        ]}
-      />
-      <PostPage
-        initialPosts={postsData.data}
-        postFilter={filtersData.data}
-        initialPage={page}
-      /></>;
+    return (
+      <>
+        <PostHeader
+          name={headkitConfig.article.name}
+          breadcrumbData={[
+            {
+              name: "Home",
+              uri: "/",
+              current: false,
+            },
+            {
+              name: "News & Tips",
+              uri: "/news",
+              current: true,
+            },
+          ]}
+        />
+        <PostPage
+          initialPosts={postsData.data}
+          postFilter={filtersData.data}
+          initialPage={page}
+        />
+      </>
+    );
   } catch (error) {
     console.error("Error fetching posts data:", error);
     throw error;
   }
-} 
+}

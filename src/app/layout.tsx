@@ -12,11 +12,6 @@ import { StripeProvider } from "@/contexts/stripe-context";
 import { Toaster } from "@/components/ui/toaster";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import config from "@/headkit.config";
-import {
-  getBranding,
-  getStoreSettings,
-  getStripeConfig,
-} from "@/lib/headkit/actions";
 import { WebsiteJsonLD } from "@/components/seo/website-json-ld";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { ModeIndicator } from "@/components/mode-indicator";
@@ -41,7 +36,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     });
   } catch (error) {
     console.error("Error fetching general settings for metadata:", error);
-    
+
     // Return fallback metadata if the query fails
     return makeRootMetadata({
       title: "Your Store",
@@ -62,22 +57,33 @@ export default async function RootLayout({
 
   try {
     const results = await Promise.all([
-      getBranding().catch((error) => {
-        console.error("Error fetching branding:", error);
-        return { data: { branding: null } };
-      }),
-      headkit().getMenu().catch((error) => {
-        console.error("Error fetching menu:", error);
-        return { data: { menus: { nodes: [] } } };
-      }),
-      getStripeConfig().catch((error) => {
-        console.error("Error fetching stripe config:", error);
-        return { data: { stripeConfig: null } };
-      }),
-      getStoreSettings().catch((error) => {
-        console.error("Error fetching store settings:", error);
-        return { data: { storeSettings: null } };
-      }),
+      headkit({
+        revalidateTags: ["headkit:branding"],
+        revalidateTime: 60
+      })
+        .getBranding()
+        .catch((error) => {
+          console.error("Error fetching branding:", error);
+          return { data: { branding: null } };
+        }),
+      headkit()
+        .getMenu()
+        .catch((error) => {
+          console.error("Error fetching menu:", error);
+          return { data: { menus: { nodes: [] } } };
+        }),
+      headkit()
+        .getStripeConfig()
+        .catch((error) => {
+          console.error("Error fetching stripe config:", error);
+          return { data: { stripeConfig: null } };
+        }),
+      headkit()
+        .getStoreSettings()
+        .catch((error) => {
+          console.error("Error fetching store settings:", error);
+          return { data: { storeSettings: null } };
+        }),
     ]);
 
     branding = results[0].data;
@@ -92,6 +98,15 @@ export default async function RootLayout({
     stripeConfigData = { stripeConfig: null };
     storeSettings = { storeSettings: null };
   }
+
+  // Process stripe config server-side to avoid client-side useEffect
+  const isLiveMode = process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true';
+  const processedStripeConfig = stripeConfigData?.stripeConfig ? {
+    publishableKey: isLiveMode && stripeConfigData.stripeConfig.publishableKeyLive
+      ? stripeConfigData.stripeConfig.publishableKeyLive
+      : stripeConfigData.stripeConfig.publishableKeyTest,
+    accountId: stripeConfigData.stripeConfig.accountId
+  } : null;
 
   // Use the enum to fetch menus by location
   const headerMenuLocations = [
@@ -198,8 +213,11 @@ export default async function RootLayout({
         <WebsiteJsonLD />
         <AuthProvider>
           <AppContextProvider
-            brandingData={branding?.branding ?? null}
             stripeFullConfig={stripeConfigData?.stripeConfig ?? null}
+            stripeConfig={processedStripeConfig}
+            storeSettings={storeSettings?.storeSettings ?? null}
+            isLiveMode={isLiveMode}
+            brandingData={branding?.branding ?? null}
           >
             <StripeProvider>
               <Header

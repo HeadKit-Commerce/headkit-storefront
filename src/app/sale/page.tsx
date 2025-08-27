@@ -1,17 +1,13 @@
 import { CollectionPage } from "@/components/collection/collection-page";
-import {
-  getPage,
-  getProductFilters,
-  getProductList,
-} from "@/lib/headkit/actions";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { SortKeyType } from "@/components/collection/utils";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
 import { PageIdType } from "@/lib/headkit/generated";
+import { headkit } from "@/lib/headkit/client";
 
 export async function generateMetadata() {
-  const { data } = await getPage({ id: "/sale", type: PageIdType.Uri });
+  const { data } = await headkit().getPage({ id: "/sale", type: PageIdType.Uri });
   const seo = data?.page?.seo;
   return await makeSEOMetadata(seo, {
     fallback: {
@@ -46,13 +42,11 @@ export default async function Page({ searchParams }: Props) {
   // Fetch products and filters in parallel
   const [{ data: initialProducts }, { data: productFilter }] =
     await Promise.all([
-      getProductList({
-        input: {
-          where: makeWhereProductQuery("sale"),
-          first: itemsPerPage,
-        },
+      headkit().getProductList({
+        where: makeWhereProductQuery("sale"),
+        first: itemsPerPage,
       }),
-      getProductFilters(),
+      headkit().getProductFilters(),
     ]);
 
   // Parse attribute filters after getting the product filter data

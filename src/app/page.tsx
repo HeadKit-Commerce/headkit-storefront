@@ -19,14 +19,16 @@ import {
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { getPage, getSEOSettings, getBranding } from "@/lib/headkit/actions";
 import { headkit } from "@/lib/headkit/client";
 
 export async function generateMetadata() {
   const [{ data }, headkitSEOSettings, headkitBranding] = await Promise.all([
-    getPage({ id: "/", type: PageIdType.Uri }),
-    getSEOSettings(),
-    getBranding(),
+    headkit().getPage({ id: "/", type: PageIdType.Uri }),
+    headkit().getSEOSettings(),
+    headkit({
+      revalidateTags: ["headkit:branding"],
+      revalidateTime: 60
+    }).getBranding(),
   ]);
 
   const seo = data?.page?.seo;

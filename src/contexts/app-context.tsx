@@ -1,8 +1,7 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useReducer, useEffect } from "react";
+import { createContext, ReactNode, useContext, useReducer } from "react";
 import { Branding, Cart, StripeConfig, StoreSettings } from "@/lib/headkit/generated";
-import { getStripeConfig } from "@/lib/headkit/actions";
 
 interface AppContextState {
   cartDrawer: boolean;
@@ -10,15 +9,15 @@ interface AppContextState {
   isGlobalDisabled: boolean;
   wishlists: number[];
   initLang: string;
-  initCurrency: string;
+  initCurrency: string; 
   stripeConfig: {
     publishableKey: string;
     accountId: string;
   } | null;
   stripeFullConfig: StripeConfig | null;
   storeSettings: StoreSettings | null;
-  isLiveMode: boolean;
   brandingData: Branding | null;
+  isLiveMode: boolean;
   isLoading: boolean;
 }
 
@@ -29,6 +28,7 @@ interface AppContextActions {
   setWishlists: (wishlists: number[]) => void;
   setStripeConfig: (config: { publishableKey: string; accountId: string } | null) => void;
   setStoreSettings: (storeSettings: StoreSettings | null) => void;
+  setBrandingData: (brandingData: Branding | null) => void;
   setIsLiveMode: (isLiveMode: boolean) => void;
   setIsLoading: (isLoading: boolean) => void;
 }
@@ -44,8 +44,13 @@ interface AppContextProviderProps {
   initialLang?: string;
   initialCurrency?: string;
   stripeFullConfig?: StripeConfig | null;
+  stripeConfig?: {
+    publishableKey: string;
+    accountId: string;
+  } | null;
   storeSettings?: StoreSettings | null;
   brandingData?: Branding | null;
+  isLiveMode?: boolean;
 }
 
 const initialState: AppContextState = {
@@ -58,10 +63,10 @@ const initialState: AppContextState = {
   stripeConfig: null,
   stripeFullConfig: null,
   storeSettings: null,
+  brandingData: null,
   isLiveMode: process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE !== undefined 
     ? process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true' 
     : false,
-  brandingData: null,
   isLoading: true,
 };
 
@@ -118,8 +123,10 @@ export const AppContextProvider = ({
   initialLang = "en-AU",
   initialCurrency = "AUD",
   stripeFullConfig = null,
+  stripeConfig = null,
   storeSettings = null,
   brandingData = null,
+  isLiveMode = process.env.NEXT_PUBLIC_STRIPE_LIVE_MODE === 'true',
 }: AppContextProviderProps) => {
   const [state, dispatch] = useReducer(reducer, {
     ...initialState,
@@ -127,46 +134,12 @@ export const AppContextProvider = ({
     initLang: initialLang,
     initCurrency: initialCurrency,
     stripeFullConfig,
+    stripeConfig,
     storeSettings,
     brandingData,
+    isLiveMode,
+    isLoading: false, // No longer need loading state since everything is server-side
   });
-
-  useEffect(() => {
-    const fetchStripeConfig = async () => {
-      try {
-        const response = await getStripeConfig();
-        if (response?.data?.stripeConfig) {
-          dispatch({
-            type: "SET_STRIPE_FULL_CONFIG",
-            payload: response.data.stripeConfig
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching stripe config:', error);
-      }
-    };
-    fetchStripeConfig();
-  }, []);
-
-  useEffect(() => {
-    if (state.stripeFullConfig) {
-      const key = state.isLiveMode && state.stripeFullConfig.publishableKeyLive
-        ? state.stripeFullConfig.publishableKeyLive
-        : state.stripeFullConfig.publishableKeyTest;
-
-      dispatch({
-        type: "SET_STRIPE_CONFIG",
-        payload: { publishableKey: key, accountId: state.stripeFullConfig.accountId }
-      });
-    }
-  }, [state.isLiveMode, state.stripeFullConfig]);
-
-  // Set loading to false after initial setup
-  useEffect(() => {
-    if (state.isLoading && (state.storeSettings || state.stripeFullConfig)) {
-      dispatch({ type: "SET_IS_LOADING", payload: false });
-    }
-  }, [state.isLoading, state.storeSettings, state.stripeFullConfig]);
 
   const actions: AppContextActions = {
     toggleCartDrawer: (enable?: boolean) => {
@@ -186,6 +159,9 @@ export const AppContextProvider = ({
     },
     setStoreSettings: (storeSettings: StoreSettings | null) => {
       dispatch({ type: "SET_STORE_SETTINGS", payload: storeSettings });
+    },
+    setBrandingData: (brandingData: Branding | null) => {
+      dispatch({ type: "SET_BRANDING_DATA", payload: brandingData });
     },
     setIsLiveMode: (isLiveMode: boolean) => {
       dispatch({ type: "SET_IS_LIVE_MODE", payload: isLiveMode });

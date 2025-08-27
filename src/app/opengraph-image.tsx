@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getBranding } from "@/lib/headkit/actions";
+import { headkit } from "@/lib/headkit/client";
 import config from "@/headkit.config";
 
 // Image metadata
@@ -13,7 +13,10 @@ export const alt = 'Site logo';
 // Image generation - Ultimate fallback with app name and primary color
 export default async function OpenGraphImage() {
   try {
-    const branding = await getBranding();
+    const branding = await headkit({
+      revalidateTags: ["headkit:branding"],
+      revalidateTime: 60
+    }).getBranding();
     
     const primaryColor = branding?.data?.branding?.primaryColor || config.metadata.appColor;
     const appName = config.metadata.appName;

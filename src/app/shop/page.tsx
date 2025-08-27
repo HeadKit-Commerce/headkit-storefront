@@ -1,8 +1,8 @@
 import { CollectionPage } from "@/components/collection/collection-page";
-import { getProductFilters, getProductList } from "@/lib/headkit/actions";
 import { makeWhereProductQuery } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { SortKeyType } from "@/components/collection/utils";
+import { headkit } from "@/lib/headkit/client";
 
 // Remove dynamic export - shop page can be statically generated with client-side interactions
 // The CollectionPage component handles dynamic filtering on the client side
@@ -31,17 +31,15 @@ export default async function Page({ searchParams }: Props) {
   // Fetch products and filters in parallel
   const [{ data: initialProducts }, { data: productFilter }] =
     await Promise.all([
-      getProductList({
-        input: {
+      headkit().getProductList({
           where: makeWhereProductQuery({
             filterQuery: filterState,
             page: pageNumber,
             perPage: itemsPerPage,
           }),
           first: itemsPerPage,
-        },
       }),
-      getProductFilters(),
+      headkit().getProductFilters(),
     ]);
 
   // Parse attribute filters after getting the product filter data

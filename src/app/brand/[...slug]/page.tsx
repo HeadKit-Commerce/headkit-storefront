@@ -1,9 +1,12 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBrand, getProductFilters, getProductList } from "@/lib/headkit/actions";
 import { CollectionPage } from "@/components/collection/collection-page";
-import { makeWhereProductQuery, SortKeyType } from "@/components/collection/utils";
+import {
+  makeWhereProductQuery,
+  SortKeyType,
+} from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
+import { headkit } from "@/lib/headkit/client";
 
 interface BrandPageProps {
   params: Promise<{
@@ -23,11 +26,11 @@ export async function generateMetadata({
   params,
 }: BrandPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const brandSlug = slug.pop();
+  const brandSlug = slug[slug.length - 1];
 
   if (!brandSlug) return notFound();
 
-  const { data } = await getBrand({ slug: brandSlug });
+  const { data } = await headkit().getBrand({ slug: brandSlug });
   if (!data?.brand) return notFound();
 
   return {
@@ -38,7 +41,7 @@ export async function generateMetadata({
 
 export default async function Page({ params, searchParams }: BrandPageProps) {
   const { slug } = await params;
-  const brandSlug = slug.pop();
+  const brandSlug = slug[slug.length - 1];
   const parsedSearchParams = await searchParams;
   const page = parsedSearchParams.page ? parseInt(parsedSearchParams.page) : 0;
   const itemsPerPage = 24;
@@ -49,8 +52,14 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
     // Parse attributes from search params
     const attributes: Record<string, string[]> = {};
     Object.entries(parsedSearchParams).forEach(([key, value]) => {
-      if (key !== 'page' && key !== 'sort' && key !== 'categories' && key !== 'brands' && key !== 'instock') {
-        attributes[key] = value?.split(',') || [];
+      if (
+        key !== "page" &&
+        key !== "sort" &&
+        key !== "categories" &&
+        key !== "brands" &&
+        key !== "instock"
+      ) {
+        attributes[key] = value?.split(",") || [];
       }
     });
 
@@ -65,19 +74,17 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
     };
 
     const [brand, productFilter, productsData] = await Promise.all([
-      getBrand({ slug: brandSlug }),
-      getProductFilters({
+      headkit().getBrand({ slug: brandSlug }),
+      headkit().getProductFilters({
         brands: [brandSlug],
       }),
-      getProductList({
-        input: {
-          where: makeWhereProductQuery({
-            filterQuery,
-            page,
-            perPage: itemsPerPage,
-          }),
-          first: itemsPerPage,
-        },
+      headkit().getProductList({
+        where: makeWhereProductQuery({
+          filterQuery,
+          page,
+          perPage: itemsPerPage,
+        }),
+        first: itemsPerPage,
       }),
     ]);
 
@@ -88,21 +95,23 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
         <CollectionHeader
           name={brand.data.brand?.name || ""}
           description={brand.data.brand?.description || ""}
-          breadcrumbData={[{
-            name: "Home",
-            uri: "/",
-            current: false,
-          }, 
-          {
-            name: "Brand",
-            uri: "/brand",
-            current: false,
-          },
-          {
-            name: brand.data.brand?.name || "",
-            uri: `/brand/${brandSlug}`,
-            current: true,
-          }]}
+          breadcrumbData={[
+            {
+              name: "Home",
+              uri: "/",
+              current: false,
+            },
+            {
+              name: "Brand",
+              uri: "/brand",
+              current: false,
+            },
+            {
+              name: brand.data.brand?.name || "",
+              uri: `/brand/${brandSlug}`,
+              current: true,
+            },
+          ]}
         />
         <CollectionPage
           initialProducts={productsData.data}
@@ -116,4 +125,4 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
     console.error("Error fetching brand products data:", error);
     return notFound();
   }
-} 
+}
