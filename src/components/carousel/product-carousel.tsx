@@ -1,42 +1,32 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+"use client";
+import { Suspense } from "react";
 import { ProductCard } from "../product/product-card";
 import { ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
-import { cn } from "@/lib/utils";
+import { Carousel } from "./carousel";
 
 interface Props {
-  products: ProductContentFullWithGroupFragment[];
+  products: (ProductContentFullWithGroupFragment & { isNew?: boolean })[];
   carouselItemClassName?: string;
+  id?: string;
 }
 
-const ProductCarousel = ({ products, carouselItemClassName }: Props) => {
+const ProductCarousel = ({
+  products,
+  carouselItemClassName,
+  id = "product-carousel",
+}: Props) => {
   return (
-    <Carousel
-      opts={{
-        align: "start",
-      }}
-      className="w-full"
-    >
-      <CarouselContent className="-ml-[30px]">
-        {products
-          ?.filter((x) => !!x?.slug)
-          ?.map((product, index) => (
-            <CarouselItem
-              key={index}
-              className={cn("basis-10/12 sm:basis-1/2 lg:basis-1/3 pl-[30px]", carouselItemClassName)}
-            >
-              <ProductCard product={product} />
-            </CarouselItem>
-          ))}
-      </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white" />
-      <CarouselNext className="-right-4 bg-white" />
-    </Carousel>
+    <Suspense fallback={null}>
+      <Carousel
+        items={products?.filter((x) => !!x?.slug) || []}
+        renderItem={(product: ProductContentFullWithGroupFragment & { isNew?: boolean }) => (
+          <ProductCard product={product} isNew={product.isNew} />
+        )}
+        carouselItemClassName={carouselItemClassName}
+        id={id}
+        showPagination={false}
+      />
+    </Suspense>
   );
 };
 

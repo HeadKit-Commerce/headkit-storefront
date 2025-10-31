@@ -1,9 +1,7 @@
 export * from './cookies';
 
+// Mutations only - all read operations are in queries.ts and queries-dynamic.ts
 export { 
   checkout,
-  getCustomer,
-  getPickupLocations,
   createPaymentIntent,
-  getPaymentGateways,
 } from '@/lib/headkit/actions'; 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
+import { useEffect, useState } from "react";
 
 const navigation = [
   { name: "Profile", href: "/account/profile" },
@@ -14,6 +15,35 @@ const navigation = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { signOut } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col md:flex-row gap-8">
+          <div className="w-full md:w-64 space-y-1">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="block px-4 py-2 rounded-lg text-sm font-medium hover:bg-muted"
+              >
+                {item.name}
+              </Link>
+            ))}
+            <div className="px-4 py-2 rounded-lg text-sm font-medium text-red-600">
+              Sign Out
+            </div>
+          </div>
+          <div className="flex-1">{children}</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">

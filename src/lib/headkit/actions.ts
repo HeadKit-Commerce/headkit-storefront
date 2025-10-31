@@ -5,22 +5,6 @@ import {
   ActionWishlistInput,
   AddToCartInput,
   CheckoutInput,
-  GetBrandsQueryVariables,
-  GetCarouselQueryVariables,
-  GetCustomerQueryVariables,
-  GetFaQsQueryVariables,
-  GetGeneralSettingsQueryVariables,
-  GetPostCategoriesQueryVariables,
-  GetPostsQueryVariables,
-  GetProductCategoriesQueryVariables,
-  GetProductFiltersQueryVariables,
-  GetProductListQueryVariables,
-  GetProductsQueryVariables,
-  GetProductSlugsQueryVariables,
-  PageIdType,
-  PostIdType,
-  ProductCategoryIdType,
-  ProductIdTypeEnum,
   RebuildCartFromKlaviyoInput,
   RemoveItemsFromCartInput,
   SubmitGfFormInput,
@@ -37,6 +21,15 @@ import {
   getSessionKeyFromCookies,
   encodeSessionCookie,
 } from "./utils/cookies";
+
+/**
+ * Server Actions - Mutations Only
+ * 
+ * This file contains ONLY write operations (mutations).
+ * All read operations have been moved to:
+ * - queries.ts (cached reads)
+ * - queries-dynamic.ts (uncached/fresh reads)
+ */
 
 const getClientConfig = async (singleCheckout?: boolean) => {
   const config: {
@@ -115,13 +108,9 @@ const handleSessionResponse = async (
   });
 };
 
-const getCart = async (singleCheckout?: boolean) => {
-  const config = await getClientConfig(singleCheckout);
-
-  const response = await headkit(config).getCart();
-  await handleSessionResponse(response, singleCheckout);
-  return response;
-};
+// ============================================
+// CART MUTATIONS
+// ============================================
 
 const addToCart = async ({
   input,
@@ -179,33 +168,6 @@ const removeGiftCard = async ({ id }: { id: string }) => {
   return response;
 };
 
-const checkout = async ({
-  input,
-  singleCheckout,
-}: {
-  input: CheckoutInput;
-  singleCheckout?: boolean;
-}) => {
-  const response = await headkit(
-    await getClientConfig(singleCheckout)
-  ).checkout({ input });
-
-  if (
-    response.data?.checkout &&
-    response.data?.checkout?.result === "success"
-  ) {
-    await handleSessionResponse(response, singleCheckout);
-  }
-  return response;
-};
-
-const getCustomer = async (variables: GetCustomerQueryVariables) => {
-  const config = await getClientConfig();
-  const response = await headkit(config).getCustomer(variables);
-
-  return response;
-};
-
 const emptyCart = async () => {
   const response = await headkit(await getClientConfig()).emptyCart({
     input: {},
@@ -230,8 +192,64 @@ const updateShippingMethod = async ({
   return response;
 };
 
-const getPaymentGateways = async () => {
-  const response = await headkit().getPaymentGateways();
+const updateItemQuantities = async ({
+  input,
+}: {
+  input: UpdateItemQuantitiesInput;
+}) => {
+  const response = await headkit(await getClientConfig()).updateItemQuantities({
+    input,
+  });
+  await handleSessionResponse(response);
+  return response;
+};
+
+const rebuildCartFromKlaviyo = async ({
+  input,
+}: {
+  input: RebuildCartFromKlaviyoInput;
+}) => {
+  const response = await headkit(await getClientConfig()).rebuildCartFromKlaviyo({
+    input,
+  });
+  
+  await handleSessionResponse(response);
+  return response;
+};
+
+const updateCartItem = async ({
+  input,
+}: {
+  input: UpdateItemQuantitiesInput;
+}) => {
+  const response = await headkit(await getClientConfig()).updateItemQuantities({
+    input,
+  });
+
+  return response;
+};
+
+// ============================================
+// CHECKOUT MUTATIONS
+// ============================================
+
+const checkout = async ({
+  input,
+  singleCheckout,
+}: {
+  input: CheckoutInput;
+  singleCheckout?: boolean;
+}) => {
+  const response = await headkit(
+    await getClientConfig(singleCheckout)
+  ).checkout({ input });
+
+  if (
+    response.data?.checkout &&
+    response.data?.checkout?.result === "success"
+  ) {
+    await handleSessionResponse(response, singleCheckout);
+  }
   return response;
 };
 
@@ -262,6 +280,10 @@ const updatePaymentIntent = async ({
   return response;
 };
 
+// ============================================
+// CUSTOMER MUTATIONS
+// ============================================
+
 const updateCustomer = async ({
   input,
   withCustomer = true,
@@ -283,15 +305,9 @@ const updateCustomer = async ({
   return response;
 };
 
-const getGravityFormById = async ({ id }: { id: string }) => {
-  const response = await headkit().getGravityFormById({ id });
-  return response;
-};
-
-const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
-  const response = await headkit().submitGravityForm({ input });
-  return response;
-};
+// ============================================
+// AUTH MUTATIONS
+// ============================================
 
 const sendPasswordResetEmail = async ({ email }: { email: string }) => {
   const response = await headkit().sendPasswordResetEmail({
@@ -359,155 +375,18 @@ const registerUser = async ({
   return response;
 };
 
-const updateItemQuantities = async ({
-  input,
-}: {
-  input: UpdateItemQuantitiesInput;
-}) => {
-  const response = await headkit(await getClientConfig()).updateItemQuantities({
-    input,
-  });
-  await handleSessionResponse(response);
+// ============================================
+// FORM MUTATIONS
+// ============================================
+
+const submitGravityForm = async ({ input }: { input: SubmitGfFormInput }) => {
+  const response = await headkit().submitGravityForm({ input });
   return response;
 };
 
-const rebuildCartFromKlaviyo = async ({
-  input,
-}: {
-  input: RebuildCartFromKlaviyoInput;
-}) => {
-  const response = await headkit(await getClientConfig()).rebuildCartFromKlaviyo({
-    input,
-  });
-  
-  await handleSessionResponse(response);
-  return response;
-};
-
-const getAvailablePaymentMethods = async () => {
-  const response = await headkit(
-    await getClientConfig()
-  ).getAvailablePaymentMethods();
-  return response;
-};
-
-const getOrder = async ({ id }: { id: string }) => {
-  const singleCheckoutToken = (await cookies()).get(
-    COOKIE_NAMES.SINGLE_CHECKOUT
-  )?.value;
-  const config = await getClientConfig(!!singleCheckoutToken);
-
-  if (config.authToken) {
-    // Logged in user - use getOrder
-    const order = await headkit(config).getOrder({ orderId: id });
-    return {
-      data: {
-        order: order.data?.order,
-      },
-    };
-  }
-
-  // Guest user - try both session tokens
-  const guestOrder = await getGuestOrder({
-    orderId: id,
-    sessionToken: singleCheckoutToken || config.woocommerceSession,
-  });
-
-  return {
-    data: {
-      order: guestOrder.data?.customer?.orders?.nodes?.[0],
-    },
-  };
-};
-
-const getProductList = async ({
-  input,
-}: {
-  input: GetProductListQueryVariables;
-}) => {
-  const response = await headkit().getProductList(input);
-  return response;
-};
-
-const getProductFilters = async (
-  productFiltersQuery?: GetProductFiltersQueryVariables
-) => {
-  const response = await headkit().getProductFilters(productFiltersQuery);
-  return response;
-};
-
-const getStripeConfig = async () => {
-  const response = await headkit().getStripeConfig();
-  return response;
-};
-
-const getStoreSettings = async () => {
-  const response = await headkit().getStoreSettings();
-  return response;
-};
-
-const getPickupLocations = async () => {
-  const response = await headkit().getPickupLocations();
-  return response;
-};
-
-const updateCartItem = async ({
-  input,
-}: {
-  input: UpdateItemQuantitiesInput;
-}) => {
-  const response = await headkit(await getClientConfig()).updateItemQuantities({
-    input,
-  });
-
-  return response;
-};
-
-const getProductCategory = async ({ slug }: { slug: string }) => {
-  const response = await headkit().getProductCategory({
-    id: slug,
-    type: ProductCategoryIdType.Slug,
-  });
-  return response;
-};
-
-const getOrders = async () => {
-  const response = await headkit(await getClientConfig()).getOrders();
-  return response;
-};
-
-// For guest users in checkout success
-const getGuestOrder = async ({
-  orderId,
-  sessionToken,
-}: {
-  orderId: string;
-  sessionToken?: string;
-}) => {
-  const config = sessionToken
-    ? { woocommerceSession: sessionToken }
-    : await getClientConfig();
-
-  const response = await headkit(config).getCustomer({
-    withAddress: true,
-    withOrders: true,
-  });
-
-  const order = response.data?.customer?.orders?.nodes?.find(
-    (order) => order?.databaseId === Number(orderId)
-  );
-
-  return {
-    data: {
-      customer: {
-        ...response.data?.customer,
-        orders: {
-          nodes: order ? [order] : [],
-        },
-      },
-    },
-  };
-};
+// ============================================
+// WISHLIST MUTATIONS
+// ============================================
 
 const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
   const response = await headkit(await getClientConfig()).actionWishlist({
@@ -516,112 +395,12 @@ const actionWishlist = async ({ input }: { input: ActionWishlistInput }) => {
   return response;
 };
 
-// Post Actions
-export async function getPostFilters({
-  input,
-}: {
-  input: GetPostCategoriesQueryVariables;
-}) {
-  const response = await headkit().getPostCategories(input);
-  return response;
-}
-
-export async function getPostList({
-  input,
-}: {
-  input: GetPostsQueryVariables;
-}) {
-  const response = await headkit().getPosts(input);
-  return response;
-}
-
-// Brand Actions
-export async function getBrandList({
-  input,
-}: {
-  input: GetBrandsQueryVariables;
-}) {
-  const response = await headkit().getBrands(input);
-  return response;
-}
-
-export async function getBrand({ slug }: { slug: string }) {
-  const response = await headkit().getBrand({ slug });
-  return response;
-}
-
-export async function getBranding() {
-  const response = await headkit().getBranding();
-  return response;
-}
-
-export async function getCarousel(
-  variables?: GetCarouselQueryVariables
-) {
-  const response = await headkit().getCarousel(variables);
-  return response;
-}
-
-export async function getProductCategories(
-  variables?: GetProductCategoriesQueryVariables
-) {
-  const response = await headkit().getProductCategories(variables);
-  return response;
-}
-
-export async function getSEOSettings() {
-  const response = await headkit().getSEOSettings();
-  return response;
-}
-
-export async function getPage({ id, type }: { id: string; type: PageIdType }) {
-  const response = await headkit().getPage({ id, type });
-  return response;
-}
-
-// FAQ Actions
-export async function getFAQs(variables?: GetFaQsQueryVariables) {
-  const response = await headkit().getFAQs(variables);
-  return response;
-}
-
-// Post Actions
-export async function getPost({ id, type }: { id: string; type: PostIdType }) {
-  const response = await headkit().getPost({ id, type });
-  return response;
-}
-
-export async function getPosts(variables: GetPostsQueryVariables) {
-  const response = await headkit().getPosts(variables);
-  return response;
-}
-
-// Product Actions
-export async function getProduct({ id, type }: { id: string; type: ProductIdTypeEnum }) {
-  const response = await headkit().getProduct({ id, type });
-  return response;
-}
-
-export async function getProducts(variables?: GetProductsQueryVariables) {
-  const response = await headkit().getProducts(variables);
-  return response;
-}
-
-export async function getProductSlugs(variables?: GetProductSlugsQueryVariables) {
-  const response = await headkit().getProductSlugs(variables);
-  return response;
-}
-
-// General Settings Actions
-export async function getGeneralSettings(variables?: GetGeneralSettingsQueryVariables) {
-  const response = await headkit().getGeneralSettings(variables);
-  return response;
-}
+// ============================================
+// EXPORTS - Mutations Only
+// ============================================
 
 export {
-  getCustomer,
-  updateCustomer,
-  getCart,
+  // Cart mutations
   addToCart,
   removeCartItem,
   applyCoupon,
@@ -630,29 +409,30 @@ export {
   removeGiftCard,
   emptyCart,
   updateShippingMethod,
-  getPaymentGateways,
+  updateItemQuantities,
+  updateCartItem,
+  rebuildCartFromKlaviyo,
+  
+  // Checkout mutations
+  checkout,
   createPaymentIntent,
   updatePaymentIntent,
-  checkout,
-  getGravityFormById,
-  submitGravityForm,
+  
+  // Customer mutations
+  updateCustomer,
+  
+  // Auth mutations
   sendPasswordResetEmail,
   resetUserPassword,
   login,
   registerUser,
-  updateItemQuantities,
-  getAvailablePaymentMethods,
-  getOrder,
-  getProductList,
-  getProductFilters,
-  getStripeConfig,
-  getPickupLocations,
-  updateCartItem,
-  getProductCategory,
-  getWoocommerceAuthToken,
-  rebuildCartFromKlaviyo,
-  getOrders,
-  getGuestOrder,
+  
+  // Form mutations
+  submitGravityForm,
+  
+  // Wishlist mutations
   actionWishlist,
-  getStoreSettings,
+  
+  // Auth helpers (for queries-dynamic.ts)
+  getWoocommerceAuthToken,
 };

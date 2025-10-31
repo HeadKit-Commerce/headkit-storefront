@@ -28,7 +28,7 @@ const BlockEditor = ({ blocks, section = "section-1" }: Props) => {
             case "headkit-product-carousel":
               return (
                 <div
-                  className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden"
+                  className="py-[30px] overflow-hidden"
                   key={index}
                 >
                   <SectionHeader
@@ -36,9 +36,10 @@ const BlockEditor = ({ blocks, section = "section-1" }: Props) => {
                     description={data.content.description}
                     allButton={data.content.button?.text ?? ""}
                     allButtonPath={data.content.button?.url ?? ""}
+                    className="px-5 md:px-10"
                   />
 
-                  <div className="mt-5 lg:mt-[30px]">
+                  <div className="mt-5">
                     <ProductCarousel
                       products={data.content.products?.nodes ?? []}
                     />

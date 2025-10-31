@@ -15,20 +15,43 @@ import {
   WoocommerceHandpickedProducts,
   WoocommerceProductNew,
   WoocommerceProductOnSale,
+  ProductTypesEnum,
+  VariableProduct,
+  ProductVariation,
+  SimpleProduct,
 } from "@/lib/headkit/generated";
 import { processBlockEditor } from "@/lib/headkit/utils/process-block-editor";
 import { makeWhereProductQuery } from "@/lib/headkit/utils/make-where";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { headkit } from "@/lib/headkit/client";
+import { getPage, getSEOSettings, getBranding, getCarousel, getProductCategories, getBrands, getProducts, getPosts } from "@/lib/headkit/queries";
+
+// Helper function to determine if a product is new (created within last 30 days)
+function calculateIsNew(product: ProductContentFullWithGroupFragment): boolean {
+  const lastMonth = new Date();
+  lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+  if (product?.type === ProductTypesEnum.Variable) {
+    const variableProduct = product as VariableProduct;
+    return (
+      variableProduct.variations?.nodes?.some(
+        (variation: ProductVariation) => {
+          const variationDate = new Date(variation?.date || "");
+          return variationDate >= lastMonth;
+        }
+      ) || false
+    );
+  } else {
+    const simpleProduct = product as SimpleProduct;
+    const productDate = new Date(simpleProduct?.date || "");
+    return productDate >= lastMonth;
+  }
+}
 
 export async function generateMetadata() {
   const [{ data }, headkitSEOSettings, headkitBranding] = await Promise.all([
-    headkit().getPage({ id: "/", type: PageIdType.Uri }),
-    headkit().getSEOSettings(),
-    headkit({
-      revalidateTags: ["headkit:branding"],
-      revalidateTime: 60
-    }).getBranding(),
+    getPage({ id: "/", type: PageIdType.Uri }),
+    getSEOSettings(),
+    getBranding(),
   ]);
 
   const seo = data?.page?.seo;
@@ -57,15 +80,15 @@ export default async function Home() {
     featuredProducts,
     posts,
   ] = await Promise.all([
-    headkit().getPage({ id: "/", type: PageIdType.Uri }),
-    headkit().getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
-    headkit().getProductCategories({ where: { featured: true } }),
-    headkit().getBrands({ where: { featured: true } }),
-    headkit().getProducts({
+    getPage({ id: "/", type: PageIdType.Uri }),
+    getCarousel({ where: { carouselCategoriesIn: ["main"] } }),
+    getProductCategories({ where: { featured: true } }),
+    getBrands({ where: { featured: true } }),
+    getProducts({
       first: 10,
       where: makeWhereProductQuery("featured"),
     }),
-    headkit().getPosts({ first: 10 }),
+    getPosts({ first: 10 }),
   ]);
 
   const editorBlocks = processBlockEditor(
@@ -94,20 +117,24 @@ export default async function Home() {
 
       {/* Featured Products */}
       {(featuredProducts?.data?.products?.nodes?.length ?? 0) > 0 && (
-        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+        <div className="py-[30px] overflow-hidden">
           <SectionHeader
             title="Featured Products"
             description="Explore our curated selection of top-rated products."
             allButton="View All"
             allButtonPath="/shop/featured"
+            className="px-5 md:px-10"
           />
-          <div className="mt-5 lg:mt-[30px]">
+          <div className="mt-5">
             <ProductCarousel
               products={
                 (featuredProducts?.data?.products?.nodes?.filter(
                   (node): node is NonNullable<typeof node> =>
                     node !== null && node !== undefined
-                ) ?? []) as ProductContentFullWithGroupFragment[]
+                ) ?? []).map((product) => ({
+                  ...(product as ProductContentFullWithGroupFragment),
+                  isNew: calculateIsNew(product as ProductContentFullWithGroupFragment),
+                }))
               }
             />
           </div>
@@ -117,14 +144,15 @@ export default async function Home() {
       <BlockEditor blocks={editorBlocks} section="section-2" />
 
       {(productCategories?.data?.productCategories?.nodes?.length ?? 0) > 0 && (
-        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+        <div className="py-[30px] overflow-hidden">
           <SectionHeader
             title="Top Collections"
             description=""
             allButton="Shop all Collections"
             allButtonPath="/shop/categories"
+            className="px-5 md:px-10"
           />
-          <div className="mt-5 lg:mt-[30px]">
+          <div className="mt-5">
             <CategoryCarousel
               categories={
                 productCategories?.data?.productCategories?.nodes?.map(
@@ -168,14 +196,15 @@ export default async function Home() {
 
       {/* post */}
       {(posts?.data?.posts?.nodes?.length ?? 0) > 0 && (
-        <div className="px-5 md:px-10 py-[30px] lg:py-[60px] overflow-hidden">
+        <div className="py-[30px] overflow-hidden">
           <SectionHeader
             title="Latest News"
             description="Get the latest news and updates from our blog."
             allButton="View All"
             allButtonPath="/news"
+            className="px-5 md:px-10"
           />
-          <div className="mt-5 lg:mt-[30px]">
+          <div className="mt-5">
             <PostCarousel
               posts={
                 posts?.data?.posts?.nodes?.map((post) => ({

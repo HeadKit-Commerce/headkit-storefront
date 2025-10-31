@@ -4,30 +4,46 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { path, tag, secret } = body;
+    const { paths, tags, secret } = body; // Removed singular 'path' and 'tag'
 
-    // Check for secret to confirm this is a valid request
-    if (secret !== process.env.REVALIDATION_SECRET) {
+    // Check secret in header first (industry standard), then body (legacy support)
+    const headerSecret = request.headers.get('x-revalidation-secret');
+    const providedSecret = headerSecret || secret;
+
+    if (providedSecret !== process.env.REVALIDATION_SECRET) {
       return NextResponse.json(
         { message: 'Invalid secret' },
         { status: 401 }
       );
     }
 
-    // Revalidate path if provided
-    if (path) {
-      revalidatePath(path);
+    const revalidatedPaths: string[] = [];
+    const revalidatedTags: string[] = [];
+
+    // Revalidate multiple paths
+    if (paths && Array.isArray(paths)) {
+      console.log('Revalidating paths:', paths);
+      paths.forEach((p: string) => {
+        revalidatePath(p);
+        revalidatedPaths.push(p);
+      });
     }
 
-    // Revalidate tag if provided
-    if (tag) {
-      revalidateTag(tag);
+    // Revalidate multiple tags with "max" profile for on-demand revalidation
+    if (tags && Array.isArray(tags)) {
+      console.log('Revalidating tags:', tags);
+      tags.forEach((t: string) => {
+        revalidateTag(t, "max"); // Use max profile for webhook-triggered revalidation
+        revalidatedTags.push(t);
+      });
     }
 
     return NextResponse.json(
       { 
-        revalidated: true, 
-        message: `Revalidated ${path ? `path: ${path}` : ''} ${tag ? `tag: ${tag}` : ''}` 
+        revalidated: true,
+        revalidatedPaths,
+        revalidatedTags,
+        message: `Revalidated ${revalidatedPaths.length} paths and ${revalidatedTags.length} tags`
       },
       { status: 200 }
     );
@@ -38,4 +54,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -3,9 +3,8 @@ import { PostPage } from "@/components/post/post-page";
 import { makeWherePostQuery, SortKeyType } from "@/components/post/utils";
 import { PostHeader } from "@/components/post/post-header";
 import headkitConfig from "@/headkit.config";
-import { headkit } from "@/lib/headkit/client";
-
-export const dynamic = "force-dynamic";
+import { getPosts, getPostFilters } from "@/lib/headkit/queries";
+import { Suspense } from "react";
 
 interface PageProps {
   searchParams: Promise<{
@@ -21,57 +20,60 @@ export const metadata: Metadata = {
   description: "Browse our collection of posts",
 };
 
-export default async function Page({ searchParams }: PageProps) {
-  try {
-    const parsedSearchParams = await searchParams;
-    const page = parsedSearchParams.page
-      ? parseInt(parsedSearchParams.page)
-      : 0;
-    const perPage = 12;
-    const categories =
-      parsedSearchParams.categories?.split(",").filter(Boolean) || [];
+async function PostsContent({ searchParams }: PageProps) {
+  const parsedSearchParams = await searchParams;
+  const page = parsedSearchParams.page
+    ? parseInt(parsedSearchParams.page)
+    : 0;
+  const perPage = 12;
+  const categories =
+    parsedSearchParams.categories?.split(",").filter(Boolean) || [];
 
-    const filterQuery = {
-      sort: parsedSearchParams.sort as SortKeyType | undefined,
-      categories,
-    };
+  const filterQuery = {
+    sort: parsedSearchParams.sort as SortKeyType | undefined,
+    categories,
+  };
 
-    const [postsData, filtersData] = await Promise.all([
-      headkit().getPosts({
-        first: perPage,
-        where: makeWherePostQuery({
-          filterQuery,
-        }),
+  const [postsData, filtersData] = await Promise.all([
+    getPosts({
+      first: perPage,
+      where: makeWherePostQuery({
+        filterQuery,
       }),
-      headkit().getPostCategories(),
-    ]);
+    }),
+    getPostFilters({}),
+  ]);
 
-    return (
-      <>
-        <PostHeader
-          name={headkitConfig.article.name}
-          breadcrumbData={[
-            {
-              name: "Home",
-              uri: "/",
-              current: false,
-            },
-            {
-              name: "News & Tips",
-              uri: "/news",
-              current: true,
-            },
-          ]}
-        />
-        <PostPage
-          initialPosts={postsData.data}
-          postFilter={filtersData.data}
-          initialPage={page}
-        />
-      </>
-    );
-  } catch (error) {
-    console.error("Error fetching posts data:", error);
-    throw error;
-  }
+  return (
+    <PostPage
+      initialPosts={postsData.data}
+      postFilter={filtersData.data}
+      initialPage={page}
+    />
+  );
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  return (
+    <>
+      <PostHeader
+        name={headkitConfig.article.name}
+        breadcrumbData={[
+          {
+            name: "Home",
+            uri: "/",
+            current: false,
+          },
+          {
+            name: "News & Tips",
+            uri: "/news",
+            current: true,
+          },
+        ]}
+      />
+      <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading posts...</div>}>
+        <PostsContent searchParams={searchParams} />
+      </Suspense>
+    </>
+  );
 }

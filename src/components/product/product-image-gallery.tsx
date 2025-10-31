@@ -8,14 +8,7 @@ import config from "@/headkit.config";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Lightbox } from "@/components/ui/lightbox";
 
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselPagination,
-  useDotButton,
-} from "@/components/ui/carousel";
+import { EnhancedCarousel } from "@/components/carousel/enhanced-carousel";
 import { useState } from "react";
 
 interface Props {
@@ -28,8 +21,7 @@ interface Props {
 }
 
 const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
-  const [api, setApi] = useState<CarouselApi>();
-  const { selectedIndex, scrollSnaps, onDotButtonClick } = useDotButton(api);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   return (
     <div>
@@ -80,47 +72,40 @@ const ProductImageGallery = ({ images, isSale, isNew }: Props) => {
         <div className="absolute left-2 top-2 z-10">
           <BadgeList isSale={isSale} isNewIn={isNew} />
         </div>
-        <Carousel
-          setApi={setApi}
-          opts={{
-            align: "start",
-          }}
-          className="w-full"
-        >
-          <CarouselContent className="-ml-[30px]">
-            {images?.map((image, i) => (
-              <CarouselItem key={i} className="basis-full pl-[30px]">
-                <Dialog>
-                  <DialogTrigger className="w-full">
-                    <div className="relative aspect-square bg-white">
-                      <Image
-                        priority={i === 0}
-                        src={image?.src || config.fallbackProductImage}
-                        alt={image?.alt || ""}
-                        fill
-                        className="object-cover object-center"
-                        placeholder="blur"
-                        blurDataURL={config.fallbackProductImage}
-                        sizes="100vw"
-                      />
-                    </div>
-                  </DialogTrigger>
-                  <Lightbox images={images} initialSelectedIndex={i} />
-                </Dialog>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {scrollSnaps?.length > 1 && (
-            <CarouselPagination
-              itemLength={images?.length}
-              selectedIndex={selectedIndex}
-              onChange={(index) => {
-                onDotButtonClick(index);
-              }}
-            />
+        <EnhancedCarousel
+          items={images || []}
+          renderItem={(image, i) => (
+            <Dialog>
+              <DialogTrigger className="w-full">
+                <div className="relative aspect-square bg-white">
+                  <Image
+                    priority={i === 0}
+                    src={image?.src || config.fallbackProductImage}
+                    alt={image?.alt || ""}
+                    fill
+                    className="object-cover object-center"
+                    placeholder="blur"
+                    blurDataURL={config.fallbackProductImage}
+                    sizes="100vw"
+                  />
+                </div>
+              </DialogTrigger>
+              <Lightbox images={images} initialSelectedIndex={i} />
+            </Dialog>
           )}
-
-        </Carousel>
+          itemSizing={{
+            base: "w-full",
+          }}
+          gap="gap-0"
+          padding="px-0"
+          showControls={false}
+          showScrollbar={false}
+          showPagination={true}
+          paginationDotClassName="bg-black/70 hover:bg-black transition-colors"
+          paginationClassName="absolute left-1/2 -translate-x-1/2 z-20 flex flex-wrap justify-center gap-2 bottom-4"
+          useScrollSnap={true}
+          className="w-full"
+        />
       </div>
     </div>
   );

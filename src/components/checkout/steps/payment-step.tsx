@@ -22,7 +22,8 @@ import {
   StripePaymentElementChangeEvent,
   PaymentIntent,
 } from "@stripe/stripe-js";
-import { createPaymentIntent, getPaymentGateways } from "@/lib/headkit/actions";
+import { createPaymentIntent } from "@/lib/headkit/actions";
+import { getPaymentGateways } from "@/lib/headkit/queries";
 import { useEffect, useState } from "react";
 import { PaymentGateway } from "@/lib/headkit/generated";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";

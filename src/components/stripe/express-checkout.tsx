@@ -5,8 +5,9 @@ import { StripeElementsOptions } from "@stripe/stripe-js";
 import { useAppContext } from "@/contexts/app-context";
 import { getFloatVal } from "@/lib/utils";
 import { ExpressCheckoutButton } from "@/components/stripe/express-checkout-button";
-import { useMemo } from "react";
-import { useStripe } from "@/contexts/stripe-context";
+import { useMemo, useEffect, useState } from "react";
+import { useStripeConfig } from "@/contexts/stripe-context";
+import { Stripe } from "@stripe/stripe-js";
 
 interface ExpressCheckoutProps {
   disabled: boolean;
@@ -28,7 +29,23 @@ export function ExpressCheckout({
   onComplete,
 }: ExpressCheckoutProps) {
   const { initCurrency, cartData } = useAppContext();
-  const { stripe, isLoading } = useStripe();
+  const { loadStripe, publishableKey } = useStripeConfig();
+  const [stripe, setStripe] = useState<Promise<Stripe | null> | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
+
+  // Load Stripe when component is not disabled and we have a publishable key
+  useEffect(() => {
+    if (!disabled && publishableKey && !stripe && !stripeLoading) {
+      setStripeLoading(true);
+      const stripePromise = loadStripe();
+      setStripe(stripePromise);
+      stripePromise.then(() => {
+        setStripeLoading(false);
+      }).catch(() => {
+        setStripeLoading(false);
+      });
+    }
+  }, [disabled, publishableKey, stripe, stripeLoading, loadStripe]);
 
   const options: StripeElementsOptions = useMemo(() => ({
     mode: "payment",
@@ -48,7 +65,7 @@ export function ExpressCheckout({
     },
   }), [singleCheckout, price, cartData?.total, initCurrency]);
 
-  if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripe || isLoading) {
+  if (disabled || (singleCheckout ? !price : !cartData?.total) || !stripe || stripeLoading) {
     return null;
   }
 

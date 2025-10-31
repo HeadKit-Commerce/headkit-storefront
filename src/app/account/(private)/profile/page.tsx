@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { getCustomer, updateCustomer } from "@/lib/headkit/actions";
+import { updateCustomer } from "@/lib/headkit/actions";
+import { getCustomer } from "@/lib/headkit/queries-dynamic";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),

@@ -12,14 +12,14 @@ import {
 import { useAppContext } from "../../contexts/app-context";
 import { Icon } from "../icon";
 import { useEffect } from "react";
-import { getCart as getCartAction } from "@/lib/headkit/actions";
+import { getCart as getCartAction } from "@/lib/headkit/queries-dynamic";
 import { Button } from "../ui/button";
 import Link from "next/link";
 import { CartItem } from "./cart-item";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { Cart, CartItemFragment } from "@/lib/headkit/generated";
 import { ExpressCheckout } from "@/components/stripe/express-checkout";
-import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
+import { PaymentMethodMessaging } from "@/components/payment-method-messaging";
 
 const CartDrawer = () => {
   const { cartDrawer, toggleCartDrawer, setCartData, cartData } = useAppContext();
@@ -97,7 +97,6 @@ const CartDrawer = () => {
             <div className="w-full flex flex-col gap-2 mt-auto bg-white">
               <PaymentMethodMessaging
                 price={getFloatVal(cartData?.contentsTotal || "0")}
-                disabled={false}
               />
               <div className="flex font-medium gap-1">
                 <p className="flex-1 flex items-end">

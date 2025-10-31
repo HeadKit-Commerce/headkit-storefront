@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCustomer, getWoocommerceAuthToken } from "@/lib/headkit/actions";
+import { getWoocommerceAuthToken } from "@/lib/headkit/actions";
+import { getCustomer } from "@/lib/headkit/queries-dynamic";
 import { handleAuthToken, removeAuthToken } from "@/lib/headkit/actions/auth";
 
 // Add type for user data

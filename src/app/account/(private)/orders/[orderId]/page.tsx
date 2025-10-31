@@ -1,25 +1,19 @@
-import { getOrder } from "@/lib/headkit/actions";
+import { getOrder } from "@/lib/headkit/queries-dynamic";
 import { notFound } from "next/navigation";
 import { Order } from "@/types/order";
+import { Suspense } from "react";
 
 interface Props {
   params: Promise<{ orderId: string }>;
 }
 
-export default async function Page({ params }: Props) {
-  const { orderId } = await params;
-
-  if (!orderId) {
-    return notFound();
-  }
-
+async function OrderDetails({ orderId }: { orderId: string }) {
   const response = await getOrder({ id: orderId });
   const order = response.data?.order as Order;
 
   if (!order) {
     return notFound();
   }
-
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -94,5 +88,19 @@ export default async function Page({ params }: Props) {
         )}
       </div>
     </div>
+  );
+}
+
+export default async function Page({ params }: Props) {
+  const { orderId } = await params;
+
+  if (!orderId) {
+    return notFound();
+  }
+
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8"><div className="max-w-4xl mx-auto">Loading order details...</div></div>}>
+      <OrderDetails orderId={orderId} />
+    </Suspense>
   );
 } 

@@ -1,6 +1,6 @@
 import config from "@/headkit.config";
 import Script from "next/script";
-import { getGeneralSettings } from "@/lib/headkit/actions";
+import { getGeneralSettings } from "@/lib/headkit/queries";
 
 export async function WebsiteJsonLD() {
   const { data: { generalSettings } } = await getGeneralSettings();

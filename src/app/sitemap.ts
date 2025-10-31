@@ -1,6 +1,6 @@
 import { removeTrailingSlash } from "@/lib/utils";
 import { MetadataRoute } from "next";
-import { getBrandList, getPostList, getProductCategories, getProductSlugs } from "@/lib/headkit/actions";
+import { getBrands as getBrandList, getPosts as getPostList, getProductCategories, getProducts as getProductSlugs } from "@/lib/headkit/queries";
 
 type BaseSitemapItem = {
   url: string;
@@ -42,7 +42,7 @@ interface BrandNode {
 }
 
 const makeBrandSitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const response = await getBrandList({ input: {} });
+  const response = await getBrandList({});
   const brands = response.data?.brands?.nodes || [];
 
   return brands.map((node: BrandNode) => ({
@@ -111,7 +111,7 @@ const makeProductSitemap = async (): Promise<MetadataRoute.Sitemap> => {
 };
 
 const makePostSitemap = async (): Promise<MetadataRoute.Sitemap> => {
-  const response = await getPostList({ input: {} });
+  const response = await getPostList({});
   const posts = response.data?.posts?.nodes || [];
 
   return posts.map((node: PostNode) => ({

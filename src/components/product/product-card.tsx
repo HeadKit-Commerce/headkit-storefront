@@ -24,6 +24,7 @@ interface ListItemProps {
   className?: string;
   dark?: boolean;
   mobileCol?: boolean;
+  isNew?: boolean;
 }
 
 export const ProductCard = ({
@@ -31,6 +32,7 @@ export const ProductCard = ({
   className,
   dark = false,
   mobileCol = false,
+  isNew = false,
 }: ListItemProps) => {
   const [colourSelected, setColourSelected] = useState<string | null>(null);
   const [imageSelected, setImageSelected] = useState<string>(
@@ -92,29 +94,6 @@ export const ProductCard = ({
     }
   }, [colourSelected, product]);
 
-  const isProductNew = (
-    product: ProductContentFullWithGroupFragment
-  ): boolean => {
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    if (product?.type === ProductTypesEnum.Variable) {
-      const variableProduct = product as VariableProduct;
-      return (
-        variableProduct.variations?.nodes?.some(
-          (variation: ProductVariation) => {
-            const variationDate = new Date(variation?.date || "");
-            return variationDate >= lastMonth;
-          }
-        ) || false
-      );
-    } else {
-      const simpleProduct = product as SimpleProduct;
-      const productDate = new Date(simpleProduct?.date || "");
-      return productDate >= lastMonth;
-    }
-  };
-
   if (!product) return null;
 
   return (
@@ -122,7 +101,7 @@ export const ProductCard = ({
       <div className="absolute left-2 top-2 z-10">
         <BadgeList
           isSale={product?.onSale || false}
-          isNewIn={isProductNew(product)}
+          isNewIn={isNew}
         />
       </div>
       <Link href={uri} aria-label="Featured Image">

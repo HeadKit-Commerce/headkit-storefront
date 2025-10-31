@@ -9,10 +9,7 @@ export const standardSize = {
 }
 
 export async function generateSocialImage(alt: string = 'Site logo') {
-  const { data: { branding } } = await headkit({
-    revalidateTags: ["headkit:branding"],
-    revalidateTime: 60
-  }).getBranding();
+  const { data: { branding } } = await headkit().getBranding();
   
   // Calculate square size for the icon (based on height to ensure it fits)
   const iconSize = Math.min(standardSize.height * 0.7, standardSize.width * 0.5);

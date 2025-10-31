@@ -4,6 +4,7 @@ query getCustomer(
   $withWishlists: Boolean! = false
 ) {
   customer {
+    jwtRefreshToken
     id
     databaseId
     username

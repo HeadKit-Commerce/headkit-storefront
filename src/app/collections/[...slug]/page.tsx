@@ -9,7 +9,7 @@ import {
 } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { headkit } from "@/lib/headkit/client";
+import { getProductCategory, getProductList, getProductFilters } from "@/lib/headkit/queries";
 import { ProductCategoryIdType } from "@/lib/headkit/generated";
 
 interface CollectionPageProps {
@@ -34,7 +34,7 @@ export async function generateMetadata({
 
   if (!categorySlug) return notFound();
 
-  const { data } = await headkit().getProductCategory({ id: categorySlug, type: ProductCategoryIdType.Slug });
+  const { data } = await getProductCategory({ slug: categorySlug });
   if (!data?.productCategory) return notFound();
 
   return makeSEOMetadata(data.productCategory.seo, {
@@ -113,9 +113,9 @@ export default async function Page({
     };
 
     const [productCategory, productFilter, productsData] = await Promise.all([
-      headkit().getProductCategory({ id: categorySlug }),
-      headkit().getProductFilters({ mainCategory: categorySlug }),
-      headkit().getProductList({
+      getProductCategory({ slug: categorySlug }),
+      getProductFilters({ mainCategory: categorySlug }),
+      getProductList({
           where: makeWhereProductQuery({
             filterQuery,
             categorySlug,

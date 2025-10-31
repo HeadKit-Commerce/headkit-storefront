@@ -1,10 +1,5 @@
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+"use client";
+import { Carousel } from "./carousel";
 import Link from "next/link";
 import { FeaturedImage } from "../product/featured-image";
 
@@ -20,27 +15,16 @@ interface Props {
 const CategoryCarousel = ({ categories }: Props) => {
   return (
     <Carousel
-      opts={{
-        align: "start",
-      }}
+      items={categories}
+      renderItem={(item) => (
+        <Link href={item?.uri}>
+          <FeaturedImage sourceUrl={item?.thumbnail} />
+          <div className="pt-3 text-[17px] font-semibold">{item?.name}</div>
+        </Link>
+      )}
       className="w-full"
-    >
-      <CarouselContent className="-ml-[30px]">
-        {categories.map((item, index) => (
-          <CarouselItem
-            key={index}
-            className="basis-10/12 sm:basis-1/2 lg:basis-1/3 pl-[30px]"
-          >
-            <Link href={item?.uri}>
-              <FeaturedImage sourceUrl={item?.thumbnail} />
-              <div className="pt-3 text-[17px] font-semibold">{item?.name}</div>
-            </Link>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious className="-left-4 bg-white" />
-      <CarouselNext className="-right-4 bg-white" />
-    </Carousel>
+      showPagination={false}
+    />
   );
 };
 

@@ -2,7 +2,8 @@ import config from "@/headkit.config";
 import { removeHtmlTags } from "@/lib/utils";
 import { Metadata } from "next";
 import { PostTypeSeoContentFragment, TaxonomySeoContentFragment } from "../generated";
-import { getSEOSettings } from "../actions";
+import { getSEOSettings } from "../queries";
+import { normalizeUrl } from "./normalize-url";
 
 interface RootMetadata {
   title?: string | null;
@@ -24,7 +25,7 @@ const makeRootMetadata = async ({ title, description }: RootMetadata): Promise<M
   return {
     title: title || seoSettings?.title || config.metadata.appName,
     description: description || seoSettings?.description || config.metadata.description,
-    metadataBase: new URL(baseUrl),
+    metadataBase: baseUrl as any,
     applicationName: config.metadata.appName,
   };
 };
@@ -36,8 +37,8 @@ const makeSEOMetadata = async (
   options?: { 
     fallback?: Metadata; 
     override?: Metadata;
-    headkitSEOSettings?: Awaited<ReturnType<typeof import('../actions').getSEOSettings>> | null;
-    headkitBranding?: Awaited<ReturnType<typeof import('../actions').getBranding>> | null;
+    headkitSEOSettings?: Awaited<ReturnType<typeof import('../queries').getSEOSettings>> | null;
+    headkitBranding?: Awaited<ReturnType<typeof import('../queries').getBranding>> | null;
   }
 ): Promise<Metadata> => {
   const baseUrl = process.env.NEXT_PUBLIC_FRONTEND_URL || "";
@@ -76,7 +77,8 @@ const makeSEOMetadata = async (
 
   const canonical =
     options?.override?.alternates?.canonical ||
-    seo?.canonical ||
+    normalizeUrl(seo?.canonical) ||
+    normalizeUrl(seo?.opengraphUrl) ||
     options?.fallback?.alternates?.canonical ||
     options?.override?.openGraph?.url;
 
@@ -148,7 +150,7 @@ const makeSEOMetadata = async (
         ""
     ),
     url: (options?.override?.openGraph?.url ||
-      seo?.opengraphUrl ||
+      normalizeUrl(seo?.opengraphUrl) ||
       canonical ||
       options?.fallback?.openGraph?.url ||
       "") as string,
@@ -218,7 +220,7 @@ const makeSEOMetadata = async (
     robots,
     openGraph,
     twitter,
-    metadataBase: new URL(baseUrl),
+    metadataBase: baseUrl as any,
   };
 };
 

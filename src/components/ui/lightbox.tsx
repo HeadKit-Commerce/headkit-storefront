@@ -6,14 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import Image from "next/image";
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { EnhancedCarousel } from "@/components/carousel/enhanced-carousel";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -22,35 +15,41 @@ interface Props {
 }
 
 const Lightbox = ({ images, initialSelectedIndex }: Props) => {
-  const [api, setApi] = useState<CarouselApi>();
+  const [currentIndex, setCurrentIndex] = useState(initialSelectedIndex);
+
   useEffect(() => {
-    if (api) {
-      api.scrollTo(initialSelectedIndex);
-    }
-  }, [api, initialSelectedIndex]);
+    setCurrentIndex(initialSelectedIndex);
+  }, [initialSelectedIndex]);
 
   return (
     <DialogContent>
       <DialogTitle hidden />
       <DialogDescription hidden />
-      <Carousel setApi={setApi} opts={{ align: "center", loop: true }}>
-        <CarouselContent>
-          {images.map((image, i) => (
-            <CarouselItem key={i} className="basis-full">
-              <Image
-                src={image.src}
-                alt={image.alt}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="object-contain object-center w-auto h-screen mx-auto"
-              />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="-left-4" />
-        <CarouselNext className="-right-4" />
-      </Carousel>
+      <EnhancedCarousel
+        items={images}
+        renderItem={(image) => (
+          <Image
+            src={image.src}
+            alt={image.alt}
+            width={0}
+            height={0}
+            sizes="100vw"
+            className="object-contain object-center w-auto h-screen mx-auto"
+          />
+        )}
+        itemSizing={{
+          base: "w-full",
+        }}
+        gap="gap-0"
+        padding="px-0"
+        showControls={true}
+        showScrollbar={false}
+        showPagination={false}
+        loop={true}
+        useScrollSnap={true}
+        initialSelectedIndex={initialSelectedIndex}
+        className="w-full"
+      />
     </DialogContent>
   );
 };

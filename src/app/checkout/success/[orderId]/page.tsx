@@ -8,7 +8,7 @@ import {
 } from "@/lib/utils";
 import { CartItem } from "@/components/layout/cart-item";
 import { ClearCart } from "@/components/checkout/clear-cart";
-import { getOrder } from "@/lib/headkit/actions";
+import { getOrder } from "@/lib/headkit/queries-dynamic";
 import { Order } from "@/types/order";
 
 interface Props {

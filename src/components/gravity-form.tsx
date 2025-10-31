@@ -23,7 +23,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormFieldValuesInput, GetGravityFormByIdQuery, InputMaybe } from "@/lib/headkit/generated";
 import { snakeCase } from "@/lib/utils";
-import { getGravityFormById, submitGravityForm } from "@/lib/headkit/actions";
+import { submitGravityForm } from "@/lib/headkit/actions";
+import { getGravityFormById } from "@/lib/headkit/queries";
 
 interface GravityFormProps {
   id?: string;

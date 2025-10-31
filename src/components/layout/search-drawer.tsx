@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { ProductCard } from "../product/product-card";
-import { getProductList } from "@/lib/headkit/actions";
+import { getProductList } from "@/lib/headkit/queries";
 import { makeWhereProductQuery } from "@/components/collection/utils";
 import { ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
 import { debounce } from "@/lib/utils";
@@ -37,15 +37,13 @@ export function SearchDrawer() {
     setIsLoading(true);
     try {
       const { data } = await getProductList({
-        input: {
-          where: makeWhereProductQuery({
-            filterQuery: {},
-            page: 0,
-            perPage: 4,
-            search: query,
-          }),
-          first: 4,
-        },
+        where: makeWhereProductQuery({
+          filterQuery: {},
+          page: 0,
+          perPage: 4,
+          search: query,
+        }),
+        first: 4,
       });
       setProducts((data?.products?.nodes || []) as ProductContentFullWithGroupFragment[]);
     } catch (error) {

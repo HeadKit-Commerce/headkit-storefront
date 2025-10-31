@@ -1,4 +1,4 @@
-import { getBranding } from "@/lib/headkit/actions";
+import { getBranding } from "@/lib/headkit/queries";
 import { ImageResponse } from "next/og";
 import { Icon as IconComponent } from "@/components/icon";
 import { NextRequest } from "next/server";

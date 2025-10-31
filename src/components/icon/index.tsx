@@ -5,9 +5,12 @@ import {
   HiBars3,
   HiHeart,
   HiOutlineArrowSmallDown,
+  HiOutlineArrowSmallLeft,
   HiOutlineArrowSmallRight,
   HiOutlineCheck,
   HiOutlineChevronDown,
+  HiOutlineChevronLeft,
+  HiOutlineChevronRight,
   HiOutlineHeart,
   HiOutlineMagnifyingGlass,
   HiOutlineMinus,
@@ -33,6 +36,7 @@ import {
   FaCcAmex,
   FaGithub,
 } from "react-icons/fa";
+import { SiAfterpay, SiKlarna, Si7Zip } from "react-icons/si";
 import { BrandmarkSvg } from "./svg/brandmark-svg";
 import { HeadkitMonoSvg } from "./svg/headkit-mono-svg";
 
@@ -60,9 +64,15 @@ const Icon = {
   applePay: (props: IconProps) => <FaApplePay {...props} />,
   paypal: (props: IconProps) => <FaPaypal {...props} />,
   amex: (props: IconProps) => <FaCcAmex {...props} />,
+  
+  // BNPL payment methods
+  afterpay: (props: IconProps) => <SiAfterpay {...props} />,
+  klarna: (props: IconProps) => <SiKlarna {...props} />,
+  zip: (props: IconProps) => <Si7Zip {...props} />,
 
   // misc
   loading: (props: IconProps) => <LoadingSvg {...props} />,
+  arrowLeft: (props: IconProps) => <HiOutlineArrowSmallLeft {...props} />,
   arrowRight: (props: IconProps) => <HiOutlineArrowSmallRight {...props} />,
   arrowDown: (props: IconProps) => <HiOutlineArrowSmallDown {...props} />,
   truck: (props: IconProps) => <HiOutlineTruck {...props} />,
@@ -73,6 +83,8 @@ const Icon = {
   check: (props: IconProps) => <HiOutlineCheck {...props} />,
   hamburger: (props: IconProps) => <HiBars3 {...props} />,
   chevronDown: (props: IconProps) => <HiOutlineChevronDown {...props} />,
+  chevronLeft: (props: IconProps) => <HiOutlineChevronLeft {...props} />,
+  chevronRight: (props: IconProps) => <HiOutlineChevronRight {...props} />,
   search: (props: IconProps) => <HiOutlineMagnifyingGlass {...props} />,
   user: (props: IconProps) => <HiOutlineUser {...props} />,
   heart: (props: IconProps) => <HiHeart {...props} />,

@@ -68,7 +68,7 @@ const BillingAddressStep: React.FC<BillingAddressStepProps> = ({
         <AddressElement
           options={{
             mode: "billing",
-            allowedCountries: ["AU", "TH"],
+            allowedCountries: ["AU"],
             fields: {
               phone: "always",
             },

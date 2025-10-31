@@ -21,7 +21,7 @@ import {
   getProduct,
   getGeneralSettings,
   getProducts,
-} from "@/lib/headkit/actions";
+} from "@/lib/headkit/queries";
 
 type Props = {
   params: Promise<{ slug: string[] }>;
@@ -31,8 +31,9 @@ export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata | ResolvedMetadata> {
+  const { slug } = await params;
+  
   try {
-    const { slug } = await params;
     const product = await getProduct({
       id: slug[slug.length - 1],
       type: ProductIdTypeEnum.Slug,
@@ -139,20 +140,21 @@ export default async function Product({ params }: Props) {
       )}
 
       {(product?.data.product.related?.nodes?.length ?? 0) > 0 && (
-        <div className="overflow-hidden px-5 md:px-10 py-[30px] lg:pt-[60px] lg:pb-[30px]">
+        <div className="overflow-hidden py-[30px] lg:pt-[60px] lg:pb-[30px]">
           <SectionHeader
             title="Something similar"
             description=""
             allButton="View All"
             allButtonPath="/shop"
+            className="px-5 md:px-10"
           />
-          <div className="mt-5 lg:mt-[30px]">
+          <div className="mt-5">
             <ProductCarousel
               products={
                 (product?.data.product.related?.nodes ||
                   []) as ProductContentFullWithGroupFragment[]
               }
-              carouselItemClassName="basis-10/12 sm:basis-1/3 lg:basis-1/4 pl-[30px]"
+              carouselItemClassName="w-[calc(91.666667%-7px)] sm:w-[calc(50%-7px)] lg:w-[calc(25%-10.5px)]"
             />
           </div>
         </div>

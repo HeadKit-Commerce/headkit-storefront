@@ -6,7 +6,7 @@ import {
   SortKeyType,
 } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
-import { headkit } from "@/lib/headkit/client";
+import { getBrand, getProductFilters, getProductList } from "@/lib/headkit/queries";
 
 interface BrandPageProps {
   params: Promise<{
@@ -30,7 +30,7 @@ export async function generateMetadata({
 
   if (!brandSlug) return notFound();
 
-  const { data } = await headkit().getBrand({ slug: brandSlug });
+  const { data } = await getBrand({ slug: brandSlug });
   if (!data?.brand) return notFound();
 
   return {
@@ -74,11 +74,11 @@ export default async function Page({ params, searchParams }: BrandPageProps) {
     };
 
     const [brand, productFilter, productsData] = await Promise.all([
-      headkit().getBrand({ slug: brandSlug }),
-      headkit().getProductFilters({
+      getBrand({ slug: brandSlug }),
+      getProductFilters({
         brands: [brandSlug],
       }),
-      headkit().getProductList({
+      getProductList({
         where: makeWhereProductQuery({
           filterQuery,
           page,

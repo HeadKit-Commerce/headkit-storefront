@@ -28,7 +28,7 @@ import { AddToCart } from "./add-to-cart";
 import config from "@/headkit.config";
 
 import { ExpressCheckout } from "@/components/stripe/express-checkout";
-import { PaymentMethodMessaging } from "@/components/stripe/payment-messaging";
+import { PaymentMethodMessaging } from "@/components/payment-method-messaging";
 import { getFloatVal } from "@/lib/utils";
 import { DeliveryType, GiftCardForm } from "../gift-card-form";
 import { GiftCardFormValues } from "../gift-card-form";
@@ -45,10 +45,15 @@ export const ProductDetail = ({ product }: Props) => {
   const [selectedProduct, setSelectedProduct] = useState<
     ProductContentFullWithGroupFragment | ProductVariationContentFragment
   >();
+  const [isClient, setIsClient] = useState(false);
 
   const [imageVariableSelected, setImageVariableSelected] = useState<
     { src: string; alt: string }[]
   >([]);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleVariableImage = (images: { src: string; alt: string }[]) => {
     const galleryImages =
@@ -64,6 +69,10 @@ export const ProductDetail = ({ product }: Props) => {
   const isGiftCard = product?.metaData?.some(
     (meta) => meta?.key === "_gift_card" && meta?.value === "yes"
   );
+
+  const isNew = isClient && product?.date
+    ? differenceInDays(new Date(), new Date(product.date)) <= 30
+    : false;
 
   useEffect(() => {
     if (product?.type === ProductTypesEnum.Simple) {
@@ -112,11 +121,7 @@ export const ProductDetail = ({ product }: Props) => {
             alt: image.alt,
           }))}
           isSale={!!product?.onSale}
-          isNew={
-            product?.date
-              ? differenceInDays(new Date(), new Date(product.date)) <= 30
-              : false
-          }
+          isNew={isNew}
         />
 
         <div>
@@ -263,11 +268,6 @@ export const ProductDetail = ({ product }: Props) => {
               price={getFloatVal(
                 selectedProduct?.price || selectedProduct?.regularPrice || ""
               )}
-              disabled={
-                !selectedProduct ||
-                (selectedProduct as SimpleProduct)?.stockStatus ===
-                StockStatusEnum.OutOfStock
-              }
             />
           </div>
 

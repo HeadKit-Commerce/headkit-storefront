@@ -292,7 +292,7 @@ const DeliveryMethodStep: React.FC<DeliveryMethodStepProps> = ({
               key={form.watch("deliveryMethod")}
               options={{
                 mode: "shipping",
-                allowedCountries: ["AU", "TH"],
+                allowedCountries: ["AU"],
                 fields: {
                   phone: "always",
                 },

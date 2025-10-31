@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GetPostCategoriesQuery, GetPostsQuery, PostObjectsConnectionOrderbyEnum, OrderEnum } from "@/lib/headkit/generated/index";
-import { getPostList } from "@/lib/headkit/actions";
+import { getPosts as getPostList } from "@/lib/headkit/queries";
 import { SortKeyType } from "./utils";
 
 interface FilterValues {
@@ -140,13 +140,11 @@ export function PostProvider({
         const sort = params.get("sort") || undefined;
 
         const response = await getPostList({
-          input: {
-            first: itemsPerPage,
-            after: page > 0 ? btoa(`arrayconnection:${(page - 1) * itemsPerPage}`) : undefined,
-            where: {
-              categoryIn: categories.length > 0 ? categories : undefined,
-              orderby: sort ? [{ field: PostObjectsConnectionOrderbyEnum.Date, order: OrderEnum.Desc }] : undefined,
-            },
+          first: itemsPerPage,
+          after: page > 0 ? btoa(`arrayconnection:${(page - 1) * itemsPerPage}`) : undefined,
+          where: {
+            categoryIn: categories.length > 0 ? categories : undefined,
+            orderby: sort ? [{ field: PostObjectsConnectionOrderbyEnum.Date, order: OrderEnum.Desc }] : undefined,
           },
         });
         

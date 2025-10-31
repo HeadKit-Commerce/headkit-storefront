@@ -3,7 +3,7 @@ interface HeadKitConfig {
     appName: string;
     description: string;
     appColor: string;
-    metadataBase: URL;
+    metadataBase: string;
     openGraphImageFallback: string;
   };
   fallbackProductImage: string;
@@ -41,9 +41,7 @@ const config: HeadKitConfig = {
     appName: "HeadKit Demo Store",
     description: "HeadKit Demo Store",
     appColor: "#0a0a0a",
-    metadataBase: new URL(
-      process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000"
-    ),
+    metadataBase: process.env.NEXT_PUBLIC_FRONTEND_URL || "http://localhost:3000",
     openGraphImageFallback:
       process.env.NEXT_PUBLIC_FRONTEND_URL + "/fallback-og-image.png",
   },

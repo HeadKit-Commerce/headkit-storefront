@@ -14,17 +14,22 @@ import {
   ShippingRate,
 } from "@/lib/headkit/generated";
 import { Elements } from "@stripe/react-stripe-js";
+import { Stripe } from "@stripe/stripe-js";
 import { currencyFormatter, getFloatVal } from "@/lib/utils";
 import { useAppContext } from "../../contexts/app-context";
 import {
   checkout,
-  getCustomer,
-  getPickupLocations,
 } from "@/lib/headkit/actions";
+import {
+  getCustomer,
+} from "@/lib/headkit/queries-dynamic";
+import {
+  getPickupLocations,
+} from "@/lib/headkit/queries";
 import { v7 as uuidv7 } from "uuid";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExpressCheckout } from "../stripe/express-checkout";
-import { useStripe } from "@/contexts/stripe-context";
+import { useStripeConfig } from "@/contexts/stripe-context";
 import { useRouter } from "next/navigation";
 import { updatePaymentIntentDescription } from "@/lib/stripe/actions";
 import Cookies from "js-cookie";
@@ -65,7 +70,8 @@ interface FormData {
 
 const CheckoutForm = () => {
   const router = useRouter();
-  const { cartData, isLiveMode } = useAppContext();
+  const { cartData } = useAppContext();
+  const { isLiveMode } = useStripeConfig();
   
   // Determine if payment is needed based on cart total
   const cartTotal = getFloatVal(cartData?.total ?? "0");
@@ -127,7 +133,23 @@ const CheckoutForm = () => {
   }>>([]);
   const [isLoadingPickupLocations, setIsLoadingPickupLocations] = useState(true);
 
-  const { stripe } = useStripe();
+  const { loadStripe, publishableKey } = useStripeConfig();
+  const [stripe, setStripe] = useState<Promise<Stripe | null> | null>(null);
+  const [stripeLoading, setStripeLoading] = useState(false);
+
+  // Load Stripe when we have a publishable key (needed for contact/address collection even for free orders)
+  useEffect(() => {
+    if (publishableKey && !stripe && !stripeLoading) {
+      setStripeLoading(true);
+      const stripePromise = loadStripe();
+      setStripe(stripePromise);
+      stripePromise.then(() => {
+        setStripeLoading(false);
+      }).catch(() => {
+        setStripeLoading(false);
+      });
+    }
+  }, [publishableKey, stripe, stripeLoading, loadStripe]);
 
   useEffect(() => {
     const fetchCustomer = async () => {

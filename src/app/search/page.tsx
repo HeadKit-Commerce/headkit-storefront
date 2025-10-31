@@ -1,5 +1,5 @@
 import { CollectionPage } from "@/components/collection/collection-page";
-import { getProductFilters, getProductList } from "@/lib/headkit/actions";
+import { getProductFilters, getProductList } from "@/lib/headkit/queries";
 import { makeWhereProductQuery } from "@/components/collection/utils";
 import { CollectionHeader } from "@/components/collection/collection-header";
 import { SortKeyType } from "@/components/collection/utils";
@@ -30,15 +30,13 @@ export default async function Page({ searchParams }: Props) {
   const [{ data: initialProducts }, { data: productFilter }] =
     await Promise.all([
       getProductList({
-        input: {
-          where: makeWhereProductQuery({
-            filterQuery: filterState,
-            page: pageNumber,
-            perPage: itemsPerPage,
-            search: searchQuery,
-          }),
-          first: itemsPerPage,
-        },
+        where: makeWhereProductQuery({
+          filterQuery: filterState,
+          page: pageNumber,
+          perPage: itemsPerPage,
+          search: searchQuery,
+        }),
+        first: itemsPerPage,
       }),
       getProductFilters(),
     ]);

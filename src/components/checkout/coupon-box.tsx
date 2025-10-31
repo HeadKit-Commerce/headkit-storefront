@@ -14,8 +14,8 @@ import {
   removeCoupons,
   applyGiftCard,
   removeGiftCard,
-  getCart,
 } from "@/lib/headkit/actions";
+import { getCart } from "@/lib/headkit/queries-dynamic";
 
 const isValidGiftCardFormat = (code: string) => {
   const regex = /^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/;

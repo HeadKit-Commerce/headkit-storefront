@@ -1,54 +1,36 @@
 "use client";
-
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-
+import { Carousel } from "./carousel";
 import Image from "next/image";
-import Autoplay from "embla-carousel-autoplay";
 
 interface Props {
   brands: { name: string; thumbnail: string; slug: string }[];
 }
 
 const BrandCarousel = ({ brands }: Props) => {
+  const filteredBrands = brands.filter(item => item?.thumbnail);
+  
   return (
     <Carousel
-      plugins={[
-        Autoplay({
-          delay: 3000,
-          stopOnInteraction: true,
-        }),
-      ]}
-      opts={{
-        align: "start",
-        loop: true,
-      }}
+      items={filteredBrands}
+      renderItem={(item) => (
+        <div className="relative h-[50px] w-[160px]">
+          <Image
+            alt={item?.name}
+            src={item?.thumbnail}
+            fill
+            className="object-contain object-center"
+          />
+        </div>
+      )}
       className="w-full"
-    >
-      <CarouselContent className="-ml-[30px]">
-        {brands.map(
-          (item, index) =>
-            item?.thumbnail && (
-              <CarouselItem
-                key={index}
-                className="basis-1/2 md:basis-1/3 lg:basis-1/5 pl-[30px]"
-              >
-                <div className="relative h-[50px] w-[160px]">
-                  <Image
-                    alt={item?.name}
-                    src={item?.thumbnail}
-                    fill
-                    className="object-contain object-center"
-                  />
-                </div>
-              </CarouselItem>
-            )
-        )}
-      </CarouselContent>
-    </Carousel>
+      autoplay={{
+        enabled: true,
+        delay: 3000,
+        stopOnInteraction: true,
+      }}
+      loop={true}
+      showPagination={false}
+    />
   );
 };
 

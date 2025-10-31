@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
 import {
   checkout,
-  getStoreSettings,
-  getStripeConfig,
   updatePaymentIntent,
 } from '@/lib/headkit/actions';
+import {
+  getStoreSettings,
+  getStripeConfig,
+} from '@/lib/headkit/queries';
 import { v7 as uuidv7 } from 'uuid';
 import {
   getCheckoutData,
@@ -29,14 +31,20 @@ export async function GET(request: Request) {
     getStripeConfig(),
   ]);
 
-  // Determine which Stripe key to use
-  const { stripeKey } = determineStripeKey(
-    stripeConfig.data.stripeConfig,
-    storeSettings.data.storeSettings
-  );
+  // Determine which Stripe key to use with new utility function
+  const config = determineStripeKey({
+    backendConfig: stripeConfig.data.stripeConfig 
+      ? {
+          publishableKeyTest: stripeConfig.data.stripeConfig.publishableKeyTest,
+          publishableKeyLive: stripeConfig.data.stripeConfig.publishableKeyLive,
+          accountId: stripeConfig.data.stripeConfig.accountId,
+        }
+      : undefined,
+    paymentMode: storeSettings.data.storeSettings?.paymentMode,
+  });
 
-  const stripe = new Stripe(stripeKey, {
-    stripeAccount: stripeConfig.data.stripeConfig.accountId,
+  const stripe = new Stripe(config.publishableKey, {
+    ...(config.accountId ? { stripeAccount: config.accountId } : {}),
   });
 
   const paymentIntentData = await stripe.paymentIntents.retrieve(paymentIntent, {

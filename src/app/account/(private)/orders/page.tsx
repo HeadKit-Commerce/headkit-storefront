@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getOrders } from "@/lib/headkit/actions";
+import { getOrders } from "@/lib/headkit/queries-dynamic";
 import { Button } from "@/components/ui/button";
 import { Order } from "@/lib/headkit/generated";
 

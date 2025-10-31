@@ -10,7 +10,7 @@ import {
 } from "@/lib/headkit/generated";
 import { processText } from "@/lib/utils";
 import sanitize from "sanitize-html";
-import { getPost, getPosts } from "@/lib/headkit/actions";
+import { getPost, getPosts } from "@/lib/headkit/queries";
 
 interface Props {
   params: Promise<{ slug: string[] }>;

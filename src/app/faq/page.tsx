@@ -3,12 +3,12 @@ import { Metadata } from "next";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import sanitize from "sanitize-html";
 import { makeSEOMetadata } from "@/lib/headkit/utils/make-metadata";
-import { headkit } from "@/lib/headkit/client";
+import { getPage, getFAQs } from "@/lib/headkit/queries";
 
 const FAQ_SLUG = "faq";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await headkit().getPage({
+  const { data } = await getPage({
     id: FAQ_SLUG,
     type: PageIdType.Uri,
   });
@@ -35,11 +35,11 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function FAQPage() {
   // Fetch page content and FAQs in parallel
   const [pageData, faqsData] = await Promise.all([
-    headkit().getPage({
+    getPage({
       id: FAQ_SLUG,
       type: PageIdType.Uri,
     }),
-    headkit().getFAQs({
+    getFAQs({
       where: {
         orderby: [{
           field: PostObjectsConnectionOrderbyEnum.Date,

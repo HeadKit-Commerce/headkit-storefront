@@ -4,7 +4,8 @@ import { useAppContext } from "@/contexts/app-context";
 import { ProductCard } from "@/components/product/product-card";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/icon";
-import { actionWishlist, getProductList } from "@/lib/headkit/actions";
+import { actionWishlist } from "@/lib/headkit/actions";
+import { getProductList } from "@/lib/headkit/queries";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
@@ -16,7 +17,7 @@ export default function Page() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data: products } = await getProductList({ input: { where: { include: wishlists } } });
+      const { data: products } = await getProductList({ where: { include: wishlists } });
       setProducts(products.products?.nodes as ProductContentFullWithGroupFragment[] || []);
     };
     fetchProducts();

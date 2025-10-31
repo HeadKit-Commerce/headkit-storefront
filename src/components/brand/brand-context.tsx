@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { GetBrandsQuery, TermObjectsConnectionOrderbyEnum } from "@/lib/headkit/generated/index";
-import { getBrandList } from "@/lib/headkit/actions";
+import { getBrands as getBrandList } from "@/lib/headkit/queries";
 import { SortKeyType } from "./utils";
 
 interface FilterValues {
@@ -137,12 +137,10 @@ export function BrandProvider({
         const sort = params.get("sort") || undefined;
 
         const response = await getBrandList({
-          input: {
-            first: itemsPerPage,
-            after: page > 0 ? btoa(`arrayconnection:${(page - 1) * itemsPerPage}`) : undefined,
-            where: {
-              orderby: sort ? TermObjectsConnectionOrderbyEnum.Name : undefined,
-            },
+          first: itemsPerPage,
+          after: page > 0 ? btoa(`arrayconnection:${(page - 1) * itemsPerPage}`) : undefined,
+          where: {
+            orderby: sort ? TermObjectsConnectionOrderbyEnum.Name : undefined,
           },
         });
         

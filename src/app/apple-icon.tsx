@@ -1,4 +1,4 @@
-import { headkit } from "@/lib/headkit/client";
+import { getBranding } from "@/lib/headkit/queries";
 import { ImageResponse } from "next/og";
 
 // Image metadata
@@ -12,10 +12,7 @@ export const contentType = "image/svg+xml";
 export default async function Icon() {
   const {
     data: { branding },
-  } = await headkit({
-    revalidateTags: ["headkit:branding"],
-    revalidateTime: 60
-  }).getBranding();
+  } = await getBranding();
   
   const alt = "Icon";
   const iconSize = 24;

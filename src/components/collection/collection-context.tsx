@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getProductList } from "@/lib/headkit/actions";
+import { getProductList } from "@/lib/headkit/queries";
 import { GetProductFiltersQuery, GetProductListQuery, ProductContentFullWithGroupFragment } from "@/lib/headkit/generated";
 import { makeWhereProductQuery, SortKeyType } from "./utils";
 
@@ -158,18 +158,16 @@ export function CollectionProvider({
       }
 
       const { data: fetchedProducts } = await getProductList({
-        input: {
-          where: makeWhereProductQuery({
-            filterQuery: queryFilters,
-            categorySlug,
-            page: pageIndex,
-            perPage: itemsPerPage,
-            onSale,
-            search,
-            newIn,
-          }),
-          first: itemsPerPage,
-        },
+        where: makeWhereProductQuery({
+          filterQuery: queryFilters,
+          categorySlug,
+          page: pageIndex,
+          perPage: itemsPerPage,
+          onSale,
+          search,
+          newIn,
+        }),
+        first: itemsPerPage,
       });
 
       const newProducts = (fetchedProducts?.products?.nodes || []) as ProductContentFullWithGroupFragment[];
