@@ -43,6 +43,14 @@ export async function GET(request: Request) {
     paymentMode: storeSettings.data.storeSettings?.paymentMode,
   });
 
+  // Debug logging for checkout confirm mode determination
+  console.log('[Checkout Confirm - Stripe Mode]', {
+    paymentIntent: paymentIntent,
+    paymentMode: storeSettings.data.storeSettings?.paymentMode,
+    selectedMode: config.isUsingTestKey ? 'test' : 'live',
+    hasAccountId: !!config.accountId,
+  });
+
   const stripe = new Stripe(config.publishableKey, {
     ...(config.accountId ? { stripeAccount: config.accountId } : {}),
   });

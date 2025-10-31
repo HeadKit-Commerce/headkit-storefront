@@ -62,6 +62,14 @@ const StripePaymentStep = React.forwardRef<
       if (stripe && elements) {
         await elements?.submit();
 
+        // Debug logging for payment intent creation
+        console.log('[Payment Step - Creating Payment Intent]', {
+          amount: getFloatVal(cartData?.total ?? "0") > 0
+            ? Math.round(getFloatVal(cartData?.total ?? "0") * 100)
+            : 9900,
+          currency: "aud",
+        });
+
         const { data: paymentIntentData } = await createPaymentIntent({
           amount:
             getFloatVal(cartData?.total ?? "0") > 0
@@ -70,7 +78,11 @@ const StripePaymentStep = React.forwardRef<
           currency: "aud",
         });
 
-  
+        console.log('[Payment Step - Payment Intent Created]', {
+          paymentIntentId: paymentIntentData.createPaymentIntent.id,
+          hasClientSecret: !!paymentIntentData.createPaymentIntent.clientSecret,
+        });
+
 
         // Submit the pending status and wait for it to complete
         const pendingResult = await onSubmit({

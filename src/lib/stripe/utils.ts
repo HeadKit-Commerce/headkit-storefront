@@ -94,8 +94,13 @@ export function determineStripeKey(
     }
 
     // Select the appropriate key
+    // Important: Backend only sends publishableKeyLive for PAID plans
+    // FREE plans will only receive publishableKeyTest, ensuring they always use test mode
     let publishableKey: string;
     if (shouldUseTestKey || !publishableKeyLive) {
+      // Use test key if:
+      // 1. Store settings say test mode, OR
+      // 2. Backend didn't send live key (FREE plan or no live key configured)
       if (!publishableKeyTest) {
         throw new Error(
           "Backend Stripe configuration is missing publishableKeyTest"
@@ -106,12 +111,25 @@ export function determineStripeKey(
       publishableKey = publishableKeyLive;
     }
 
-    return {
+    const result = {
       publishableKey,
       accountId, // Include accountId for Stripe Connect
       isUsingTestKey: publishableKey.startsWith('pk_test_'),
-      mode: 'backend_connect',
+      mode: 'backend_connect' as const,
     };
+
+    // Debug logging for mode determination
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Stripe Mode Determination]', {
+        source: 'backend_connect',
+        paymentMode: paymentMode,
+        hasLiveKey: !!publishableKeyLive,
+        selectedMode: result.isUsingTestKey ? 'test' : 'live',
+        reason: !publishableKeyLive ? 'no_live_key_from_backend' : (shouldUseTestKey ? 'store_settings_test' : 'store_settings_live'),
+      });
+    }
+
+    return result;
   }
 
   // No configuration available
