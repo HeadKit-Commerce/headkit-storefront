@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build --debug-prerender",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "generate": "dotenvx run -f .env.local -- gql-gen --config src/lib/headkit/codegen.ts"
