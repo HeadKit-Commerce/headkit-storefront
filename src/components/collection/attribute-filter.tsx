@@ -5,7 +5,6 @@ import { FormControl, FormItem } from "@/components/ui/form";
 import { useCollection } from "./collection-context";
 import { VariantSwatch } from "@/components/product/product-variations/variant-swatch";
 import { GetProductFiltersQuery } from "@/lib/headkit/generated";
-import { FilterValues } from "./types";
 import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 
@@ -44,7 +43,7 @@ export const AttributeFilter = ({ attribute }: AttributeFilterProps) => {
             typeof value === 'string' && value !== null && value !== undefined && value !== ''
           );
 
-          const newFilterValues: FilterValues = {
+          const newFilterValues = {
             categories: filterValues.categories,
             brands: filterValues.brands,
             attributes: newAttributes,

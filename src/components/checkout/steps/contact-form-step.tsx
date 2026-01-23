@@ -21,7 +21,7 @@ import { useAuth } from "@/contexts/auth-context";
 
 const contactSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
-  newsletter: z.boolean().optional().default(false),
+  newsletter: z.boolean(),
 });
 
 interface ContactFormStepProps {

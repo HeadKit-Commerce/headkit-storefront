@@ -5,7 +5,7 @@ import { SortKeyType } from "./utils";
 export const filterSchema = z.object({
   categories: z.array(z.string()).default([]),
   brands: z.array(z.string()).default([]),
-  attributes: z.record(z.array(z.string())).default({}),
+  attributes: z.record(z.string(), z.array(z.string())).default({}),
   instock: z.boolean().default(false),
   sort: z.string().transform((val): SortKeyType | "" => val as SortKeyType | "").default(""),
   page: z.number().default(0),

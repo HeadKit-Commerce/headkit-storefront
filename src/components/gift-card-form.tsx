@@ -35,7 +35,7 @@ export enum DeliveryType {
 export interface GiftCardFormValues {
   wc_gc_giftcard_to_multiple: string;
   wc_gc_giftcard_from: string;
-  wc_gc_giftcard_message: string;
+  wc_gc_giftcard_message?: string;
   wc_gc_giftcard_delivery: string;
   wc_gc_giftcard_select_delivery: DeliveryType;
 }
