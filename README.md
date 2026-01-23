@@ -133,7 +133,7 @@ Edit `next.config.ts` for:
 
 Deploy to [Vercel](https://vercel.com) for the best experience:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-repo/headkit-store-template)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/HeadKit-Commerce/headkit-storefront)
 
 Or build and run anywhere:
 
